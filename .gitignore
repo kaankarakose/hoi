@@ -5,3 +5,13 @@ src/hamer/_DATA
 src/hamer/hand/_DATA
 src/hamer/hand/thirdparty/hamer/_DATA
 src/hamer/hand/thirdparty/hamer/third-party/ViTPose
+src/hamer/hand/thirdparty/hamer/third-party/ViTPose/_DATA
+src/hamer/hand/thirdparty/hamer/third-party/ViTPose/
+src/hamer/hand/thirdparty/hamer
+src/hamer/hand/thirdparty/hamer/_DATA
+src/hamer/hand/thirdparty/hamer/_DATA/vitpose_ckpts/vitpose+_huge
+src/hamer/hand/thirdparty/hamer/_DATA/vitpose_ckpts
+src/hamer/hand/thirdparty/hamer/_DATA/hamer_ckpts/checkpoints
+src/hamer/hand/thirdparty/hamer/_DATA/hamer_ckpts
+src/cnos/datasets/bop23_challenge/pretrained/segment-anything/sam_vit_h_4b8939.pth
+src/cnos/datasets/bop23_challenge/pretrained/FastSAM/FastSAM-x.pt
