@@ -15,3 +15,5 @@ src/hamer/hand/thirdparty/hamer/_DATA/hamer_ckpts/checkpoints
 src/hamer/hand/thirdparty/hamer/_DATA/hamer_ckpts
 src/cnos/datasets/bop23_challenge/pretrained/segment-anything/sam_vit_h_4b8939.pth
 src/cnos/datasets/bop23_challenge/pretrained/FastSAM/FastSAM-x.pt
+
+src/hamer/hand/testing_outputs
