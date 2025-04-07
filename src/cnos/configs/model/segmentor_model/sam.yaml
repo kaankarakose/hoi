@@ -1,0 +1,54 @@
+_target_: src.model.sam.CustomSamAutomaticMaskGenerator
+points_per_side: 16
+points_per_batch: 16
+pred_iou_thresh: 0.88          # Lowered to capture more complete objects
+stability_score_thresh: 0.90    # Lowered to be more inclusive
+stability_score_offset: 1.5    # Increased to favor larger, more complete masks
+box_nms_thresh: 0.5            # Lowered to reduce overlapping partial masks
+crop_n_layers: 0 # 
+crop_nms_thresh: 0.8
+crop_overlap_ratio: 0.2
+crop_n_points_downscale_factor: 2
+min_mask_region_area: 1        # 
+output_mode: "binary_mask"
+sam:
+  _target_: src.model.sam.load_sam
+  model_type: vit_h
+  checkpoint_dir: ${machine.root_dir}/pretrained/segment-anything/
+
+
+
+
+
+
+# _target_: src.model.sam.CustomSamAutomaticMaskGenerator
+# points_per_side: 8
+# points_per_batch: 16
+# pred_iou_thresh: 0.88          # Lowered to capture more complete objects
+# stability_score_thresh: 0.95    # Lowered to be more inclusive
+# stability_score_offset: 1.0    # Increased to favor larger, more complete masks
+# box_nms_thresh: 0.5            # Lowered to reduce overlapping partial masks
+# crop_n_layers: 0 # 
+# crop_nms_thresh: 0.8
+# crop_overlap_ratio: 0.2
+# crop_n_points_downscale_factor: 2
+# min_mask_region_area: 300        # Increased to focus on more substantial objects
+# output_mode: "binary_mask"
+# sam:
+#   _target_: src.model.sam.load_sam
+#   model_type: vit_h
+#   checkpoint_dir: ${machine.root_dir}/pretrained/segment-anything/
+
+
+
+# _target_: src.model.sam.CustomSamAutomaticMaskGenerator
+# points_per_batch: 64
+# stability_score_thresh: 0.97
+# box_nms_thresh: 0.7
+# min_mask_region_area: 0
+# crop_overlap_ratio: 
+# segmentor_width_size: ${model.segmentor_width_size}
+# sam:
+#   _target_: src.model.sam.load_sam
+#   model_type: vit_h
+#   checkpoint_dir: ${machine.root_dir}/pretrained/segment-anything/

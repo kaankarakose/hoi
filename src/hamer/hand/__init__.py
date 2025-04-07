@@ -1,0 +1,3 @@
+"""
+Hand detection module package.
+"""

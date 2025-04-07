@@ -1,0 +1,7 @@
+camera_params
+processed_data
+raw_data
+src/hamer/_DATA
+src/hamer/hand/_DATA
+src/hamer/hand/thirdparty/hamer/_DATA
+src/hamer/hand/thirdparty/hamer/third-party/ViTPose
