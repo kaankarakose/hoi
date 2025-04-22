@@ -137,7 +137,6 @@ def visualize(rgb, detections, save_path="./tmp/tmp.png"):
 
     masks = getattr(detections, 'masks')
     object_ids = getattr(detections, 'object_ids')
-    #TODO: I need to take care of unshaped masks!! --> conf_threshold
     for mask_idx in range(len(detections)):
         # Convert mask to numpy and threshold to get boolean mask
         mask = masks[mask_idx]

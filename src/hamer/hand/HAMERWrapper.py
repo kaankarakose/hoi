@@ -210,6 +210,8 @@ class HAMERWrapper:
                 is_right.append(1)
                 keypoints_list.append(keyp)
         
+        if len(bboxes) == 0:
+            return False
         
         boxes = np.stack(bboxes)
         right = np.stack(is_right)
@@ -231,7 +233,7 @@ class HAMERWrapper:
             
             # Process camera parameters
             multiplier = (2*batch['right']-1)
-            pred_cam = out['pred_cam']
+            pred_cam = out['pred_cam'] ## TODO: I have camera parameters!!
             pred_cam[:, 1] = multiplier*pred_cam[:, 1]
             box_center = batch["box_center"].float()
             box_size = batch["box_size"].float()
@@ -342,12 +344,15 @@ class HAMERWrapper:
         all_cam_t = []
         all_right = []
         
-        if self.right_hands is not None:
-            all_verts.append(self.right_hands[0].vertices)
-            all_cam_t.append(self.right_hands[0].cam_t)
-            all_right.append(1)
+        if self.right_hands != []:
+            try:
+                all_verts.append(self.right_hands[0].vertices)
+                all_cam_t.append(self.right_hands[0].cam_t)
+                all_right.append(1)
+            except:
+                print(self.right_hands)
         
-        if self.left_hands is not None:
+        if self.left_hands != []:
             all_verts.append(self.left_hands[0].vertices)
             all_cam_t.append(self.left_hands[0].cam_t)
             all_right.append(0)

@@ -46,7 +46,7 @@ def load_config():
     
     return Config()
 
-def get_original_frame(npz_path, frame_index=None, frame_path=None):
+def get_original_frame(npz_path, frame_path=None):
     """Find the original frame corresponding to the NPZ file
     
     Args:
@@ -58,20 +58,18 @@ def get_original_frame(npz_path, frame_index=None, frame_path=None):
   
     return cv2.imread(str(frame_path))
 
-def get_bounding_box(npz_path, frame_index=None):
+def get_bounding_box(npz_path):
     """Get the bounding box for the hand from the bounding_boxes.json file"""
     # Extract frame index from NPZ filename if not provided
-    if frame_index is None:
-        frame_index = int(os.path.basename(npz_path).split('_')[-1].split('.')[0])
     
+    frame_index = int(os.path.basename(npz_path).split('_')[-1].split('.')[0])
+    print(f"Using frame index from filename: {frame_index}")
     # Path to the bounding boxes JSON file
     data_dir = Path(npz_path).parent.parent
     bbox_path = data_dir / "bounding_boxes.json"
     
     if not bbox_path.exists():
-        print(f"Warning: Bounding boxes file not found at {bbox_path}")
-        return None
-    
+        raise ValueError(f"Warning: Bounding boxes file not found at {bbox_path}")
     # Load the bounding boxes
     with open(bbox_path, 'r') as f:
         bbox_data = json.load(f)
@@ -84,10 +82,10 @@ def get_bounding_box(npz_path, frame_index=None):
         bbox = bbox_data[frame_key].get(box_key)
         return bbox
     else:
-        print(f"Warning: No bounding box found for frame {frame_index}")
-        return None
+         raise ValueError(f"Warning: No bounding box found for frame {frame_index}")
+        
 
-def visualize_with_image(npz_path, output_dir=None, frame_index=None, frame_path=None):
+def visualize_with_image(npz_path, output_dir=None, frame_path=None):
     """
     Visualize hand mesh alongside the original image
     
@@ -102,7 +100,9 @@ def visualize_with_image(npz_path, output_dir=None, frame_index=None, frame_path
     # Load the NPZ file
     print(f"Loading hand data from: {npz_path}")
     hand_data = np.load(npz_path, allow_pickle=True)
-    
+    # get frame index for visul
+    frame_index = int(os.path.basename(npz_path).split('_')[-1].split('.')[0])
+
     # Extract hand data
     vertices = hand_data['vertices']
     cam_t = hand_data.get('cam_t', None)
@@ -117,28 +117,17 @@ def visualize_with_image(npz_path, output_dir=None, frame_index=None, frame_path
     if bbox is not None:
         print(f"- Bounding box from NPZ: {bbox}")
     
-    # Get the frame index from the filename if not provided
-    if frame_index is None:
-        frame_index = int(os.path.basename(npz_path).split('_')[-1].split('.')[0])
-        print(f"Using frame index from filename: {frame_index}")
-    
+
     # Load the original frame
-    original_frame = get_original_frame(npz_path, frame_index, frame_path)
+    original_frame = get_original_frame(npz_path, frame_path)
     if original_frame is None:
         print("No original frame found. Creating blank image.")
         original_frame = np.zeros((800, 800, 3), dtype=np.uint8)
     
     # Get the bounding box
     if bbox is None:
-        bbox = get_bounding_box(npz_path, frame_index)
-        if bbox is not None:
-            print(f"- Bounding box from JSON: {bbox}")
-        else:
-            print("No bounding box found. Using default values.")
-            # Create a default bounding box in the center of the image
-            h, w = original_frame.shape[:2]
-            bbox = [w//4, h//4, w*3//4, h*3//4]
-    
+        bbox = get_bounding_box(npz_path)
+
     # Load MANO faces
     faces = load_mano_faces()
     
@@ -286,7 +275,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize hand data alongside original image")
     parser.add_argument("npz_path", help="Path to the NPZ file containing hand data")
     parser.add_argument("--output-dir", help="Directory to save the visualization", default="./")
-    parser.add_argument("--frame", type=int, help="Specific frame number to use for visualization", default=None)
     parser.add_argument("--frame-path", help="Direct path to a specific frame image file (overrides --frame)", default=None)
     
     args = parser.parse_args()
@@ -294,10 +282,10 @@ if __name__ == "__main__":
     # Check which method is being used to specify the frame
     if args.frame_path is not None:
         print(f"Using specified frame path: {args.frame_path}")
-    elif args.frame is not None:
-        print(f"Using specified frame number: {args.frame}")
     else:
         print("No specific frame specified, will detect automatically from NPZ filename")
     
     # Visualize hand with image
-    visualize_with_image(args.npz_path, args.output_dir, frame_index=args.frame, frame_path=args.frame_path)
+    visualize_with_image(args.npz_path,
+                        args.output_dir,
+                        frame_path=args.frame_path)

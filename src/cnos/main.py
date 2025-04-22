@@ -26,7 +26,7 @@ def process_video_session(video_name, video_path, objects_dir, objects_list, out
     for camera_view in camera_views:
 
         # Process camera view
-        if camera_view in ['cam_side_l','cam_side_r']: continue
+        if camera_view in ['cam_top','cam_side_r']: continue
             
         camera_path = os.path.join(video_path, camera_view)
         print(f'{camera_path} is processing')

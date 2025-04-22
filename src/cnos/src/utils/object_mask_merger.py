@@ -125,6 +125,201 @@ class ObjectAwareMaskMerger:
             List of MergedDetection objects
         """
         # Extract masks from detections
+        masks = [det.masks for det in detections]
+        num_masks = len(masks)
+        
+        if num_masks == 0:
+            return None
+        
+        print('Number of masks:', num_masks)
+        
+        # Generate descriptors for individual masks (this is likely a bottleneck)
+        descriptors = self.descriptor_model.forward(image, detections)  # [N_masks, DinoV2]
+
+        # Compute initial similarity scores with reference features - vectorized operation
+        # Shape: [N_masks, N_objects]
+        # Reshape tensors once instead of using None index multiple times
+        descriptors_reshaped = descriptors.unsqueeze(1)  # [N_masks, 1, D]
+        ref_features_reshaped = ref_features.unsqueeze(0)  # [1, N_objects, D]
+        initial_scores = self.similarity_metric(descriptors_reshaped, ref_features_reshaped).squeeze()
+
+        # Find best match for each mask
+        best_match_indices = torch.argmax(initial_scores, dim=1)  # [N_masks]
+        best_match_scores = torch.gather(
+            initial_scores, 1, 
+            best_match_indices.unsqueeze(1)
+        ).squeeze()  # [N_masks]
+        
+        # Pre-filter by confidence threshold - speeds up by reducing candidates early
+        valid_mask_indices = torch.where(best_match_scores >= conf_threshold / 2)[0].cpu().numpy()
+        
+        if len(valid_mask_indices) == 0:
+            return None
+            
+        # Only create MergedDetections for masks that pass the threshold
+        merged_detections = []
+        for i in valid_mask_indices:
+            current_mask = masks[i]
+            merged_detections.append(MergedDetection(
+                mask=current_mask,
+                component_indices=[i],
+                score=best_match_scores[i].item(),
+                descriptor=descriptors[i].detach().cpu().numpy()
+            ))
+
+        # Early return if only one mask
+        if len(merged_detections) == 1:
+            return merged_detections
+        
+        # Cache for neighbor checks to avoid repeated computations
+        neighbor_cache = {}
+        
+        # Try merging masks
+        improved = True
+        iteration = 0
+        max_iterations = min(num_masks * 2, 20)  # Avoid excessive iterations, cap at 20
+        
+        # Track which masks have been merged
+        merged_mask_indices = set()
+        
+        while improved and iteration < max_iterations:
+            improved = False
+            iteration += 1
+            
+            # Prepare potential merges to evaluate
+            potential_merges = []
+            
+            # First pass: Find all potential merges without computing descriptors yet
+            for i in range(len(merged_detections)):
+                if i in merged_mask_indices:
+                    continue
+                    
+                merged_i = merged_detections[i]
+                
+                for j in range(i + 1, len(merged_detections)):  # Start from i+1 to avoid duplicate checks
+                    if j in merged_mask_indices:
+                        continue
+                        
+                    merged_j = merged_detections[j]
+                    
+                    # Check if masks are neighbors using cached results if available
+                    cache_key = tuple(sorted([id(merged_i.mask), id(merged_j.mask)]))
+                    if cache_key in neighbor_cache:
+                        are_neighbors = neighbor_cache[cache_key]
+                    else:
+                        are_neighbors = self.check_if_neighbors(merged_i.mask, merged_j.mask)
+                        neighbor_cache[cache_key] = are_neighbors
+                    
+                    if not are_neighbors:
+                        continue
+                    
+                    # Add to potential merges list
+                    potential_merges.append((i, j))
+            
+            # Second pass: Evaluate all potential merges in batch if possible
+            best_merges = {}  # i -> (j, improvement, merged_mask, merged_descriptor)
+            
+            for i, j in potential_merges:
+                merged_i = merged_detections[i]
+                merged_j = merged_detections[j]
+                
+                # Create a merged mask
+                if isinstance(merged_i.mask, torch.Tensor):
+                    # Handle PyTorch tensors
+                    mask1 = merged_i.mask.cpu() if merged_i.mask.device.type == 'cuda' else merged_i.mask
+                    mask2 = merged_j.mask.cpu() if merged_j.mask.device.type == 'cuda' else merged_j.mask
+                    
+                    # Fast path: use logical_or directly
+                    merged_mask = torch.logical_or(mask1, mask2)
+                
+                # Skip additional validation to improve speed
+                
+                # Create a temporary detection with the merged mask
+                merged_detection = {
+                    "mask": merged_mask,
+                    "bbox": self._mask_to_bbox(merged_mask)
+                }
+                
+                # Generate descriptor for the merged mask
+                merged_descriptor = self.descriptor_model.forward(
+                    np.array(image), merged_detection
+                )[0]  # [D]
+                
+                # Compute similarity score for the merged mask - avoid reshaping multiple times
+                merged_descriptor_reshaped = merged_descriptor.unsqueeze(0).unsqueeze(1)
+                merged_score = self.similarity_metric(
+                    merged_descriptor_reshaped,
+                    ref_features_reshaped
+                ).squeeze()
+                
+                # Get score for the best matching object
+                best_obj_idx = best_match_indices[merged_i.component_indices[0]].item()
+                merged_obj_score = merged_score[best_obj_idx].item()
+                
+                # Calculate improvement
+                improvement = merged_obj_score - max(merged_i.score, merged_j.score)
+                
+                # Track the best merge for each mask i
+                if improvement > 0:  # Only consider positive improvements
+                    if i not in best_merges or improvement > best_merges[i][1]:
+                        best_merges[i] = (j, improvement, merged_mask, merged_descriptor)
+            
+            # Apply all the best merges
+            # Sort by improvement to prioritize most beneficial merges
+            sorted_merges = sorted(best_merges.items(), key=lambda x: x[1][1], reverse=True)
+            
+            for i, (j, improvement, merged_mask, merged_descriptor) in sorted_merges:
+                # Skip if either mask has already been merged
+                if i in merged_mask_indices or j in merged_mask_indices:
+                    continue
+                
+                improved = True
+                merged_i = merged_detections[i]
+                merged_j = merged_detections[j]
+                
+                # Create a new merged detection
+                new_merged = MergedDetection(
+                    mask=merged_mask,
+                    component_indices=merged_i.component_indices + merged_j.component_indices,
+                    score=merged_i.score + improvement,
+                    descriptor=merged_descriptor.detach().cpu().numpy()
+                )
+                
+                # Mark the merged detections as processed
+                merged_mask_indices.add(j)
+                
+                # Replace the current detection with the merged one
+                merged_detections[i] = new_merged
+            
+            # Remove the merged detections - more efficient than creating a new list
+            merged_detections = [md for idx, md in enumerate(merged_detections) 
+                               if idx not in merged_mask_indices]
+            merged_mask_indices = set()  # Reset for next iteration
+            
+            # Early termination if no improvements found
+            if not improved:
+                break
+        
+        return merged_detections
+
+
+    def merge_masks_v2(self, 
+                   image: np.ndarray, 
+                   detections: Detections, 
+                   ref_features: torch.Tensor,
+                   conf_threshold: float) -> List[MergedDetection]:
+        """
+        Merge masks that likely belong to the same object.
+        
+        Args:
+            image: RGB image as numpy array
+            detections: List of detection objects with masks
+            ref_features: Reference features to compare against [N_images, D]
+            
+        Returns:
+            List of MergedDetection objects
+        """
+        # Extract masks from detections
 
         # Extract masks and ensure they're 2D
         masks = []
@@ -183,10 +378,13 @@ class ObjectAwareMaskMerger:
         # Track which masks have been merged
         merged_mask_indices = set()
         
+        # Sort merged detections by score
+        merged_detections.sort(key=lambda x: x.score, reverse=True)
+
         # Try merging masks
         improved = True
         iteration = 0
-        max_iterations = num_masks * 2  # Avoid infinite loops
+        max_iterations =min(num_masks * 2, 20)  # Avoid infinite loops
         
         while improved and iteration < max_iterations:
             improved = False
@@ -222,18 +420,18 @@ class ObjectAwareMaskMerger:
                         mask2 = merged_j.mask.cpu() if merged_j.mask.device.type == 'cuda' else merged_j.mask
                         
                         # Validate mask dimensions before merging
-                        if len(mask1.shape) != 2:
-                            raise ValueError(f"1D mask detected before merging, mask1 shape: {mask1.shape}")
-                        if len(mask2.shape) != 2:
-                            raise ValueError(f"1D mask detected before merging, mask2 shape: {mask2.shape}")
+                        # if len(mask1.shape) != 2:
+                        #     raise ValueError(f"1D mask detected before merging, mask1 shape: {mask1.shape}")
+                        # if len(mask2.shape) != 2:
+                        #     raise ValueError(f"1D mask detected before merging, mask2 shape: {mask2.shape}")
                             
                         merged_mask = torch.logical_or(mask1, mask2)
                         
-                        if isinstance(merged_mask, torch.Tensor) and (merged_mask.shape[0] == 1 or merged_mask.shape[1] == 1):
-                            raise ValueError('merged mask has 1 in dimension!')
-                        # Validate merged mask dimensions
-                        if len(merged_mask.shape) != 2:
-                            raise ValueError(f"1D mask created after merging, merged_mask shape: {merged_mask.shape}")
+                        # if isinstance(merged_mask, torch.Tensor) and (merged_mask.shape[0] == 1 or merged_mask.shape[1] == 1):
+                        #     raise ValueError('merged mask has 1 in dimension!')
+                        # # Validate merged mask dimensions
+                        # if len(merged_mask.shape) != 2:
+                        #     raise ValueError(f"1D mask created after merging, merged_mask shape: {merged_mask.shape}")
        
                     
                     # Create a temporary detection with the merged mask

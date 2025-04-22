@@ -90,7 +90,7 @@ class VideoProcessor:
         
         # Crop the image
         crop = image[y1_pad:y2_pad, x1_pad:x2_pad].copy()
-        return crop
+        return crop, [x1_pad, y1_pad, x2_pad, y2_pad]
     
     def _save_outputs(self, session_name, camera_view, frame_index, hands, image):
         """
@@ -133,26 +133,23 @@ class VideoProcessor:
         right_bbox = np.array([0,0,0,0])
 
         # Process left hand
-        if hands['left'] is not None and len(hands['left']) > 0:
+        if hands['left'] != []:
             left_bbox = hands['left'][0].bbox
 
-            # Expand bounding box for each additional hand
-            for hand in hands['left'][1:]:
-                current_bbox = hand.bbox
-                left_bbox = np.array([
-                        min(left_bbox[0], current_bbox[0]),  # min x1
-                        min(left_bbox[1], current_bbox[1]),  # min y1
-                        max(left_bbox[2], current_bbox[2]),  # max x2
-                        max(left_bbox[3], current_bbox[3])   # max y2
-                    ])
+            # # Expand bounding box for each additional hand
+            # for hand in hands['left'][1:]:
+            #     current_bbox = hand.bbox
+            #     left_bbox = np.array([
+            #             min(left_bbox[0], current_bbox[0]),  # min x1
+            #             min(left_bbox[1], current_bbox[1]),  # min y1
+            #             max(left_bbox[2], current_bbox[2]),  # max x2
+            #             max(left_bbox[3], current_bbox[3])   # max y2
+            #         ])
                             
-               
-            
-            
             bbox_info['left_hand'] = left_bbox.tolist() if isinstance(left_bbox, np.ndarray) else left_bbox
                 
             # Save cropped image
-            left_crop = self._crop_hand_with_padding(image, left_bbox)
+            left_crop, left_crop_bbox = self._crop_hand_with_padding(image, left_bbox)
             if left_crop is not None:
                 left_crop_path = os.path.join(left_frames_dir, f"frame_{frame_index:06d}.jpg")
                 cv2.imwrite(left_crop_path, left_crop)
@@ -161,6 +158,7 @@ class VideoProcessor:
             left_pose_data = {
                 'vertices': hands['left'][0].vertices,
                 'cam_t': hands['left'][0].cam_t,
+                'left_crop_bbox' : left_crop_bbox,
                 'bbox': left_bbox,
                 'is_right': False
             }
@@ -168,23 +166,21 @@ class VideoProcessor:
             np.savez(left_pose_path, **left_pose_data)
         
         # Process right hand
-        if hands['right'] is not None and len(hands['left']) > 0:
-            right_bbox = hands['left'][0].bbox
+        if hands['right'] != []:
+            right_bbox = hands['right'][0].bbox
             # Expand bounding box for each additional hand
-            for hand in hands['left'][1:]:
-                current_bbox = hand.bbox
-                right_bbox = np.array([
-                        min(right_bbox[0], current_bbox[0]),  # min x1
-                        min(right_bbox[1], current_bbox[1]),  # min y1
-                        max(right_bbox[2], current_bbox[2]),  # max x2
-                        max(right_bbox[3], current_bbox[3])   # max y2
-                    ])
-                
-            
+            # for hand in hands['left'][1:]:
+            #     current_bbox = hand.bbox
+            #     right_bbox = np.array([
+            #             min(right_bbox[0], current_bbox[0]),  # min x1
+            #             min(right_bbox[1], current_bbox[1]),  # min y1
+            #             max(right_bbox[2], current_bbox[2]),  # max x2
+            #             max(right_bbox[3], current_bbox[3])   # max y2
+            #         ])
             bbox_info['right_hand'] = right_bbox.tolist() if isinstance(right_bbox, np.ndarray) else right_bbox
             
             # Save cropped image
-            right_crop = self._crop_hand_with_padding(image, right_bbox)
+            right_crop, right_crop_bbox = self._crop_hand_with_padding(image, right_bbox)
             if right_crop is not None:
                 right_crop_path = os.path.join(right_frames_dir, f"frame_{frame_index:06d}.jpg")
                 cv2.imwrite(right_crop_path, right_crop)
@@ -193,6 +189,7 @@ class VideoProcessor:
             right_pose_data = {
                 'vertices': hands['right'][0].vertices,
                 'cam_t': hands['right'][0].cam_t,
+                'right_crop_bbox' : right_crop_bbox,
                 'bbox': right_bbox,
                 'is_right': True
             }
@@ -234,40 +231,43 @@ class VideoProcessor:
         with open(bbox_file, 'w') as f:
             json.dump(all_bbox_data, f, indent=2)
     
-    def process_image(self, image_path, output_path=None):
-        """
-        Process a single image file
+    # def process_image(self, image_path, output_path=None):
+    #     """
+    #     Process a single image file
         
-        Args:
-            image_path: Path to the image
-            output_path: Path to save the processed image (None to use default)
+    #     Args:
+    #         image_path: Path to the image
+    #         output_path: Path to save the processed image (None to use default)
         
-        Returns:
-            Processed image array
-        """
-        # Load the image
-        img = cv2.imread(image_path)
-        if img is None:
-            raise ValueError(f"Could not load image: {image_path}")
+    #     Returns:
+    #         Processed image array
+    #     """
+    #     # Load the image
+    #     img = cv2.imread(image_path)
+    #     if img is None:
+    #         raise ValueError(f"Could not load image: {image_path}")
         
-        # Process the image
-        has_hands = self.hand_model.process_frame(img)
+    #     # Process the image
+    #     has_hands = self.hand_model.process_frame(img)
         
-        # Get hand detection results
-        hands = self.hand_model.getHands()
-        self._update_stats(hands)
+    #     if not has_hands:
+    #         return img
         
-        # Render hands if requested
-        if self.render_hands and has_hands:
-            img = self.hand_model.render(img, side_view=self.side_view)
+    #     # Get hand detection results
+    #     hands = self.hand_model.getHands()
+    #     self._update_stats(hands)
         
-        # Save mesh data if requested
-        if self.save_meshes and has_hands:
-            self._save_mesh_data(0, hands)
+    #     # Render hands if requested
+    #     if self.render_hands and has_hands:
+    #         img = self.hand_model.render(img, side_view=self.side_view)
         
-        # Save result if output path is specified
+    #     # Save mesh data if requested
+    #     if self.save_meshes and has_hands:
+    #         self._save_mesh_data(0, hands)
         
-        return img
+    #     # Save result if output path is specified
+        
+    #     return img
     
     def process_frame_sequence(self, frames_dir, output_dir=None, start_frame=0, end_frame=None, step=1, session_name=None, camera_view=None):
         """
@@ -305,9 +305,7 @@ class VideoProcessor:
             end_frame = total_frames
         
 
-        
-        # Process frames
-        
+    
         # Create progress bar
         frames_to_process = ((end_frame - start_frame) + step - 1) // step
         pbar = tqdm(total=frames_to_process, desc="Processing frames")
@@ -335,7 +333,9 @@ class VideoProcessor:
                 continue
             
             has_hands = self.hand_model.process_frame(img)
-    
+            if not has_hands:
+                pbar.update(1)
+                continue ## No hands detected then what to do?
             # Get hand detection results
             hands = self.hand_model.getHands()
             
@@ -359,10 +359,7 @@ class VideoProcessor:
             
             # # Save processed frame if needed
             # if output_path is not None:
-            #     cv2.imwrite(output_path, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-            
-
-            
+            #     cv2.imwrite(output_path, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))           
     
     
     def process_camera_view(self, session_dir, camera_view, output_base_dir=None, **kwargs):
@@ -431,6 +428,7 @@ class VideoProcessor:
         # Process each camera view
         results = {}
         for camera_view in camera_views:
+            if camera_view in ['cam_side_l']: continue # Do not process cam_side_l ( cam_side_l has two person in the scene)
             # try:
             self.process_camera_view(
                 session_dir, 
@@ -544,6 +542,7 @@ def main():
     else:
         print("CUDA not available, using CPU")
         device = "cpu"
+        raise ValueError("Cuda not available!")
     
     # Create processor
     processor = VideoProcessor(

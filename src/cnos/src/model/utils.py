@@ -160,44 +160,37 @@ class Detections:
     def to_numpy(self):
         for key in self.keys:
             value = getattr(self, key).detach().cpu()
-            print(f"Processing key: {key}")
-            
+            #print(f"Processing key: {key}")
             # Special handling for masks to preserve dimensions
             if key == 'masks':
                 # Check if masks is already a single thin mask
                 if len(value.shape) == 2:  # single mask, not batch
-                    print(f"Found single mask with shape {value.shape}")
+                    #print(f"Found single mask with shape {value.shape}")
                     if value.shape[0] == 1 or value.shape[1] == 1:  # thin in one dimension
-                        print(f"This is a thin mask that might get squeezed - preserving dimensions")
+                        #print(f"This is a thin mask that might get squeezed - preserving dimensions")
                         # Convert to numpy but force it to stay 2D
                         numpy_mask = np.zeros((1920,1200))
                         setattr(self, key, numpy_mask)
-                        continue
-                
+                        continue          
                 # Check the shape of each mask in batch
-                print(f"Mask tensor shape: {value.shape}")
+                #print(f"Mask tensor shape: {value.shape}")
                 if len(value.shape) == 3:  # batch x height x width
-                    print(f"\nDiagnostics for masks tensor conversion:")
-                    print(f"  - Full tensor shape: {value.shape}")
-                    
+                    #print(f"\nDiagnostics for masks tensor conversion:")
+                    #print(f"  - Full tensor shape: {value.shape}")
                     # Convert masks to numpy one at a time to prevent dimension squeezing
                     numpy_masks = []
                     for i in range(value.shape[0]):
                         mask = value[i]
-                        print(f"  - Processing mask {i} with shape {mask.shape}")
-                        
+                        #print(f"  - Processing mask {i} with shape {mask.shape}")
                         # Handle thin masks (1xW or Hx1)
-                        if mask.shape[0] == 1 or mask.shape[1] == 1:
-                            print(f"  - Mask {i} is thin with shape {mask.shape}")
-                        
+                        #if mask.shape[0] == 1 or mask.shape[1] == 1:
+                            #print(f"  - Mask {i} is thin with shape {mask.shape}")
                         # Convert to numpy and force 2D shape
                         numpy_mask = mask.numpy().reshape(mask.shape[0], mask.shape[1])
                         numpy_masks.append(numpy_mask)
-                    
-                    print(f"  - Successfully converted {len(numpy_masks)} masks to numpy")
+                    #print(f"  - Successfully converted {len(numpy_masks)} masks to numpy")
                     setattr(self, key, numpy_masks)
                     continue
-            
             # Default handling for other attributes
             setattr(self, key, value.numpy())
 

@@ -1,0 +1,38 @@
+nohup: ignoring input
+WARNING:matplotlib:/home/kaan/.config/matplotlib is not a writable directory
+WARNING:matplotlib:Matplotlib created a temporary cache directory at /tmp/matplotlib-hko58q0t because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Using GPU: 6 (NVIDIA A100-PCIE-40GB)
+INFO:root:Initializing model on GPU 6
+INFO:torch.distributed.nn.jit.instantiator:Created a temporary directory at /tmp/tmp7583ypnk
+INFO:torch.distributed.nn.jit.instantiator:Writing /tmp/tmp7583ypnk/_remote_module_non_scriptable.py
+INFO:root:Loading SAM model from ./datasets/bop23_challenge/pretrained/segment-anything/
+INFO:root:Init CustomSamAutomaticMaskGenerator done!
+Using cache found in /home/kaan/.cache/torch/hub/facebookresearch_dinov2_main
+/home/kaan/.cache/torch/hub/facebookresearch_dinov2_main/dinov2/layers/swiglu_ffn.py:43: UserWarning: xFormers is available (SwiGLU)
+  warnings.warn("xFormers is available (SwiGLU)")
+/home/kaan/.cache/torch/hub/facebookresearch_dinov2_main/dinov2/layers/attention.py:27: UserWarning: xFormers is available (Attention)
+  warnings.warn("xFormers is available (Attention)")
+/home/kaan/.cache/torch/hub/facebookresearch_dinov2_main/dinov2/layers/block.py:33: UserWarning: xFormers is available (Block)
+  warnings.warn("xFormers is available (Block)")
+INFO:dinov2:using SwiGLU layer as FFN
+INFO:root:Init CustomDINOv2 done!
+INFO:root:Init CustomDINOv2 with full size=640 and proposal size=364 done!
+INFO:root:Init CNOS done!
+INFO:root:Moving models to cuda:6 (GPU 6) done!
+Using GPU 6: NVIDIA A100-PCIE-40GB
+Found 10 objects
+Found 22 videos in total
+Processing split 13/16: 1 videos (from 12 to 12)
+Processing video session: imi_session2_10
+Found camera views: ['cam_side_r', 'cam_top']
+/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/hand_detections/imi_session2_10/cam_side_r is processing
+Found frame types: []
+Processing camera view: cam_side_r
+Found 0 direct image frames in /nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/hand_detections/imi_session2_10/cam_side_r
+No direct image frames found in /nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/hand_detections/imi_session2_10/cam_side_r, looking for frame type directories
+Found frame directories: ['L_frames', 'R_frames']
+Processing frames folder: L_frames in cam_side_r
+Found 1858 frames in /nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/hand_detections/imi_session2_10/cam_side_r/L_frames
+First frame example: /nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/hand_detections/imi_session2_10/cam_side_r/L_frames/frame_000025.jpg
+Processing object: AMF1 in L_frames
+Processing AMF1 in imi_session2_10/cam_side_r/L_frames:   0%|          | 0/1858 [00:00<?, ?it/s]
