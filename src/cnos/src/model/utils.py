@@ -158,41 +158,51 @@ class Detections:
         ), f"Size mismatch {mask_size} {box_size} {score_size} {object_id_size}"
 
     def to_numpy(self):
+        """Convert all tensor attributes to numpy arrays.
+        Skip non-tensor attributes to prevent errors.
+        """
+        import logging
         for key in self.keys:
-            value = getattr(self, key).detach().cpu()
-            #print(f"Processing key: {key}")
-            # Special handling for masks to preserve dimensions
-            if key == 'masks':
-                # Check if masks is already a single thin mask
-                if len(value.shape) == 2:  # single mask, not batch
-                    #print(f"Found single mask with shape {value.shape}")
-                    if value.shape[0] == 1 or value.shape[1] == 1:  # thin in one dimension
-                        #print(f"This is a thin mask that might get squeezed - preserving dimensions")
-                        # Convert to numpy but force it to stay 2D
-                        numpy_mask = np.zeros((1920,1200))
-                        setattr(self, key, numpy_mask)
-                        continue          
-                # Check the shape of each mask in batch
-                #print(f"Mask tensor shape: {value.shape}")
-                if len(value.shape) == 3:  # batch x height x width
-                    #print(f"\nDiagnostics for masks tensor conversion:")
-                    #print(f"  - Full tensor shape: {value.shape}")
-                    # Convert masks to numpy one at a time to prevent dimension squeezing
-                    numpy_masks = []
-                    for i in range(value.shape[0]):
-                        mask = value[i]
-                        #print(f"  - Processing mask {i} with shape {mask.shape}")
-                        # Handle thin masks (1xW or Hx1)
-                        #if mask.shape[0] == 1 or mask.shape[1] == 1:
-                            #print(f"  - Mask {i} is thin with shape {mask.shape}")
-                        # Convert to numpy and force 2D shape
-                        numpy_mask = mask.numpy().reshape(mask.shape[0], mask.shape[1])
-                        numpy_masks.append(numpy_mask)
-                    #print(f"  - Successfully converted {len(numpy_masks)} masks to numpy")
-                    setattr(self, key, numpy_masks)
-                    continue
-            # Default handling for other attributes
-            setattr(self, key, value.numpy())
+            # Skip the 'keys' attribute itself
+            if key == 'keys':
+                continue
+                
+            # Get the attribute
+            value = getattr(self, key)
+            
+            # Skip non-tensor attributes
+            if not torch.is_tensor(value):
+                logging.debug(f"Skipping non-tensor attribute '{key}' of type {type(value)} during to_numpy conversion")
+                continue
+                
+            # Convert tensor to CPU then numpy
+            try:
+                value = value.detach().cpu()
+                
+                # Special handling for masks to preserve dimensions
+                if key == 'masks':
+                    # Check if masks is already a single thin mask
+                    if len(value.shape) == 2:  # single mask, not batch
+                        if value.shape[0] == 1 or value.shape[1] == 1:  # thin in one dimension
+                            # Convert to numpy but force it to stay 2D
+                            numpy_mask = np.zeros((1920,1200))
+                            setattr(self, key, numpy_mask)
+                            continue          
+                    # Check the shape of each mask in batch
+                    if len(value.shape) == 3:  # batch x height x width
+                        # Convert masks to numpy one at a time to prevent dimension squeezing
+                        numpy_masks = []
+                        for i in range(value.shape[0]):
+                            mask = value[i]
+                            # Convert to numpy and force 2D shape
+                            numpy_mask = mask.numpy().reshape(mask.shape[0], mask.shape[1])
+                            numpy_masks.append(numpy_mask)
+                        setattr(self, key, numpy_masks)
+                        continue
+                # Default handling for other attributes
+                setattr(self, key, value.numpy())
+            except Exception as e:
+                logging.warning(f"Error converting attribute '{key}' to numpy: {str(e)}. Skipping.")
 
     def to_torch(self):
         for key in self.keys:
@@ -241,8 +251,55 @@ class Detections:
         return data
 
     def filter(self, idxs):
+        """Filter detections by indices. Handle device mismatches automatically.
+        
+        Args:
+            idxs: Index tensor to filter by. Will be moved to CPU automatically.
+        """
+        # Force indices to CPU and convert as needed
+        if torch.is_tensor(idxs):
+            if idxs.device.type != 'cpu':
+                idxs = idxs.cpu()
+            # Ensure it's a proper integer tensor for indexing
+            if idxs.dtype not in [torch.int32, torch.int64, torch.long]:
+                idxs = idxs.long()
+        
+        # Process each attribute - skip the 'keys' attribute itself
         for key in self.keys:
-            setattr(self, key, getattr(self, key)[idxs])
+            # Skip the 'keys' attribute itself to prevent self-filtering
+            if key == 'keys':
+                continue
+                
+            attr = getattr(self, key)
+            if attr is None:
+                continue
+                
+            # Handle tensor attributes
+            if torch.is_tensor(attr):
+                # Move to CPU for consistent processing
+                if attr.device.type != 'cpu':
+                    attr = attr.cpu()
+                # Do the filtering
+                try:
+                    filtered_attr = attr[idxs]
+                    setattr(self, key, filtered_attr)
+                except Exception as e:
+                    # Add diagnostics if indexing fails
+                    raise RuntimeError(f"Error filtering attribute '{key}'. Attr shape: {attr.shape}, "
+                                      f"Attr device: {attr.device}, IDX shape: {idxs.shape}, "
+                                      f"IDX device: {idxs.device}, IDX dtype: {idxs.dtype}. "
+                                      f"Original error: {str(e)}") from e
+            else:
+                # Handle non-tensor attributes (like lists or numpy arrays)
+                try:
+                    # Skip any list attributes that should not be filtered
+                    if isinstance(attr, list):
+                        continue
+                    setattr(self, key, attr[idxs])
+                except Exception as e:
+                    # Don't raise for non-filterable attributes, just log and skip
+                    import logging
+                    logging.warning(f"Could not filter attribute '{key}' of type {type(attr)}. Skipping.")
 
     def clone(self):
         """

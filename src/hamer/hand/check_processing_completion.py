@@ -39,7 +39,8 @@ def check_processing_completion(root_dir, frames_root):
                     num_bboxes = len(bbox_data)
                 except Exception as e:
                     num_bboxes = 0
-                if num_frames > 0 and num_bboxes == num_frames:
+                #print(num_frames - num_bboxes, "fark")
+                if num_frames > 0 and num_frames - num_bboxes < 300:
                     complete.append((session, camera_view, num_frames))
                 else:
                     incomplete.append((session, camera_view, num_bboxes, num_frames))
@@ -59,8 +60,11 @@ def check_processing_completion(root_dir, frames_root):
     print("\nDone.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Check which videos are fully processed (bounding_boxes.json matches original frames)")
-    parser.add_argument("root_dir", type=str, help="Root directory containing processed session folders")
-    parser.add_argument("frames_root", type=str, help="Root directory containing original frames (session/camera_view)")
-    args = parser.parse_args()
-    check_processing_completion(args.root_dir, args.frames_root)
+    #parser = argparse.ArgumentParser(description="Check which videos are fully processed (bounding_boxes.json matches original frames)")
+    #parser.add_argument("root_dir", type=str,default = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/orginal_frames" ,help="Root directory containing processed session folders")
+    #parser.add_argument("frames_root", type=str,default = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/hand_detections", help="Root directory containing original frames (session/camera_view)")
+    #args = parser.parse_args()
+    #check_processing_completion(args.root_dir, args.frames_root)
+    root_dir = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/hand_detections"
+    frames_root = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/orginal_frames"
+    check_processing_completion(root_dir, frames_root)

@@ -17,3 +17,5 @@ src/cnos/datasets/bop23_challenge/pretrained/segment-anything/sam_vit_h_4b8939.p
 src/cnos/datasets/bop23_challenge/pretrained/FastSAM/FastSAM-x.pt
 src/cnos/processing_logs/*
 src/hamer/hand/testing_outputs/*.png
+src/visualization
+visualization

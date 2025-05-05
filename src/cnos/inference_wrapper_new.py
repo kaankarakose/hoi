@@ -24,7 +24,6 @@ from src.model.utils import Detections, convert_npz_to_json
 from src.model.loss import Similarity
 from src.utils.inout import save_json_bop23
 
-from src.utils.object_mask_merger import MaskMergingPipeline
 import cv2
 import distinctipy
 from skimage.feature import canny
@@ -83,7 +82,6 @@ def mask_to_rle(mask):
 
 
 
-
 def visualize(rgb, detections, save_path="./tmp/tmp.png"):
     img = rgb.copy()
     gray = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2GRAY)
@@ -92,24 +90,14 @@ def visualize(rgb, detections, save_path="./tmp/tmp.png"):
     colors = distinctipy.get_colors(len(detections))
     alpha = 0.33
 
-
-
     masks = getattr(detections, 'masks')
     object_ids = getattr(detections, 'object_ids')
+    
     for mask_idx in range(len(detections)):
         # Convert mask to numpy and threshold to get boolean mask
         mask = masks[mask_idx]
         mask = mask > 0.5  # Convert to boolean mask
         
-        # # Strictly validate mask dimensions - should always be 2D
-        # if len(mask.shape) < 2:
-        #     print(f"ERROR: 1D mask detected in visualize function, mask {mask_idx} with shape {mask.shape}")
-        #     raise ValueError(f"1D mask detected in visualize function, mask {mask_idx} with shape {mask.shape}")
-            
-        # # Skip empty masks (all False)
-        # if not mask.any():
-        #     print(f"Warning: Skipping empty mask {mask_idx} (all False values)")
-        #     raise ValueError("Empty Mask!")
         edge = canny(mask.astype(np.uint8) * 255)
         edge = binary_dilation(edge, np.ones((2, 2)))
         obj_id = object_ids[mask_idx].item()
@@ -125,15 +113,6 @@ def visualize(rgb, detections, save_path="./tmp/tmp.png"):
     
     img = Image.fromarray(np.uint8(img))
     return img
-    # img.save(save_path)
-    # prediction = Image.open(save_path)
-    
-    # # concat side by side in PIL
-    # img = np.array(img)
-    # concat = Image.new('RGB', (img.shape[1] + prediction.size[0], img.shape[0]))
-    # concat.paste(rgb, (0, 0))
-    # concat.paste(prediction, (img.shape[1], 0))
-    # return concat
 
 
 def mask_to_bbox(mask):
@@ -162,9 +141,6 @@ def mask_to_bbox(mask):
         "ymax": int(ymax)
     }
     return bbox
-
-
-
 
 
 class InferenceWrapper:
@@ -200,10 +176,6 @@ class InferenceWrapper:
         
         # Configure segmentor model
         cfg_segmentor = self.cfg.model.segmentor_model
-        # if "fast_sam" in cfg_segmentor._target_:
-        #     logging.info("Using FastSAM, ignore stability_score_thresh!")
-        # else:
-        #     self.cfg.model.segmentor_model.stability_score_thresh = stability_score_thresh
         
         # Initialize similarity metric
         self.metric = Similarity()
@@ -239,6 +211,7 @@ class InferenceWrapper:
         self.ref_feats = None
         self.template_dir = None
         self.scores = None
+        
     def load_templates(self, template_dir):
         """
         Load templates from the given directory.
@@ -254,7 +227,6 @@ class InferenceWrapper:
             data = np.load(template_dir)
             self.ref_feats = torch.from_numpy(data['ref_feats']).to(self.device)
             return self.ref_feats
-            
         
     def run(self, rgb_image, custom_conf_threshold=None, custom_num_max_dets=None):
         """
@@ -273,7 +245,6 @@ class InferenceWrapper:
         
         # Use custom parameters if provided
         conf_threshold = custom_conf_threshold if custom_conf_threshold is not None else self.conf_threshold
-        #num_max_dets = custom_num_max_dets if custom_num_max_dets is not None else self.num_max_dets
 
         frame_name = os.path.basename(rgb_image).split('.')[0] # get rid of jpg
         vis_output = os.path.join(self.output_dir, 'frames')
@@ -289,21 +260,21 @@ class InferenceWrapper:
         
         print(f'Input image size: {rgb.size}')
         
-
-        mask_merging_pipeline = MaskMergingPipeline(
-                                segmentor_model= self.model.segmentor_model,
-                                descriptor_model= self.model.descriptor_model,
-                                ref_feats= self.ref_feats,
-                                similarity_metric= self.metric,
-                                conf_threshold = conf_threshold
-        )
-
-        detections, scores = mask_merging_pipeline.process_image(np.array(rgb))
-
-
-        # No mask detected!
-        if detections is None:
-            return None, None
+        # Generate masks with segmentor model
+        print('\nGenerating masks with segmentor model...')
+        detections = self.model.segmentor_model.generate_masks(np.array(rgb))
+        detections = Detections(detections)
+        
+        # Generate descriptors
+        print('\nGenerating descriptors...')
+        descriptors = self.model.descriptor_model.forward(np.array(rgb), detections)
+        
+        # Calculate similarity scores
+        print('\nCalculating similarity scores...')
+        scores = self.metric(descriptors[:, None, :], self.ref_feats[None, :, :])
+        print(f'Raw scores shape: {scores.shape}')
+        
+        # Get top-k scores per detection
         score_per_detection = torch.topk(scores, k=10, dim=-1)[0]
         score_per_detection = torch.mean(score_per_detection, dim=-1)
         print(f'Mean scores shape: {score_per_detection.shape}')
@@ -314,7 +285,6 @@ class InferenceWrapper:
 
         detections.filter(index)
         
-
         # Convert boolean mask to indices
         keep_indices = torch.nonzero(scores > conf_threshold).squeeze()
         if len(keep_indices.shape) == 0 and keep_indices.numel() > 0:
@@ -334,29 +304,10 @@ class InferenceWrapper:
         print('\nConverting detections to numpy and saving...')
         detections.to_numpy()
         
-        # # Validate mask dimensions after numpy conversion
-        # if hasattr(detections, 'masks'):
-        #     masks = detections.masks
-        #     if isinstance(masks, list):
-        #         for i, mask in enumerate(masks):
-        #             if len(mask.shape) != 2:
-        #                 print(f"ERROR: 1D mask detected after numpy conversion, index {i}, shape {mask.shape}")
-        #                 raise ValueError(f"1D mask detected after numpy conversion, index {i}, shape {mask.shape}")
-        #     elif isinstance(masks, np.ndarray):
-        #         for i in range(masks.shape[0]):
-        #             mask = masks[i]
-        #             if len(mask.shape) != 2:
-        #                 raise ValueError(f"1D mask detected in numpy array at index {i}, shape {mask.shape}")
-
         # Visualize detections
-        # for mask_idx, mask in enumerate(detections.masks):
-        #     if len(mask.shape) < 2:
-        #         print(f"ERROR: 1D mask detected in visualize function, mask {mask_idx} with invalid shape {mask.shape}")
-        #         raise ValueError(f"1D mask detected in visualize function, mask {mask_idx} with shape {mask.shape}")
         vis_img = visualize(rgb, detections)
         vis_img.save(f"{vis_output}/{frame_name}.png")
        
-        torch.cuda.empty_cache()
         return detections, scores
     
     def get_masks(self, detections):
@@ -396,37 +347,6 @@ class InferenceWrapper:
         """
         return getattr(detections, 'object_ids')
     
-    ## This wasn't efficent for saving mask.
-    # def save_masks(self, detections, frame_info=None):
-    #     """
-    #     Save masks from detections as individual PNG files.
-        
-    #     Args:
-    #         detections (Detections): Detection object.
-    #         output_dir (str, optional): Directory to save masks. If None, will use self.output_dir.
-        
-    #     Returns:
-    #         list: Paths to saved mask files.
-    #     """
-        
-    #     output_dir = os.path.join(self.output_dir, 'masks', frame_info)
-    #     os.makedirs(output_dir, exist_ok=True)
-        
-    #     masks = self.get_masks(detections)
-    #     mask_paths = []
-    #     if self.scores is None:
-    #         raise ValueError('No scores!')
-
-    #     scores = self.scores
-
-    #     for i, mask in enumerate(masks):
-
-    #         mask_path = f"{output_dir}/mask_{i}.png"
-    #         mask_img = np.uint8(mask * 255)
-    #         cv2.imwrite(mask_path, mask_img, [cv2.IMWRITE_PNG_COMPRESSION, 9])
-    #         mask_paths.append(mask_path)
-        
-    #     return True
     def save_masks(self, detections, frame_info=None):
         """
         Save masks from detections as RLE (Run-Length Encoding) format.
@@ -475,8 +395,6 @@ class InferenceWrapper:
         
         return True
     
-        
-     
     def save_bbox(self, detections, object_name, frame_info=None):
         """
         Save bounding boxes and object names as a JSON file.
@@ -507,6 +425,7 @@ class InferenceWrapper:
             json.dump(bboxes, f, indent=2)
 
         return True
+        
     def save_scores(self, scores, frame_info=None):
         """
         Save scores as individual text files.
@@ -518,8 +437,6 @@ class InferenceWrapper:
         Returns:
             list: Paths to saved score files.
         """
-        import os
-        
         output_dir = os.path.join(self.output_dir, 'scores')
         if frame_info is not None:
             output_dir = os.path.join(output_dir, frame_info)
@@ -528,12 +445,14 @@ class InferenceWrapper:
         score_paths = []
         
         for i, score in enumerate(scores):
-            if score < self.conf_threshold: continue # Don't save less then conf
+            if score < self.conf_threshold: continue # Don't save less than conf
             score_path = f"{output_dir}/score_{i}.txt"
             with open(score_path, 'w') as f:
                 f.write(str(score.item()))
             score_paths.append(score_path)
         return True
+
+
 if __name__ == "__main__":
 
     # Example usage
@@ -544,8 +463,6 @@ if __name__ == "__main__":
         output_dir=output_dir
     )
     
-
-
     # Load templates
     wrapper.load_templates(f"/nas/project_data/B1_Behavior/rush/ados-objects/object_pose_mega/rtdt/cnos/cnos/rendered_objects/{object_name}")
     
@@ -555,7 +472,6 @@ if __name__ == "__main__":
     frames = [os.path.join(frame_folder, path) for path in os.listdir(frame_folder)]
 
     for frame in frames:
-
         detections, scores = wrapper.run(frame)
         # Get masks and scores
         masks = wrapper.get_masks(detections)
@@ -563,7 +479,7 @@ if __name__ == "__main__":
         
         frame_info = os.path.basename(frame).split('.')[0]
         # Save masks
-        wrapper.save_masks(detections,frame_info)
+        wrapper.save_masks(detections, frame_info)
         wrapper.save_bbox(detections, object_name, frame_info)
         wrapper.save_scores(scores, frame_info)
         torch.cuda.empty_cache()

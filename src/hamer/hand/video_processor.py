@@ -67,30 +67,51 @@ class VideoProcessor:
             pad_factor: Padding factor relative to bbox size
             
         Returns:
-            Cropped image with padding
+            Cropped image with padding, or None if invalid crop
         """
         if bbox is None or image is None:
-            return None
+            return None, None
             
         # Convert bbox to integers
-        x1, y1, x2, y2 = map(int, bbox)
-        
-        # Calculate padding
-        width = x2 - x1
-        height = y2 - y1
-        pad_x = int(width * pad_factor)
-        pad_y = int(height * pad_factor)
-        
-        # Apply padding with bounds checking
-        img_h, img_w = image.shape[:2]
-        x1_pad = max(0, x1 - pad_x)
-        y1_pad = max(0, y1 - pad_y)
-        x2_pad = min(img_w, x2 + pad_x)
-        y2_pad = min(img_h, y2 + pad_y)
-        
-        # Crop the image
-        crop = image[y1_pad:y2_pad, x1_pad:x2_pad].copy()
-        return crop, [x1_pad, y1_pad, x2_pad, y2_pad]
+        try:
+            x1, y1, x2, y2 = map(int, bbox)
+            
+            # Check if bbox is valid
+            if x1 >= x2 or y1 >= y2:
+                print(f"Warning: Invalid bbox dimensions: [{x1}, {y1}, {x2}, {y2}]")
+                return None, None
+            
+            # Calculate padding
+            width = x2 - x1
+            height = y2 - y1
+            pad_x = int(width * pad_factor)
+            pad_y = int(height * pad_factor)
+            
+            # Apply padding with bounds checking
+            img_h, img_w = image.shape[:2]
+            x1_pad = max(0, x1 - pad_x)
+            y1_pad = max(0, y1 - pad_y)
+            x2_pad = min(img_w, x2 + pad_x)
+            y2_pad = min(img_h, y2 + pad_y)
+            
+            # Check if padded dimensions are valid
+            if x1_pad >= x2_pad or y1_pad >= y2_pad:
+                print(f"Warning: Invalid padded bbox dimensions: [{x1_pad}, {y1_pad}, {x2_pad}, {y2_pad}]")
+                return None, None
+            
+            # Crop the image
+            crop = image[y1_pad:y2_pad, x1_pad:x2_pad].copy()
+            
+            # Check if crop is empty
+            if crop.size == 0 or crop.shape[0] == 0 or crop.shape[1] == 0:
+                print(f"Warning: Empty crop from bbox [{x1}, {y1}, {x2}, {y2}] with padding [{x1_pad}, {y1_pad}, {x2_pad}, {y2_pad}]")
+                return None, None
+                
+            return crop, [x1_pad, y1_pad, x2_pad, y2_pad]
+            
+        except Exception as e:
+            print(f"Error cropping hand: {str(e)}")
+            return None, None
     
     def _save_outputs(self, session_name, camera_view, frame_index, hands, image):
         """
@@ -150,7 +171,7 @@ class VideoProcessor:
                 
             # Save cropped image
             left_crop, left_crop_bbox = self._crop_hand_with_padding(image, left_bbox)
-            if left_crop is not None:
+            if left_crop is not None and not left_crop.size == 0:
                 left_crop_path = os.path.join(left_frames_dir, f"frame_{frame_index:06d}.jpg")
                 cv2.imwrite(left_crop_path, left_crop)
             
@@ -181,7 +202,7 @@ class VideoProcessor:
             
             # Save cropped image
             right_crop, right_crop_bbox = self._crop_hand_with_padding(image, right_bbox)
-            if right_crop is not None:
+            if right_crop is not None and not right_crop.size == 0:
                 right_crop_path = os.path.join(right_frames_dir, f"frame_{frame_index:06d}.jpg")
                 cv2.imwrite(right_crop_path, right_crop)
             
@@ -230,44 +251,7 @@ class VideoProcessor:
         # Save the updated bbox data
         with open(bbox_file, 'w') as f:
             json.dump(all_bbox_data, f, indent=2)
-    
-    # def process_image(self, image_path, output_path=None):
-    #     """
-    #     Process a single image file
-        
-    #     Args:
-    #         image_path: Path to the image
-    #         output_path: Path to save the processed image (None to use default)
-        
-    #     Returns:
-    #         Processed image array
-    #     """
-    #     # Load the image
-    #     img = cv2.imread(image_path)
-    #     if img is None:
-    #         raise ValueError(f"Could not load image: {image_path}")
-        
-    #     # Process the image
-    #     has_hands = self.hand_model.process_frame(img)
-        
-    #     if not has_hands:
-    #         return img
-        
-    #     # Get hand detection results
-    #     hands = self.hand_model.getHands()
-    #     self._update_stats(hands)
-        
-    #     # Render hands if requested
-    #     if self.render_hands and has_hands:
-    #         img = self.hand_model.render(img, side_view=self.side_view)
-        
-    #     # Save mesh data if requested
-    #     if self.save_meshes and has_hands:
-    #         self._save_mesh_data(0, hands)
-        
-    #     # Save result if output path is specified
-        
-    #     return img
+
     
     def process_frame_sequence(self, frames_dir, output_dir=None, start_frame=0, end_frame=None, step=1, session_name=None, camera_view=None):
         """
