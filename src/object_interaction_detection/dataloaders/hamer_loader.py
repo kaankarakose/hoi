@@ -6,8 +6,11 @@ import os
 import glob
 import re
 import sys
+import json
+import logging
 import numpy as np
 from typing import Dict, List, Tuple, Any, Optional, Union
+
 # Add the parent directory to the path dynamically
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(os.path.dirname(current_dir))
@@ -15,6 +18,7 @@ sys.path.append(parent_dir)
 
 from object_interaction_detection.dataloaders.base_loader import BaseDataLoader
 
+logging.basicConfig(level=logging.INFO)
 
 class HAMERLoader(BaseDataLoader):
     """
@@ -47,6 +51,7 @@ class HAMERLoader(BaseDataLoader):
         
         # HAMER specific attributes
         self.hand_types = ['left', 'right']
+        self.camera_views = ['cam_top', 'cam_side_l', 'cam_side_r']
         
         # Define hand joint indices for specific landmarks
         # These indices are based on MANO model joints
@@ -82,53 +87,83 @@ class HAMERLoader(BaseDataLoader):
             'left_hand': {
                 'pose_data': None,
                 'success': False,
-                'landmarks': {}
+                'vertices': None,
+                'cam_t': None,
+                'crop_bbox': None,
+                'bbox': None
             },
             'right_hand': {
                 'pose_data': None,
                 'success': False,
-                'landmarks': {}
+                'vertices': None,
+                'cam_t': None,
+                'crop_bbox': None,
+                'bbox': None
             }
         }
         
-        # Process each hand type
+        # Process each hand type separately
         for hand_type in self.hand_types:
-            # Load pose data for this hand
+            # Load pose data for this specific hand
             pose_data = self._load_pose_data(camera_view, frame_idx, hand_type)
             
             if pose_data is None:
                 continue
             
-            # Store raw pose data (reference only, not stored in cache)
-            features[f'{hand_type}_hand']['pose_data'] = pose_data
-            features[f'{hand_type}_hand']['success'] = True
+            # Determine which hand data we're working with based on is_right flag
+            if pose_data.get('is_right', False):  # Right hand
+                hand_key = 'right_hand'
+            else:  # Left hand
+                hand_key = 'left_hand'
             
-            # Extract key landmarks if available
-            self._extract_landmarks(features[f'{hand_type}_hand'], pose_data)
+            # Update features for this hand
+            features[hand_key]['success'] = True
+            features[hand_key]['pose_data'] = pose_data
+            features[hand_key]['vertices'] = pose_data.get('vertices')
+            features[hand_key]['cam_t'] = pose_data.get('cam_t')
+            
+            # Handle crop bbox - each hand may have a different naming convention
+            crop_bbox_key = f'{hand_type}_crop_bbox' if f'{hand_type}_crop_bbox' in pose_data else 'crop_bbox'
+            features[hand_key]['crop_bbox'] = pose_data.get(crop_bbox_key)
+            features[hand_key]['bbox'] = pose_data.get('bbox')
         
-        # Cache features (store a copy without the raw pose data to save memory)
-        cache_features = features.copy()
-        for hand_type in self.hand_types:
-            if cache_features[f'{hand_type}_hand']['success']:
-                # Create a copy without the large pose_data field
-                hand_data = cache_features[f'{hand_type}_hand'].copy()
-                hand_data['pose_data'] = None  # Don't cache the full pose data
-                cache_features[f'{hand_type}_hand'] = hand_data
-        
-        # Cache the memory-efficient version
+        # Cache features (store a copy without the raw vertices data to save memory)
+        cache_features = self._prepare_cache_features(features)
         self._cache_features(camera_view, frame_idx, cache_features)
         
         return features
     
-    def _load_pose_data(self, camera_view: str, frame_idx: int, 
-                       hand_type: str) -> Optional[Dict[str, Any]]:
+    def _prepare_cache_features(self, features: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Load raw pose data for a specific hand.
+        Prepare a memory-efficient version of features for caching.
+        
+        Args:
+            features: Full features dictionary
+            
+        Returns:
+            Memory-efficient features dictionary for caching
+        """
+        cache_features = features.copy()
+        
+        for hand_type in self.hand_types:
+            hand_key = f'{hand_type}_hand'
+            if features[hand_key]['success']:
+                # Create a copy without the large data fields
+                hand_data = features[hand_key].copy()
+                hand_data['pose_data'] = None  # Don't cache the full pose data
+                hand_data['vertices'] = None   # Don't cache the vertices
+                cache_features[hand_key] = hand_data
+        
+        return cache_features
+    
+    def _load_pose_data(self, camera_view: str, frame_idx: int, hand_type: str = None) -> Optional[Dict[str, Any]]:
+        """
+        Load raw pose data for a specific hand at a specific frame.
         
         Args:
             camera_view: Camera view name
             frame_idx: Frame index
-            hand_type: Hand type ('left' or 'right')
+            hand_type: Hand type ('left' or 'right'). If None, will try both hands.
             
         Returns:
             Raw pose data or None if not available
@@ -142,229 +177,137 @@ class HAMERLoader(BaseDataLoader):
         )
         
         if not os.path.exists(poses_dir):
+            logging.warning(f"Poses directory not found: {poses_dir}")
             return None
         
-        # Try different filename patterns
-        pattern = f"{hand_type}_hand_{frame_idx:06d}.npz",
- 
-        path = os.path.join(poses_dir, pattern)
-        if os.path.exists(path):
-            try:
-                return dict(np.load(path, allow_pickle=True))
-            except Exception as e:
-                print(f"Error loading pose data: {e}")
+        # Try to load specific hand if specified
+        if hand_type is not None:
+            file_pattern = f"{hand_type}_hand_{frame_idx:06d}.npz"
+            file_path = os.path.join(poses_dir, file_pattern)
+            
+            if os.path.exists(file_path):
+                try:
+                    # Load the npz file
+                    data = np.load(file_path, allow_pickle=True)
+                    
+                    # Convert to dictionary for easier access
+                    pose_data = {}
+                    for key in data.files:
+                        pose_data[key] = data[key]
+                    
+                    # Set is_right flag based on hand_type
+                    pose_data['is_right'] = (hand_type == 'right')
+                    return pose_data
+                except Exception as e:
+                    logging.error(f"Error loading pose data from {file_path}: {e}")
         
+        # If hand_type is None or we didn't find the specified hand, try both hands
+        for hand in ['left', 'right']:
+            file_pattern = f"{hand}_hand_{frame_idx:06d}.npz"
+            file_path = os.path.join(poses_dir, file_pattern)
+            
+            if os.path.exists(file_path):
+                try:
+                    # Load the npz file
+                    data = np.load(file_path, allow_pickle=True)
+                    
+                    # Convert to dictionary for easier access
+                    pose_data = {}
+                    for key in data.files:
+                        pose_data[key] = data[key]
+                    
+                    # Set is_right flag based on hand
+                    pose_data['is_right'] = (hand == 'right')
+                    return pose_data
+                except Exception as e:
+                    logging.error(f"Error loading pose data from {file_path}: {e}")
+        
+        # If we get here, no hand data was found
         return None
     
-    def _extract_landmarks(self, hand_features: Dict[str, Any], 
-                          pose_data: Dict[str, Any]):
+    def get_hand_features(self, camera_view: str, frame_idx: int, hand_type: str) -> Dict[str, Any]:
         """
-        Extract key landmarks from pose data.
-        :TODO
-        Args:
-            hand_features: Features dictionary to update
-            pose_data: Raw pose data
-        """
-        # Check for joints in pose data
-        if 'joints3d' not in pose_data and 'verts' not in pose_data:
-            return
-        
-        # Use joints if available, otherwise use vertices
-        if 'joints3d' in pose_data:
-            joints = pose_data['joints3d']
-            # Extract key landmarks
-            for landmark_name, joint_idx in self.landmark_indices.items():
-                if joint_idx < len(joints):
-                    hand_features['landmarks'][landmark_name] = {
-                        'position': joints[joint_idx].tolist() if isinstance(joints[joint_idx], np.ndarray) else joints[joint_idx],
-                        'confidence': pose_data.get('confidence', 1.0)
-                    }
-        elif 'verts' in pose_data:
-            # For mesh vertices, we might need to use a different approach
-            # This is just a placeholder - would need to be adjusted for actual data
-            verts = pose_data['verts']
-            # Extract approximate tip positions (if there's a mapping available)
-            if hasattr(self, 'vertex_to_landmark_mapping'):
-                for landmark_name, vertex_idx in self.vertex_to_landmark_mapping.items():
-                    if vertex_idx < len(verts):
-                        hand_features['landmarks'][landmark_name] = {
-                            'position': verts[vertex_idx].tolist() if isinstance(verts[vertex_idx], np.ndarray) else verts[vertex_idx],
-                            'confidence': pose_data.get('confidence', 1.0)
-                        }
-        
-        # Store global hand properties
-        if 'global_orient' in pose_data:
-            hand_features['global_orient'] = pose_data['global_orient'].tolist() if isinstance(pose_data['global_orient'], np.ndarray) else pose_data['global_orient']
-        
-        if 'hand_pose' in pose_data:
-            hand_features['hand_pose'] = True  # Just store if it exists, not the full pose
-        
-        if 'betas' in pose_data:
-            hand_features['betas'] = True  # Just store if it exists, not the full betas
-        
-        if 'confidence' in pose_data:
-            hand_features['confidence'] = float(pose_data['confidence'])
-        
-        # Store crop bounding box if available
-        hand_type = 'left' if 'left' in hand_features.get('type', '') else 'right'
-        if f'{hand_type}_crop_bbox' in pose_data:
-            hand_features['crop_bbox'] = pose_data[f'{hand_type}_crop_bbox'].tolist() if isinstance(pose_data[f'{hand_type}_crop_bbox'], np.ndarray) else pose_data[f'{hand_type}_crop_bbox']
-        elif 'crop_bbox' in pose_data:
-            hand_features['crop_bbox'] = pose_data['crop_bbox'].tolist() if isinstance(pose_data['crop_bbox'], np.ndarray) else pose_data['crop_bbox']
-    
-    def get_hand_velocities(self, camera_view: str, start_frame: int, 
-                           end_frame: int) -> Dict[int, Dict[str, Any]]:
-        """
-        Calculate hand velocities for a range of frames.
-        
-        Args:
-            camera_view: Camera view name
-            start_frame: Starting frame index
-            end_frame: Ending frame index
-            
-        Returns:
-            Dictionary mapping frame indices to velocity data
-        """
-        # Load features for all frames in range
-        features_by_frame = self.load_features_range(camera_view, start_frame, end_frame)
-        
-        # Initialize velocities dictionary
-        velocities = {}
-        
-        # Process each frame (except the first one)
-        for frame_idx in range(start_frame + 1, end_frame + 1):
-            # Skip if this frame or previous frame doesn't have features
-            if frame_idx not in features_by_frame or frame_idx - 1 not in features_by_frame:
-                continue
-            
-            # Get current and previous frame features
-            curr_features = features_by_frame[frame_idx]
-            prev_features = features_by_frame[frame_idx - 1]
-            
-            # Initialize velocities for this frame
-            velocities[frame_idx] = {
-                'left_hand': {},
-                'right_hand': {}
-            }
-            
-            # Process each hand type
-            for hand_type in self.hand_types:
-                hand_key = f'{hand_type}_hand'
-                
-                # Skip if either frame doesn't have this hand
-                if (not curr_features[hand_key]['success'] or 
-                    not prev_features[hand_key]['success']):
-                    continue
-                
-                # Process each landmark
-                for landmark_name in self.landmark_indices.keys():
-                    # Skip if either frame doesn't have this landmark
-                    if (landmark_name not in curr_features[hand_key]['landmarks'] or 
-                        landmark_name not in prev_features[hand_key]['landmarks']):
-                        continue
-                    
-                    # Get current and previous positions
-                    curr_pos = curr_features[hand_key]['landmarks'][landmark_name]['position']
-                    prev_pos = prev_features[hand_key]['landmarks'][landmark_name]['position']
-                    
-                    # Calculate velocity (difference in position)
-                    if isinstance(curr_pos, list) and isinstance(prev_pos, list) and len(curr_pos) == 3 and len(prev_pos) == 3:
-                        velocity = [
-                            curr_pos[0] - prev_pos[0],
-                            curr_pos[1] - prev_pos[1],
-                            curr_pos[2] - prev_pos[2]
-                        ]
-                        
-                        # Calculate magnitude
-                        magnitude = np.sqrt(velocity[0]**2 + velocity[1]**2 + velocity[2]**2)
-                        
-                        # Store velocity
-                        velocities[frame_idx][hand_key][landmark_name] = {
-                            'velocity': velocity,
-                            'magnitude': float(magnitude)
-                        }
-        
-        return velocities
-    
-    def detect_hand_object_proximity(self, camera_view: str, frame_idx: int, 
-                                    object_positions: Dict[str, List[float]], 
-                                    threshold: float = 0.1) -> Dict[str, Any]:
-        """
-        Detect proximity between hands and objects.
+        Get features specifically for one hand.
         
         Args:
             camera_view: Camera view name
             frame_idx: Frame index
-            object_positions: Dictionary mapping object names to 3D positions
-            threshold: Proximity threshold in meters
+            hand_type: Hand type ('left' or 'right')
             
         Returns:
-            Dictionary with proximity detection results
+            Dictionary with hand features or empty dict if not available
         """
-        # Load hand features
-        hand_features = self.load_features(camera_view, frame_idx)
+        features = self.load_features(camera_view, frame_idx)
+        hand_key = f'{hand_type}_hand'
         
-        # Initialize results
-        results = {
-            'frame_idx': frame_idx,
-            'camera_view': camera_view,
-            'proximity_threshold': threshold,
-            'hand_object_proximities': {
-                'left_hand': {},
-                'right_hand': {}
-            }
+        if not features[hand_key]['success']:
+            return {}
+            
+        return features[hand_key]
+    
+    def get_hand_vertices(self, camera_view: str, frame_idx: int, hand_type: str) -> Optional[np.ndarray]:
+        """
+        Get hand vertices for a specific frame and hand.
+        
+        Args:
+            camera_view: Camera view name
+            frame_idx: Frame index
+            hand_type: Hand type ('left' or 'right')
+            
+        Returns:
+            Numpy array of vertices or None if not available
+        """
+        hand_features = self.get_hand_features(camera_view, frame_idx, hand_type)
+        return hand_features.get('vertices')
+    
+    def get_hand_crop_bbox(self, camera_view: str, frame_idx: int, hand_type: str) -> Optional[List[int]]:
+        """
+        Get hand crop bounding box for a specific frame and hand.
+        
+        Args:
+            camera_view: Camera view name
+            frame_idx: Frame index
+            hand_type: Hand type ('left' or 'right')
+            
+        Returns:
+            List containing bounding box coordinates [x1, y1, x2, y2] or None if not available
+        """
+        hand_features = self.get_hand_features(camera_view, frame_idx, hand_type)
+        return hand_features.get('crop_bbox')
+    
+    def get_hand_detection_status(self, camera_view: str, frame_idx: int) -> Dict[str, bool]:
+        """
+        Get detection status for both hands in a specific frame.
+        
+        Args:
+            camera_view: Camera view name
+            frame_idx: Frame index
+            
+        Returns:
+            Dictionary with keys 'left' and 'right' containing boolean values
+        """
+        features = self.load_features(camera_view, frame_idx)
+        return {
+            'left': features['left_hand']['success'],
+            'right': features['right_hand']['success']
         }
-        
-        # Process each hand type
-        for hand_type in self.hand_types:
-            hand_key = f'{hand_type}_hand'
-            
-            # Skip if no hand data
-            if not hand_features[hand_key]['success']:
-                continue
-            
-            # Process each landmark
-            for landmark_name, landmark_data in hand_features[hand_key]['landmarks'].items():
-                # Skip if no position data
-                if 'position' not in landmark_data:
-                    continue
-                
-                hand_pos = landmark_data['position']
-                
-                # Skip if invalid position
-                if not isinstance(hand_pos, list) or len(hand_pos) != 3:
-                    continue
-                
-                # Check proximity to each object
-                for object_name, object_pos in object_positions.items():
-                    # Skip if invalid object position
-                    if not isinstance(object_pos, list) or len(object_pos) != 3:
-                        continue
-                    
-                    # Calculate distance
-                    distance = np.sqrt(
-                        (hand_pos[0] - object_pos[0])**2 +
-                        (hand_pos[1] - object_pos[1])**2 +
-                        (hand_pos[2] - object_pos[2])**2
-                    )
-                    
-                    # Check if within threshold
-                    if distance <= threshold:
-                        # Store proximity result
-                        if object_name not in results['hand_object_proximities'][hand_key]:
-                            results['hand_object_proximities'][hand_key][object_name] = []
-                        
-                        results['hand_object_proximities'][hand_key][object_name].append({
-                            'landmark': landmark_name,
-                            'distance': float(distance),
-                            'hand_position': hand_pos,
-                            'object_position': object_pos
-                        })
-        
-        # Add summary
-        results['interaction_detected'] = (
-            len(results['hand_object_proximities']['left_hand']) > 0 or
-            len(results['hand_object_proximities']['right_hand']) > 0
-        )
-        
-        return results
+
+
+if __name__ == "__main__":
+    # Test the loader
+    hamer_loader = HAMERLoader(
+        session_name="imi_session1_2", 
+        data_root_dir="/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data"
+    )
+    
+    # Test loading data for a specific frame
+    data = hamer_loader.load_features(camera_view="cam_top", frame_idx=100)
+    
+    print("Left hand detected:", data['left_hand']['success'])
+    print("Right hand detected:", data['right_hand']['success'])
+    
+    if data['left_hand']['success']:
+        print("Left hand crop bbox:", data['left_hand']['crop_bbox'])
+    
+    if data['right_hand']['success']:
+        print("Right hand crop bbox:", data['right_hand']['crop_bbox'])

@@ -1,0 +1,7 @@
+
+
+## Put all necessary paths here
+input_directories:
+  data_root_dir: "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data"
+
+output_directoires:
