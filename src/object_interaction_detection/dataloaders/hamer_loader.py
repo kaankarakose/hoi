@@ -292,7 +292,61 @@ class HAMERLoader(BaseDataLoader):
             'right': features['right_hand']['success']
         }
 
-
+    def get_valid_frame_idx(self) -> Dict[str, Dict[str, List[int]]]:
+        """
+        Get valid frame indices for each hand type and camera view.
+        
+        Returns:
+            Dictionary with camera views as keys, each containing a dictionary with
+            'left' and 'right' as keys and lists of valid frame indices as values.
+        """
+        valid_frames = {}
+        
+        # Iterate through all camera views
+        for camera_view in self.camera_views:
+            valid_frames[camera_view] = {
+                'left': [],
+                'right': []
+            }
+            
+            # Build path to pose directory
+            poses_dir = os.path.join(
+                self.config['pose_dir'],
+                self.session_name,
+                camera_view,
+                "3D_poses"
+            )
+            
+            if not os.path.exists(poses_dir):
+                logging.warning(f"Poses directory not found: {poses_dir}")
+                continue
+            
+            # Look for left hand files
+            left_hand_files = sorted(glob.glob(os.path.join(poses_dir, "left_hand_*.npz")))
+            for file_path in left_hand_files:
+                try:
+                    # Extract frame index from filename
+                    match = re.search(r'left_hand_(\d+).npz', os.path.basename(file_path))
+                    if match:
+                        frame_idx = int(match.group(1))
+                        valid_frames[camera_view]['left'].append(frame_idx)
+                except Exception as e:
+                    logging.error(f"Error processing file {file_path}: {e}")
+            
+            # Look for right hand files
+            right_hand_files = sorted(glob.glob(os.path.join(poses_dir, "right_hand_*.npz")))
+            for file_path in right_hand_files:
+                try:
+                    # Extract frame index from filename
+                    match = re.search(r'right_hand_(\d+).npz', os.path.basename(file_path))
+                    if match:
+                        frame_idx = int(match.group(1))
+                        valid_frames[camera_view]['right'].append(frame_idx)
+                except Exception as e:
+                    logging.error(f"Error processing file {file_path}: {e}")
+        
+        return valid_frames
+        
 if __name__ == "__main__":
     # Test the loader
     hamer_loader = HAMERLoader(
@@ -311,3 +365,6 @@ if __name__ == "__main__":
     
     if data['right_hand']['success']:
         print("Right hand crop bbox:", data['right_hand']['crop_bbox'])
+
+    valid_frames = hamer_loader.get_valid_frame_idx()
+    print("Valid frames:", list(valid_frames['cam_top']['left']))

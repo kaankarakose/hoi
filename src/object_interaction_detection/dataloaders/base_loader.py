@@ -51,7 +51,7 @@ class BaseDataLoader(ABC):
             List of camera view names
         """
         # Default implementation - subclasses may override
-        frames_dir = os.path.join(self.data_root_dir, 'original_frames', self.session_name)
+        frames_dir = os.path.join(self.data_root_dir, 'orginal_frames', self.session_name)
         if not os.path.exists(frames_dir):
             print(f"Warning: Frames directory not found: {frames_dir}")
             return []
@@ -59,9 +59,10 @@ class BaseDataLoader(ABC):
         # Get all subdirectories as camera views
         camera_views = [d for d in os.listdir(frames_dir) 
                        if os.path.isdir(os.path.join(frames_dir, d))]
-        assert 'cam_top' not in camera_views
-        assert 'cam_side_l' not in camera_views
-        assert 'cam_side_r' not in camera_views
+        print(camera_views)
+        assert 'cam_top' in camera_views
+        assert 'cam_side_l' in camera_views
+        assert 'cam_side_r' in camera_views
         
         print(f"Found {len(camera_views)} camera views: {camera_views}")
         return camera_views
