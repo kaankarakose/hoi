@@ -1,1 +1,19 @@
 ## put all necessary detections threshold here...
+
+Hand:
+  -
+Cnos:
+  Object:
+    - AMF1
+      threshold: 0.4
+
+    - AMF2
+    - AMF3
+    - 
+#TODO: add more detections
+Flow:
+  temporal_window: 1
+  motion_threshold: 0.05 #TODO: normalize it
+  scale_factor: 5.0
+  aggregation_method: mean
+

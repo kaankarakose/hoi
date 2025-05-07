@@ -19,3 +19,10 @@ src/cnos/processing_logs/*
 src/hamer/hand/testing_outputs/*.png
 src/visualization
 visualization
+
+
+__pycache__/
+*.py[cod]
+*$py.class
+# 
+NOTES
