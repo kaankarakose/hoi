@@ -16,6 +16,8 @@ parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.append(parent_dir)
 
 from object_interaction_detection.dataloaders.base_loader import BaseDataLoader
+from object_interaction_detection.dataloaders.hamer_loader import HAMERLoader
+
 from object_interaction_detection.utils.utils import load_rle_mask, rle2mask
 import logging
 logging.basicConfig(level=logging.INFO)

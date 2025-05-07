@@ -85,7 +85,6 @@ class HAMERLoader(BaseDataLoader):
             'frame_idx': frame_idx,
             'camera_view': camera_view,
             'left_hand': {
-                'pose_data': None,
                 'success': False,
                 'vertices': None,
                 'cam_t': None,
@@ -93,11 +92,10 @@ class HAMERLoader(BaseDataLoader):
                 'bbox': None
             },
             'right_hand': {
-                'pose_data': None,
                 'success': False,
                 'vertices': None,
                 'cam_t': None,
-                'crop_bbox': None,
+                'crop_bbox': None, 
                 'bbox': None
             }
         }
@@ -118,7 +116,6 @@ class HAMERLoader(BaseDataLoader):
             
             # Update features for this hand
             features[hand_key]['success'] = True
-            features[hand_key]['pose_data'] = pose_data
             features[hand_key]['vertices'] = pose_data.get('vertices')
             features[hand_key]['cam_t'] = pose_data.get('cam_t')
             
@@ -150,7 +147,6 @@ class HAMERLoader(BaseDataLoader):
             if features[hand_key]['success']:
                 # Create a copy without the large data fields
                 hand_data = features[hand_key].copy()
-                hand_data['pose_data'] = None  # Don't cache the full pose data
                 hand_data['vertices'] = None   # Don't cache the vertices
                 cache_features[hand_key] = hand_data
         
@@ -362,9 +358,11 @@ if __name__ == "__main__":
     
     if data['left_hand']['success']:
         print("Left hand crop bbox:", data['left_hand']['crop_bbox'])
-    
+        print("Left hand crop :", data['left_hand']['bbox'])
+    print('-----')
     if data['right_hand']['success']:
         print("Right hand crop bbox:", data['right_hand']['crop_bbox'])
+        print("Left hand crop :", data['right_hand']['bbox'])
 
     valid_frames = hamer_loader.get_valid_frame_idx()
-    print("Valid frames:", list(valid_frames['cam_top']['left']))
+    #print("Valid frames:", list(valid_frames['cam_top']['left']))
