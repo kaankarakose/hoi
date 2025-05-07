@@ -75,6 +75,7 @@ class CombinedLoader(BaseDataLoader):
         
         # Add default score threshold configuration
         config.setdefault('score_threshold', 0.45)  # Default threshold of 0.5
+        config.setdefault('lower_threshold', 0.25)  # Default threshold of 0.5
         config.setdefault('frames_dir', os.path.join(data_root_dir, 'orginal_frames'))  # For visualization
         
         # Call parent constructor
@@ -94,10 +95,11 @@ class CombinedLoader(BaseDataLoader):
         }
         # Store the score threshold for filtering objects
         self.score_threshold = config['score_threshold']
-        
+        self.lower_threshold = config['lower_threshold']
         # Set up object colors for visualization
         self.object_colors = OBJECT_COLORS
-        
+        #
+        self.features_cache = {}
         logging.info(f"Initialized combined loader for session {session_name} with score threshold {self.score_threshold}")
     
     def load_features(self, camera_view: str, frame_idx: int) -> Dict[str, Any]:
@@ -136,12 +138,25 @@ class CombinedLoader(BaseDataLoader):
         self._merge_objects_by_hand(combined_features)
         
         # Cache features (without large arrays to save memory)
-        #cache_features = self._prepare_cache_features(combined_features)
-        #self._cache_features(camera_view, frame_idx, cache_features)
+        cache_features = self._prepare_cache_features(combined_features)
+        self._cache_features(camera_view, frame_idx, cache_features)
 
 
         return combined_features
-    
+    def _cache_features(self, camera_view: str, frame_idx: int, features: Dict[str, Any]) -> None:
+        """
+        Cache features for a specific camera view and frame.
+        
+        Args:
+            camera_view: Camera view name
+            frame_idx: Frame index
+            features: Features dictionary to cache
+        """
+        # Create cache key
+        cache_key = f"{camera_view}_{frame_idx}"
+        
+        # Store in cache
+        self.features_cache[cache_key] = features
     def _prepare_cache_features(self, features: Dict[str, Any]) -> Dict[str, Any]:
         """
         Prepare a memory-efficient version of features for caching.
@@ -153,30 +168,25 @@ class CombinedLoader(BaseDataLoader):
             Memory-efficient features dictionary for caching
         """
         # Create a deep copy without the large data arrays
-        cache_features =      {
-            'frame_idx': frame_idx,
-            'camera_view': camera_view,
-            'cnos': cnos_features,    # Original CNOS features
-            'merged' : {
-                    'mask': None,
-                    'success': features['merged']['success'],
-                }
-        }
-
-
-
-   
-        # Initialize combined features dictionary
-        combined_features = {
-            'frame_idx': frame_idx,
-            'camera_view': camera_view,
-            'cnos': cnos_features,    # Original CNOS features
-            'merged' : {
-                    'success': False,
+        cache_features = {
+            'frame_idx': features['frame_idx'],
+            'camera_view': features['camera_view'],
+            'cnos': {
+                'L_frames': {
+                    'success': features['cnos']['L_frames']['success'],
+                    'objects': {}
+                },
+                'R_frames': {
+                    'success': features['cnos']['R_frames']['success'],
                     'objects': {}
                 }
-        }
-            
+            },
+            'merged': {
+                'success': features['merged']['success'],
+                'object_id_map': features['merged']['object_id_map']
+                # Exclude the large 'mask' array
+            }
+        }            
         return cache_features
     
     
@@ -194,7 +204,7 @@ class CombinedLoader(BaseDataLoader):
             left_hand = features['cnos']['L_frames']
             for object_name, object_data in left_hand['objects'].items():
                 object_data = left_hand['objects'][object_name]
-                if object_data['max_score'] >= self.score_threshold:
+                if object_data['max_score'] >= self.lower_threshold :
                     left_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
         
         # Process right hand objects
@@ -203,7 +213,7 @@ class CombinedLoader(BaseDataLoader):
             right_hand = features['cnos']['R_frames']
             for object_name, object_data in right_hand['objects'].items():
                 object_data = right_hand['objects'][object_name]
-                if object_data['max_score'] >= self.score_threshold:
+                if object_data['max_score'] >= self.lower_threshold:
                     right_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
         
         # Combine all candidates
@@ -219,6 +229,7 @@ class CombinedLoader(BaseDataLoader):
         # Create mapping from object names to unique IDs (starting from 2)
         unique_objects = sorted(set(candidate[0] for candidate in all_candidates))
         object_id_map = {obj_name: idx + 2 for idx, obj_name in enumerate(unique_objects)} # Escape from 0 and 1 True False
+
         
         # Create a score map and ID map with same dimensions as masks
         score_map = np.zeros(mask_shape, dtype=np.float32)
@@ -230,10 +241,6 @@ class CombinedLoader(BaseDataLoader):
             
             # Create a mask for pixels where current object has higher score than existing
             # or where no object exists yet
-
-            print(score_map.shape)
-            print(id_map.shape)
-            print(mask.shape)
             better_score_mask = np.logical_or(
                     (mask > 0) & (score_map == 0),  # No object yet
                     (mask > 0) & (score > score_map)  # Current object has higher score
@@ -262,32 +269,6 @@ class CombinedLoader(BaseDataLoader):
         features['merged']['mask'] = id_map.copy()
         features['merged']['object_id_map'] = object_id_map
 
-        
-    def _get_object_color(self, object_name: str) -> Tuple[int, int, int]:
-        """
-        Get a consistent color for an object using predefined color mapping.
-        
-        Args:
-            object_name: Object name
-            
-        Returns:
-            BGR color tuple
-        """
-        # Use predefined colors if available
-        if object_name in OBJECT_COLORS:
-            return OBJECT_COLORS[object_name]
-            
-        # Fall back to existing color if generated before
-        if object_name in self.object_colors:
-            return self.object_colors[object_name]
-            
-        # Generate a random color as a last resort
-        r = random.randint(50, 200)
-        g = random.randint(50, 200)
-        b = random.randint(50, 200)
-        self.object_colors[object_name] = (b, g, r)  # OpenCV uses BGR
-        
-        return self.object_colors[object_name]
     
     def _load_original_frame(self, camera_view: str, frame_idx: int) -> Optional[np.ndarray]:
         """
@@ -328,7 +309,7 @@ def visualize_object_masks(id_map, rgb_frame, object_id_map, object_colors, alph
     
     # Create a reverse mapping from ID to object name
     id_to_name = {id_val: name for name, id_val in object_id_map.items()}
-    
+
     # Create a colored mask
     colored_mask = np.zeros_like(visualization)
     
@@ -383,7 +364,8 @@ if __name__ == "__main__":
     
     # Create a configuration with a specific score threshold
     config = {
-        'score_threshold': 0.40,
+        'score_threshold': 0.35,
+        'lower_threshold': 0.28,
         'frames_dir': f"{data_root_dir}/orginal_frames"
     }
     
