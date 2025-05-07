@@ -268,6 +268,7 @@ class CombinedLoader(BaseDataLoader):
         # Add a single merged mask to the output
         features['merged']['mask'] = id_map.copy()
         features['merged']['object_id_map'] = object_id_map
+        features['merged']['success'] = True
 
     
     def _load_original_frame(self, camera_view: str, frame_idx: int) -> Optional[np.ndarray]:
