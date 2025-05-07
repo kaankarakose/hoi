@@ -16,7 +16,6 @@ parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.append(parent_dir)
 
 from object_interaction_detection.dataloaders.base_loader import BaseDataLoader
-from object_interaction_detection.dataloaders.hamer_loader import HAMERLoader
 
 from object_interaction_detection.utils.utils import load_rle_mask, rle2mask
 import logging
@@ -368,14 +367,14 @@ if __name__ == "__main__":
     cnos_loader = CNOSLoader(session_name="imi_session1_2", data_root_dir="/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data")
     print("Testing cnos loader")
     print("get_max_score_by_frame -> it should return me max score for each frame")
-    #print(cnos_loader.get_max_score_by_frame(camera_view="cam_side_l", start_frame=100, end_frame=101))
+    print(cnos_loader.get_max_score_by_frame(camera_view="cam_side_l", start_frame=100, end_frame=101))
 
-    #print("get_avaiable_objects",cnos_loader.get_available_objects(camera_view="cam_top", frame_type="L_frames"))
+    print("get_avaiable_objects",cnos_loader.get_available_objects(camera_view="cam_top", frame_type="L_frames"))
     
-    #print("get_frame_count",cnos_loader.get_frame_count(camera_view="cam_top", frame_type="L_frames"))
+    print("get_frame_count",cnos_loader.get_frame_count(camera_view="cam_top", frame_type="L_frames"))
 
 
-    #data = cnos_loader.load_masks(camera_view="cam_top", frame_idx=100, load_masks=True)
+    data = cnos_loader.load_masks(camera_view="cam_top", frame_idx=100, load_masks=True)
 
    
     

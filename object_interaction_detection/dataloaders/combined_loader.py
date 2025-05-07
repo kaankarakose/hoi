@@ -19,7 +19,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.append(parent_dir)
 
-from object_interaction_detection.dataloaders.base_loader import BaseDataLoader
+from object_interaction_detection.dataloaders.helper_loader.base_loader import BaseDataLoader
 from object_interaction_detection.dataloaders.cnos_loader import CNOSLoader
 from object_interaction_detection.dataloaders.hamer_loader import HAMERLoader
 from object_interaction_detection.utils.utils import load_rle_mask, rle2mask
@@ -208,11 +208,6 @@ class CombinedLoader(BaseDataLoader):
                     'objects': {},
                     'success': False
                 },
-            'combined': {         # Combined objects from both hands
-                'objects': {},
-                'success': False
-            }
-            }
         }
         
         ## merged object masks into one
