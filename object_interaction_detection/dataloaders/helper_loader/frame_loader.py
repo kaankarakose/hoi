@@ -8,8 +8,15 @@ import cv2
 import numpy as np
 from typing import Dict, List, Tuple, Any, Optional, Union
 
-# Import the base loader
-from object_interaction_detection.dataloaders.base_loader import BaseDataLoader
+# Fix import path for BaseDataLoader
+if __name__ == "__main__":
+    # When run directly as a script, use absolute imports
+    from object_interaction_detection.dataloaders.helper_loader.base_loader import BaseDataLoader
+else:
+    # When imported as a module, can use relative imports
+    from .base_loader import BaseDataLoader
+
+#
 import logging
 logging.basicConfig(level=logging.INFO)
 

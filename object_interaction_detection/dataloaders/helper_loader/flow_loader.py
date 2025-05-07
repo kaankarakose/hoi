@@ -16,8 +16,13 @@ from typing import Dict, List, Tuple, Any, Optional, Union, Callable
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.append(parent_dir)
-
-from object_interaction_detection.dataloaders.base_loader import BaseDataLoader
+# Fix import path for BaseDataLoader
+if __name__ == "__main__":
+    # When run directly as a script, use absolute imports
+    from object_interaction_detection.dataloaders.helper_loader.base_loader import BaseDataLoader
+else:
+    # When imported as a module, can use relative imports
+    from .base_loader import BaseDataLoader
 
 logging.basicConfig(level=logging.INFO)
 

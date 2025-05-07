@@ -17,16 +17,25 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.append(parent_dir)
 
-from src.object_interaction_detection.dataloaders.helper_loader.base_loader import BaseDataLoader
-from src.object_interaction_detection.dataloaders.helper_loader.cnos_loader import CNOSLoader
-from src.object_interaction_detection.dataloaders.helper_loader.hamer_loader import HAMERLoader
+# Use absolute or relative imports depending on how the script is run
+if __name__ == "__main__":
+    # When run directly as a script, use absolute imports
+    sys.path.append(os.path.dirname(current_dir))  # Add parent of dataloaders
+    from object_interaction_detection.dataloaders.helper_loader.base_loader import BaseDataLoader
+    from object_interaction_detection.dataloaders.helper_loader.cnos_loader import CNOSLoader
+    from object_interaction_detection.dataloaders.helper_loader.hamer_loader import HAMERLoader
+else:
+    # When imported as a module, use relative imports
+    from .helper_loader.base_loader import BaseDataLoader
+    from .helper_loader.cnos_loader import CNOSLoader
+    from .helper_loader.hamer_loader import HAMERLoader
 
 logging.basicConfig(level=logging.INFO)
 
 class CNOSHAMERLoader(BaseDataLoader):
     """
     Combined loader that uses both CNOS and HAMER loaders to provide
-    object segmentation masks in original image coordinates.
+    object segmentation masks in original image coordinates only.
     """
     
     def __init__(self, 
@@ -43,6 +52,10 @@ class CNOSHAMERLoader(BaseDataLoader):
         """
         # Set defaults for paths
         config = config or {}
+        
+        # Add default score threshold configuration
+        config.setdefault('score_threshold', 0.45)  # Default threshold of 0.5
+        config.setdefault('frames_dir', os.path.join(data_root_dir, 'orginal_frames'))  # For visualization
         
         # Call parent constructor
         super().__init__(session_name, data_root_dir, config)
@@ -83,7 +96,12 @@ class CNOSHAMERLoader(BaseDataLoader):
         # Load features from both loaders
         cnos_features = self.cnos_loader.load_features(camera_view, frame_idx)
         hamer_features = self.hamer_loader.load_features(camera_view, frame_idx)
-        
+        # print(frame_idx)
+        # print(hamer_features['left_hand']['success'])
+        # print(hamer_features['right_hand']['success'])
+
+        # print(hamer_features['right_hand']['crop_bbox'])
+        # raise ValueError
         # Initialize combined features dictionary
         features = {
             'frame_idx': frame_idx,
@@ -131,6 +149,13 @@ class CNOSHAMERLoader(BaseDataLoader):
         # Load combined features first
         features = self.load_features(camera_view, frame_idx)
         
+        # print(features['L_frames']['success'])
+        # print(features['R_frames']['success'])
+
+        # print(features['L_frames']['crop_bbox'])
+        # print(features['R_frames']['crop_bbox'])
+        # raise ValueError
+
         # Load raw masks from CNOS
         cnos_features = self.cnos_loader.load_masks(camera_view, frame_idx)
         
@@ -158,7 +183,7 @@ class CNOSHAMERLoader(BaseDataLoader):
             
             # Get crop bbox for this frame type
             crop_bbox = features[frame_type]['crop_bbox']
-            
+
             # Process each object
             for object_name, object_data in cnos_features[frame_type]['objects'].items():
                 # Initialize object in transformed features
@@ -175,7 +200,7 @@ class CNOSHAMERLoader(BaseDataLoader):
                 transformed_features[frame_type]['objects'][object_name]['masks'] = object_data['masks']
                 
                 # Transform masks if crop_bbox is available
-                if crop_bbox:
+                if crop_bbox is not None:
                     # Transform all masks
                     orig_masks = self._transform_masks_to_original(
                         object_data['masks'], crop_bbox
@@ -325,6 +350,7 @@ class CNOSHAMERLoader(BaseDataLoader):
 
 
 if __name__ == "__main__":
+    import random
     # Test the CNOSHAMERLoader
     cnos_hamer_loader = CNOSHAMERLoader(session_name="imi_session1_2", data_root_dir="/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data")
     print("Testing CNOSHAMERLoader")
@@ -339,15 +365,21 @@ if __name__ == "__main__":
     # Test get_frame_count
     print("get_frame_count", cnos_hamer_loader.get_frame_count(camera_view="cam_top", frame_type="L_frames"))
     
+
+    #Valid index
+
+    valid_index = cnos_hamer_loader.hamer_loader.get_valid_frame_idx()
+    print("valid_index", len(valid_index))
+    index = random.choice(valid_index['cam_top']['left'])
+    print("index", index)
+    
     # Test the combined loader functionality
     print("\nLoading features")
-    features = cnos_hamer_loader.load_features(camera_view="cam_top", frame_idx=100)
-    print(f"L_frames success: {features['L_frames']['success']}")
-    print(f"R_frames success: {features['R_frames']['success']}")
-    
+    features = cnos_hamer_loader.load_features(camera_view="cam_top", frame_idx=index)
+
     # Test loading masks and transforming to original coordinates
     print("\nLoading masks and transforming to original coordinates")
-    orig_masks = cnos_hamer_loader.load_original_masks(camera_view="cam_top", frame_idx=100)
+    orig_masks = cnos_hamer_loader.load_original_masks(camera_view="cam_top", frame_idx=index)
     
     # Print information about the masks
     for frame_type in ['L_frames', 'R_frames']:
@@ -355,6 +387,11 @@ if __name__ == "__main__":
             print(f"\n{frame_type} crop_bbox:", orig_masks[frame_type]['crop_bbox'])
             print(f"{frame_type} objects:")
             for obj_name, obj_data in orig_masks[frame_type]['objects'].items():
+                print(obj_data.keys())
+                print(len(obj_data['orig_masks']))
+                print(obj_data['orig_max_score_mask'].shape)
+                print(obj_data['max_score'])
+                raise ValueError
                 print(f"  - {obj_name}: {len(obj_data['masks'])} masks, max score: {obj_data['max_score']:.4f}")
                 if 'orig_masks' in obj_data:
                     print(f"    - {len(obj_data['orig_masks'])} transformed masks")
