@@ -244,7 +244,7 @@ class CNOSHAMERLoader(BaseDataLoader):
             # Log the number of True pixels in the mask
             # only for debug!
             true_pixels = np.sum(mask)
-            logging.info(f"Placed mask with {true_pixels} True pixels into original coordinates")
+            #logging.info(f"Placed mask with {true_pixels} True pixels into original coordinates")
         except ValueError as e:
             logging.error(f"Error transforming mask: {e}")
             logging.error(f"Mask shape: {mask.shape}, Crop: ({x1},{y1},{x2},{y2})")
@@ -293,7 +293,7 @@ class CNOSHAMERLoader(BaseDataLoader):
                 transformed_mask[y1:y2, x1:x2] = mask
                 # Log the number of True pixels in the mask
                 true_pixels = np.sum(mask)
-                logging.info(f"Placed mask with {true_pixels} True pixels into original coordinates")
+                #logging.info(f"Placed mask with {true_pixels} True pixels into original coordinates")
             except ValueError as e:
                 logging.error(f"Error transforming mask: {e}")
                 logging.error(f"Mask shape: {mask.shape}, Crop: ({x1},{y1},{x2},{y2})")

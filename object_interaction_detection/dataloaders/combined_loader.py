@@ -25,10 +25,12 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(current_dir))  # Add parent of dataloaders
     from object_interaction_detection.dataloaders.helper_loader.base_loader import BaseDataLoader
     from object_interaction_detection.dataloaders.cnos_hamer import CNOSHAMERLoader 
+    from object_interaction_detection.dataloaders.helper_loader.hamer_loader import HAMERLoader
 else:
     # When imported as a module, use relative imports
     from .helper_loader.base_loader import BaseDataLoader
-    from cnos_hamer import CNOSHAMERLoader
+    from .helper_loader.hamer_loader import HAMERLoader
+    from .cnos_hamer import CNOSHAMERLoader
 
 from object_interaction_detection.utils.utils import load_rle_mask, rle2mask
 
@@ -80,10 +82,10 @@ class CombinedLoader(BaseDataLoader):
         
         # Initialize CNOS and HAMER loaders
         self.cnos_loader = CNOSHAMERLoader(session_name, data_root_dir, config)
-        
+        self.hamer_loader = HAMERLoader(session_name, data_root_dir, config) # just need for valid index somehow
         # Get camera views and frame types from CNOS loader
         self.camera_views = self.cnos_loader.camera_views
-        self.frame_types = self.cnos_loader.frame_types
+        self.frame_types = self.cnos_loader.frame_type_to_hand_type
         
         # Mapping between frame types and hand types
         self.frame_to_hand_map = {
@@ -94,7 +96,7 @@ class CombinedLoader(BaseDataLoader):
         self.score_threshold = config['score_threshold']
         
         # Set up object colors for visualization
-        self.object_colors = {}
+        self.object_colors = OBJECT_COLORS
         
         logging.info(f"Initialized combined loader for session {session_name} with score threshold {self.score_threshold}")
     
@@ -116,8 +118,7 @@ class CombinedLoader(BaseDataLoader):
         
       
         # Load CNOS features (object segmentation)
-        cnos_features = self.cnos_loader.load_features(camera_view, frame_idx)
-        
+        cnos_features = self.cnos_loader.load_original_masks(camera_view, frame_idx) # not load features because i need original mask
         # Initialize combined features dictionary
         combined_features = {
             'frame_idx': frame_idx,
@@ -125,6 +126,7 @@ class CombinedLoader(BaseDataLoader):
             'cnos': cnos_features,    # Original CNOS features
             'merged' : {
                     'mask': None,
+                    'object_id_map': None,
                     'success': False,
                 }
         }
@@ -134,8 +136,8 @@ class CombinedLoader(BaseDataLoader):
         self._merge_objects_by_hand(combined_features)
         
         # Cache features (without large arrays to save memory)
-        cache_features = self._prepare_cache_features(combined_features)
-        self._cache_features(camera_view, frame_idx, cache_features)
+        #cache_features = self._prepare_cache_features(combined_features)
+        #self._cache_features(camera_view, frame_idx, cache_features)
 
 
         return combined_features
@@ -151,16 +153,19 @@ class CombinedLoader(BaseDataLoader):
             Memory-efficient features dictionary for caching
         """
         # Create a deep copy without the large data arrays
-        cache_features = {
-            'frame_idx': features['frame_idx'],
-            'camera_view': features['camera_view'],
-            'merged': 
-                 {
-                    'success': features['merged']['combined']['success'],
-                    'objects': {}
+        cache_features =      {
+            'frame_idx': frame_idx,
+            'camera_view': camera_view,
+            'cnos': cnos_features,    # Original CNOS features
+            'merged' : {
+                    'mask': None,
+                    'success': features['merged']['success'],
                 }
-            }
+        }
 
+
+
+   
         # Initialize combined features dictionary
         combined_features = {
             'frame_idx': frame_idx,
@@ -188,16 +193,18 @@ class CombinedLoader(BaseDataLoader):
         if features['cnos']['L_frames']['success']:
             left_hand = features['cnos']['L_frames']
             for object_name, object_data in left_hand['objects'].items():
+                object_data = left_hand['objects'][object_name]
                 if object_data['max_score'] >= self.score_threshold:
-                    left_mask_candidates.append((object_name, object_data['max_score_mask'], object_data['max_score']))
+                    left_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
         
         # Process right hand objects
         right_mask_candidates = []
         if features['cnos']['R_frames']['success']:
             right_hand = features['cnos']['R_frames']
             for object_name, object_data in right_hand['objects'].items():
+                object_data = right_hand['objects'][object_name]
                 if object_data['max_score'] >= self.score_threshold:
-                    right_mask_candidates.append((object_name, object_data['max_score_mask'], object_data['max_score']))
+                    right_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
         
         # Combine all candidates
         all_candidates = left_mask_candidates + right_mask_candidates
@@ -223,11 +230,14 @@ class CombinedLoader(BaseDataLoader):
             
             # Create a mask for pixels where current object has higher score than existing
             # or where no object exists yet
+
+            print(score_map.shape)
+            print(id_map.shape)
+            print(mask.shape)
             better_score_mask = np.logical_or(
-                mask > 0 & score_map == 0,  # No object yet
-                mask > 0 & score > score_map  # Current object has higher score
-            )
-            
+                    (mask > 0) & (score_map == 0),  # No object yet
+                    (mask > 0) & (score > score_map)  # Current object has higher score
+                )
             # Update score_map and id_map where current object is better
             score_map = np.where(better_score_mask, score, score_map)
             id_map = np.where(better_score_mask, object_id, id_map)
@@ -250,90 +260,9 @@ class CombinedLoader(BaseDataLoader):
         
         # Add a single merged mask to the output
         features['merged']['mask'] = id_map.copy()
-        
+        features['merged']['object_id_map'] = object_id_map
 
-
-              
-                    
-               
-    
-    def get_object_mask(self, camera_view: str, frame_idx: int, object_name: str) -> Optional[np.ndarray]:
-        """
-        Get mask for a specific object in original image coordinates.
         
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            object_name: Object name
-            
-        Returns:
-            Binary mask in original image coordinates or None if not available
-        """
-        features = self.load_features(camera_view, frame_idx)
-        
-        if (not features['merged']['combined']['success'] or 
-            object_name not in features['merged']['combined']['objects']):
-            return None
-            
-        return features['merged']['combined']['objects'][object_name].get('mask')
-    
-    def get_available_objects(self, camera_view: str, frame_idx: int) -> List[str]:
-        """
-        Get list of available objects for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            
-        Returns:
-            List of object names
-        """
-        features = self.load_features(camera_view, frame_idx)
-        
-        if not features['merged']['combined']['success']:
-            return []
-            
-        return list(features['merged']['combined']['objects'].keys())
-    
-    def get_object_scores(self, camera_view: str, frame_idx: int) -> Dict[str, float]:
-        """
-        Get scores for all objects in a specific frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            
-        Returns:
-            Dictionary mapping object names to scores
-        """
-        features = self.load_features(camera_view, frame_idx)
-        
-        if not features['merged']['combined']['success']:
-            return {}
-            
-        return {
-            obj_name: obj_data['score']
-            for obj_name, obj_data in features['merged']['combined']['objects'].items()
-        }
-    
-
-    def set_score_threshold(self, threshold: float) -> None:
-        """
-        Set the confidence score threshold for object filtering.
-        
-        Args:
-            threshold: New threshold value (0.0 to 1.0)
-        """
-        if threshold < 0.0 or threshold > 1.0:
-            logging.warning(f"Invalid threshold value {threshold}. Must be between 0.0 and 1.0. Using current value {self.score_threshold}.")
-            return
-            
-        self.score_threshold = threshold
-        logging.info(f"Updated score threshold to {self.score_threshold}")
-        
-        # Clear cache as threshold change affects results
-        self.clear_cache()
-    
     def _get_object_color(self, object_name: str) -> Tuple[int, int, int]:
         """
         Get a consistent color for an object using predefined color mapping.
@@ -373,7 +302,6 @@ class CombinedLoader(BaseDataLoader):
         """
         # Frame filename format may vary depending on your dataset
         frame_path = os.path.join(self.config['frames_dir'], self.session_name, camera_view, f"frame_{frame_idx + 1:04d}.jpg")
-     
         if os.path.exists(frame_path):
             return cv2.imread(frame_path)
         
@@ -381,7 +309,66 @@ class CombinedLoader(BaseDataLoader):
         return None
     
     
-
+def visualize_object_masks(id_map, rgb_frame, object_id_map, object_colors, alpha=0.5):
+    """
+    Create a visualization of object masks overlaid on an RGB frame.
+    
+    Args:
+        id_map: NumPy array where each pixel value is an object ID
+        rgb_frame: Original RGB image as a NumPy array
+        object_id_map: Dictionary mapping object names to IDs
+        object_colors: Dictionary mapping object names to RGB colors
+        alpha: Transparency factor for the overlay (0-1)
+        
+    Returns:
+        Visualization as a NumPy array
+    """
+    # Create a copy of the RGB frame as float for blending
+    visualization = rgb_frame.astype(np.float32).copy()
+    
+    # Create a reverse mapping from ID to object name
+    id_to_name = {id_val: name for name, id_val in object_id_map.items()}
+    
+    # Create a colored mask
+    colored_mask = np.zeros_like(visualization)
+    
+    # Extract unique object IDs from the id_map (excluding 0/background)
+    unique_ids = np.unique(id_map)
+    unique_ids = unique_ids[unique_ids > 0]
+    
+    # For each object ID in the id_map
+    for obj_id in unique_ids:
+        # Get the object name
+        if obj_id in id_to_name:
+            obj_name = id_to_name[obj_id]
+            
+            # Get the color for this object
+            if obj_name in object_colors:
+                color = np.array(object_colors[obj_name], dtype=np.float32)
+                
+                # Create a binary mask for this object
+                obj_mask = (id_map == obj_id)
+                
+                # Apply the color to this object in the colored mask
+                for c in range(3):  # RGB channels
+                    # This is the key fix - properly apply the color to the mask
+                    colored_mask[:,:,c][obj_mask] = color[c]
+    
+    # Create the mask for all objects
+    mask = (id_map > 0)
+    
+    # Blend the colored mask with the original frame
+    for c in range(3):  # RGB channels
+        visualization[:,:,c] = np.where(
+            mask,
+            (1 - alpha) * visualization[:,:,c] + alpha * colored_mask[:,:,c],
+            visualization[:,:,c]
+        )
+    
+    # Convert back to uint8
+    visualization = np.clip(visualization, 0, 255).astype(np.uint8)
+    
+    return visualization
 
 if __name__ == "__main__":
     import random
@@ -396,8 +383,8 @@ if __name__ == "__main__":
     
     # Create a configuration with a specific score threshold
     config = {
-        'score_threshold': 0.45,
-        'frames_dir': f"{data_root_dir}/original_frames"
+        'score_threshold': 0.40,
+        'frames_dir': f"{data_root_dir}/orginal_frames"
     }
     
     # Initialize the loader
@@ -407,124 +394,21 @@ if __name__ == "__main__":
     # Get valid frame indices from the CNOS loader
     valid_indices = combined_loader.cnos_loader.hamer_loader.get_valid_frame_idx()
     print(f"Available camera views: {combined_loader.camera_views}")
+
+    index = random.choice(valid_indices['cam_side_r']['left'])
+
+    print("Left testing:")
+    features = combined_loader.load_features(camera_view='cam_side_r', frame_idx=index)
+
+    final_mask = features['merged']['mask']
+    object_id_map = features['merged']['object_id_map']
+    frame = combined_loader._load_original_frame(camera_view='cam_side_r', frame_idx=index)
+
+    visualization = visualize_object_masks(final_mask, frame, object_id_map, combined_loader.object_colors)
     
-    # Choose a random valid frame from one camera view
-    camera_view = "cam_top"  # Using cam_top as in the example
-    if camera_view in valid_indices and 'left' in valid_indices[camera_view]:
-        valid_frames = valid_indices[camera_view]['left']
-        if valid_frames:
-            test_frame_idx = random.choice(valid_frames)
-            print(f"\nSelected test frame: {camera_view}, frame {test_frame_idx}")
-        else:
-            print(f"No valid frames found for {camera_view}, 'left'")
-            # Try to find any valid frame in any camera
-            for cam in combined_loader.camera_views:
-                if cam in valid_indices and 'left' in valid_indices[cam] and valid_indices[cam]['left']:
-                    camera_view = cam
-                    test_frame_idx = random.choice(valid_indices[cam]['left'])
-                    print(f"Using alternative: {camera_view}, frame {test_frame_idx}")
-                    break
-            else:
-                print("No valid frames found in any camera")
-                exit(1)
-    else:
-        print(f"Camera view {camera_view} or 'left' hand not found in valid indices")
-        exit(1)
+    print(features)
+    cv2.imwrite('Visualization.png', visualization)
     
-    # Test 1: Load features and check merged objects
-    print("\nTest 1: Loading features")
-    features = combined_loader.load_features(camera_view=camera_view, frame_idx=test_frame_idx)
     
-    # Check if merged features exist
-    if 'cnos' in features and 'combined_objects' in features['cnos']:
-        print("Merged objects found:")
-        for obj_name, obj_data in features['cnos']['combined_objects'].items():
-            print(f"  - {obj_name}: max score = {obj_data['max_score']:.4f}, mask shape = {obj_data['max_score_mask'].shape}")
-    else:
-        print("No merged objects found in features")
+
     
-    # Test 2: Get available objects
-    print("\nTest 2: Getting available objects")
-    objects = combined_loader.get_available_objects(camera_view=camera_view, frame_idx=test_frame_idx)
-    print(f"Available objects: {objects}")
-    
-    # Test 3: Get object scores
-    print("\nTest 3: Getting object scores")
-    scores = combined_loader.get_object_scores(camera_view=camera_view, frame_idx=test_frame_idx)
-    print(f"Object scores: {scores}")
-    
-    # Test 4: Change score threshold and reload features
-    print("\nTest 4: Changing score threshold")
-    new_threshold = 0.7
-    combined_loader.set_score_threshold(threshold=new_threshold)
-    print(f"Set score threshold to {new_threshold}")
-    
-    # Reload features with new threshold
-    features_high_threshold = combined_loader.load_features(camera_view=camera_view, frame_idx=test_frame_idx)
-    
-    # Check merged objects with new threshold
-    if 'cnos' in features_high_threshold and 'combined_objects' in features_high_threshold['cnos']:
-        print("Merged objects with higher threshold:")
-        for obj_name, obj_data in features_high_threshold['cnos']['combined_objects'].items():
-            print(f"  - {obj_name}: max score = {obj_data['max_score']:.4f}")
-    else:
-        print("No merged objects found with higher threshold")
-    
-    # Test 5: Visualize the merged masks
-    print("\nTest 5: Visualizing merged masks")
-    # Try to load the original frame
-    original_frame = combined_loader._load_original_frame(camera_view=camera_view, frame_idx=test_frame_idx)
-    
-    if original_frame is not None:
-        # Create a copy for visualization
-        vis_frame = original_frame.copy()
-        
-        # Get all merged objects
-        if 'cnos' in features and 'combined_objects' in features['cnos']:
-            for obj_name, obj_data in features['cnos']['combined_objects'].items():
-                # Get the object mask
-                obj_mask = obj_data['max_score_mask']
-                
-                # Get color for this object
-                color = combined_loader._get_object_color(obj_name)
-                
-                # Apply mask to frame - create an overlay
-                mask_overlay = np.zeros_like(original_frame)
-                mask_overlay[obj_mask > 0] = color
-                
-                # Blend with original frame
-                alpha = 0.5  # Transparency
-                cv2.addWeighted(mask_overlay, alpha, vis_frame, 1 - alpha, 0, vis_frame)
-                
-                # Add object name
-                # Find centroid of mask
-                if np.any(obj_mask):
-                    y_indices, x_indices = np.where(obj_mask > 0)
-                    centroid_y = int(np.mean(y_indices))
-                    centroid_x = int(np.mean(x_indices))
-                    
-                    # Put text at centroid
-                    cv2.putText(vis_frame, obj_name, (centroid_x, centroid_y), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-            
-            # Display the visualization
-            plt.figure(figsize=(12, 8))
-            plt.imshow(cv2.cvtColor(vis_frame, cv2.COLOR_BGR2RGB))
-            plt.title(f"Merged Objects - {camera_view}, Frame {test_frame_idx}")
-            plt.axis('off')
-            plt.tight_layout()
-            
-            # Save the visualization
-            output_dir = "visualizations"
-            os.makedirs(output_dir, exist_ok=True)
-            plt.savefig(f"{output_dir}/merged_objects_{camera_view}_{test_frame_idx}.png")
-            print(f"Visualization saved to {output_dir}/merged_objects_{camera_view}_{test_frame_idx}.png")
-            
-            # Show the plot
-            plt.show()
-        else:
-            print("No merged objects to visualize")
-    else:
-        print("Original frame not found for visualization")
-    
-    print("\nTesting completed")
