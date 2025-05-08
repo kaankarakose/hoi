@@ -181,14 +181,56 @@ class MotionFilteredLoader(BaseDataLoader):
             }
         }            
         return cache_features
-    
-    def _filter_by_motion(self, 
-                         camera_view: str, 
-                         frame_idx: int, 
-                         merged_mask: np.ndarray, 
-                         object_id_map: Dict[str, int]) -> Tuple[np.ndarray, List[str]]:
+    def _get_cached_features(self, camera_view: str, frame_idx: int) -> Optional[Dict[str, Any]]:
         """
-        Filter object masks based on motion detected by optical flow.
+        Get cached features for a specific camera view and frame.
+        
+        Args:
+            camera_view: Camera view name
+            frame_idx: Frame index
+            
+        Returns:
+            Cached features dictionary or None if not in cache
+        """
+        # Create cache key
+        cache_key = f"{camera_view}_{frame_idx}"
+        
+        # Return cached features if available
+        return self.features_cache.get(cache_key)
+
+    def _cache_features(self, camera_view: str, frame_idx: int, features: Dict[str, Any]) -> None:
+        """
+        Cache features for a specific camera view and frame.
+        
+        Args:
+            camera_view: Camera view name
+            frame_idx: Frame index
+            features: Features dictionary to cache
+        """
+        # Create cache key
+        cache_key = f"{camera_view}_{frame_idx}"
+        
+        # Store in cache
+        self.features_cache[cache_key] = features
+    def _load_original_frame(self, camera_view: str, frame_idx: int) -> Optional[np.ndarray]:
+            """
+            Load the original frame image (delegate to combined loader).
+            
+            Args:
+                camera_view: Camera view name
+                frame_idx: Frame index
+                
+            Returns:
+                Frame image as numpy array or None if not available
+            """
+            return self.combined_loader._load_original_frame(camera_view, frame_idx)
+    def _filter_by_motion(self, 
+                     camera_view: str, 
+                     frame_idx: int, 
+                     merged_mask: np.ndarray, 
+                     object_id_map: Dict[str, int]) -> Tuple[np.ndarray, List[str]]:
+        """
+        Filter object masks based on activeness detected by optical flow.
         
         Args:
             camera_view: Camera view name
@@ -222,37 +264,27 @@ class MotionFilteredLoader(BaseDataLoader):
             # Create a binary mask for this object
             obj_mask = (merged_mask == obj_id)
             
-            # Check if the object is moving using the flow loader
-            flow_info = self.flow_loader.process_flow_in_mask(
+            # Check the activeness of the object using the flow loader
+            activeness = self.flow_loader.process_flow_in_mask_active_area(
                 camera_view=camera_view,
                 frame_idx=frame_idx,
-                mask=obj_mask,
-                temporal_window=self.temporal_window,
-                motion_threshold=self.motion_threshold
+                mask=obj_mask
             )
-      
-            print(flow_info['avg_u'])
-            print(flow_info['avg_v'])
-            print(flow_info['avg_dir'])
-            print(flow_info['avg_dir_scaled'])
-            print(flow_info['avg_len'])
-            print(flow_info['is_moving'])
-            print(flow_info['raw_u_vectors'])
-            print(flow_info['raw_v_vectors'])
-            # If the object is not moving, remove it from the filtered mask
-            if not flow_info['is_moving']:
-                filtered_mask[obj_mask] = 0
-            else:
-                moving_objects.append(obj_name)
+            
+            # If the object is not active enough, remove it from the filtered mask
+            # if activeness < self.motion_threshold:
+            #     filtered_mask[obj_mask] = 0
+            # else:
+            moving_objects.append(obj_name)
         
         return filtered_mask, moving_objects
     
-    def get_motion_vectors(self, 
+    def get_activeness(self, 
                           camera_view: str, 
                           frame_idx: int, 
                           object_name: str) -> Dict[str, Any]:
         """
-        Get motion vectors for a specific object.
+        Get activeness score for a specific object.
         
         Args:
             camera_view: Camera view name
@@ -260,7 +292,7 @@ class MotionFilteredLoader(BaseDataLoader):
             object_name: Name of the object
             
         Returns:
-            Dictionary containing motion vectors and related information
+            Dictionary containing activeness score and related information
         """
         # Load filtered features
         features = self.load_features(camera_view, frame_idx)
@@ -270,8 +302,7 @@ class MotionFilteredLoader(BaseDataLoader):
             return {
                 'success': False,
                 'object_name': object_name,
-                'is_moving': False,
-                'motion_vector': (0.0, 0.0)
+                'activeness': 0
             }
         
         # Get object ID map and filtered mask
@@ -283,8 +314,7 @@ class MotionFilteredLoader(BaseDataLoader):
             return {
                 'success': False,
                 'object_name': object_name,
-                'is_moving': False,
-                'motion_vector': (0.0, 0.0)
+                'activeness': 0,
             }
         
         # Get the object ID
@@ -298,26 +328,20 @@ class MotionFilteredLoader(BaseDataLoader):
             return {
                 'success': True,
                 'object_name': object_name,
-                'is_moving': False,
-                'motion_vector': (0.0, 0.0)
+                'activeness': 0,
             }
-        
+
         # Get flow information for this object
-        flow_info = self.flow_loader.process_flow_in_mask(
+        activeness = self.flow_loader.process_flow_in_mask_active_area(
             camera_view=camera_view,
             frame_idx=frame_idx,
             mask=obj_mask,
-            temporal_window=self.temporal_window
         )
         
         return {
             'success': True,
             'object_name': object_name,
-            'is_moving': flow_info['is_moving'],
-            'motion_vector': flow_info['avg_dir'],
-            'motion_vector_scaled': flow_info['avg_dir_scaled'],
-            'motion_magnitude': flow_info['avg_len'],
-            'raw_flow_info': flow_info
+            'activeness': activeness
         }
     
     def get_all_moving_objects(self, 
@@ -392,34 +416,102 @@ class MotionFilteredLoader(BaseDataLoader):
         
         return visualization
     
-    def _add_flow_vectors_to_visualization(self,
-                                          visualization: np.ndarray,
-                                          camera_view: str,
-                                          frame_idx: int,
-                                          filtered_mask: np.ndarray,
-                                          object_id_map: Dict[str, int]) -> np.ndarray:
+    
+    
+    
+
+    def _calculate_object_activeness(self, 
+                                camera_view: str, 
+                                frame_idx: int, 
+                                mask: np.ndarray, 
+                                object_id_map: Dict[str, int]) -> Dict[int, float]:
         """
-        Add flow vectors to object mask visualization.
+        Calculate activeness scores for all objects in the mask.
         
         Args:
-            visualization: Mask visualization image
             camera_view: Camera view name
             frame_idx: Frame index
-            filtered_mask: Filtered object mask
+            mask: Object mask with object IDs
             object_id_map: Mapping from object names to IDs
             
         Returns:
-            Visualization with flow vectors
+            Dictionary mapping object IDs to activeness scores
         """
-        # Create a copy of the visualization
-        result = visualization.copy()
+        # Create a reverse mapping from ID to object name
+        id_to_name = {id_val: name for name, id_val in object_id_map.items()}
+        
+        # Dictionary to store activeness for each object ID
+        activeness_map = {}
+        
+        # Extract unique object IDs from the mask (excluding 0/background)
+        unique_ids = np.unique(mask)
+        unique_ids = unique_ids[unique_ids > 0]
+        
+        # Process each object ID
+        for obj_id in unique_ids:
+            # Get the object name
+            obj_name = id_to_name.get(obj_id)
+            if obj_name is None:
+                activeness_map[obj_id] = 0.0
+                continue
+            
+            # Create a binary mask for this object
+            obj_mask = (mask == obj_id)
+            
+            # Get activeness for this object
+            activeness = self.flow_loader.process_flow_in_mask_active_area(
+                camera_view=camera_view,
+                frame_idx=frame_idx,
+                mask=obj_mask
+            )
+            
+            activeness_map[obj_id] = activeness
+        
+        return activeness_map
+        
+    def _visualize_with_activeness(self,
+                                id_map: np.ndarray,
+                                rgb_frame: np.ndarray,
+                                object_id_map: Dict[str, int],
+                                object_colors: Dict[str, Tuple[int, int, int]],
+                                activeness_map: Dict[int, float]) -> np.ndarray:
+        """
+        Visualize object masks with brightness based on activeness scores.
+        
+        Args:
+            id_map: Object mask with object IDs
+            rgb_frame: Original RGB frame
+            object_id_map: Mapping from object names to IDs
+            object_colors: Mapping from object names to colors
+            activeness_map: Mapping from object IDs to activeness scores
+            
+        Returns:
+            Visualization as a NumPy array
+        """
+        # Create a copy of the RGB frame
+        visualization = rgb_frame.copy()
         
         # Create a reverse mapping from ID to object name
         id_to_name = {id_val: name for name, id_val in object_id_map.items()}
         
         # Extract unique object IDs from the mask (excluding 0/background)
-        unique_ids = np.unique(filtered_mask)
+        unique_ids = np.unique(id_map)
         unique_ids = unique_ids[unique_ids > 0]
+        
+        # Create a separate overlay for each object
+        overlay = np.zeros_like(rgb_frame, dtype=np.float32)
+        
+        # Define brightness levels based on activeness
+        # This creates a step function with 4 levels
+        def get_brightness_factor(activeness):
+            if activeness < 0.125:
+                return 0.25  # Very low brightness (25%)
+            elif activeness < 0.25:
+                return 0.5   # Low brightness (50%)
+            elif activeness < 0.5:
+                return 0.75  # Medium brightness (75%)
+            else:
+                return 1.0   # Full brightness (100%)
         
         # Process each object ID
         for obj_id in unique_ids:
@@ -428,102 +520,203 @@ class MotionFilteredLoader(BaseDataLoader):
             if obj_name is None:
                 continue
             
-            # Create a binary mask for this object
-            obj_mask = (filtered_mask == obj_id)
+            # Get the object's activeness
+            activeness = activeness_map.get(obj_id, 0.0)
             
-            # Get flow information for this object
-            flow_info = self.flow_loader.process_flow_in_mask(
-                camera_view=camera_view,
-                frame_idx=frame_idx,
-                mask=obj_mask,
-                temporal_window=self.temporal_window
-            )
+            # Get the object's color
+            base_color = object_colors.get(obj_name, (255, 0, 0))  # Default to red
             
-            # Skip if the object is not moving
-            if not flow_info['is_moving']:
-                continue
+            # Calculate brightness-adjusted color
+            brightness = get_brightness_factor(activeness)
+            adjusted_color = tuple(int(c * brightness) for c in base_color)
             
-            # Get centroid of the object mask
-            y_indices, x_indices = np.where(obj_mask)
-            if len(y_indices) == 0 or len(x_indices) == 0:
+            # Create object mask
+            obj_mask = (id_map == obj_id)
+            
+            # Apply color to the object mask with transparency
+            for c in range(3):  # RGB channels
+                overlay[obj_mask, c] = adjusted_color[c]
+        
+        # Combine the original frame with the overlay
+        alpha = 0.5  # Transparency factor
+        visualization = cv2.addWeighted(visualization, 1-alpha, overlay.astype(np.uint8), alpha, 0)
+        
+        # Add activeness labels to each object
+        for obj_id in unique_ids:
+            obj_name = id_to_name.get(obj_id, "")
+            activeness = activeness_map.get(obj_id, 0.0)
+            
+            # Create object mask and find its center point
+            obj_mask = (id_map == obj_id)
+            if not np.any(obj_mask):
                 continue
                 
-            centroid_y = int(np.min(y_indices))
-            centroid_x = int(np.min(x_indices))
+            y_indices, x_indices = np.where(obj_mask)
+            center_y = int(np.mean(y_indices))
+            center_x = int(np.mean(x_indices))
             
-            # Draw an arrow from the centroid in the direction of motion
-            motion_vector = flow_info['avg_dir_scaled']
-            arrow_end_x = centroid_x + motion_vector[0]
-            arrow_end_y = centroid_y + motion_vector[1]
+            # Format label with activeness percentage
+            label = f"{obj_name}: {activeness:.2f}"
             
-            # Draw the arrow
-            cv2.arrowedLine(
-                result,
-                (centroid_x, centroid_y),
-                (arrow_end_x, arrow_end_y),
-                (0, 255, 0),  # Green color
-                3,  # Line thickness
-                tipLength=6  # Length of arrow tip
+            # Add activeness level indicator
+            if activeness < 0.125:
+                level = "Very Low"
+            elif activeness < 0.25:
+                level = "Low"
+            elif activeness < 0.5:
+                level = "Medium"
+            else:
+                level = "High"
+                
+            full_label = f"{obj_name}: {level} ({activeness:.2f})"
+            
+            # Add label to visualization
+            cv2.putText(
+                visualization,
+                full_label,
+                (center_x, center_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (255, 255, 255),  # White text
+                1,
+                cv2.LINE_AA
             )
         
-        return result
-    
-    def _load_original_frame(self, camera_view: str, frame_idx: int) -> Optional[np.ndarray]:
-        """
-        Load the original frame image (delegate to combined loader).
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            
-        Returns:
-            Frame image as numpy array or None if not available
-        """
-        return self.combined_loader._load_original_frame(camera_view, frame_idx)
-    
-    def _cache_features(self, camera_view: str, frame_idx: int, features: Dict[str, Any]) -> None:
-        """
-        Cache features for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            features: Features dictionary to cache
-        """
-        # Create cache key
-        cache_key = f"{camera_view}_{frame_idx}"
-        
-        # Store in cache
-        self.features_cache[cache_key] = features
-    
-    def _get_cached_features(self, camera_view: str, frame_idx: int) -> Optional[Dict[str, Any]]:
-        """
-        Get cached features for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            
-        Returns:
-            Cached features dictionary or None if not in cache
-        """
-        # Create cache key
-        cache_key = f"{camera_view}_{frame_idx}"
-        
-        # Return cached features if available
-        return self.features_cache.get(cache_key)
+        return visualization    
 
 
+
+
+def visualize_object_masks(id_map, rgb_frame, object_id_map, object_colors, activeness_map=None, alpha=0.5, min_activeness=0.40):
+    """
+    Create a visualization of object masks overlaid on an RGB frame, with brightness controlled by activeness.
+    
+    Args:
+        id_map: NumPy array where each pixel value is an object ID
+        rgb_frame: Original RGB image as a NumPy array
+        object_id_map: Dictionary mapping object names to IDs
+        object_colors: Dictionary mapping object names to RGB colors
+        activeness_map: Dictionary mapping object names to activeness scores (0 to 1)
+        alpha: Transparency factor for the overlay (0-1)
+        min_activeness: Minimum activeness threshold for displaying an object (default 0.25)
+        
+    Returns:
+        Visualization as a NumPy array
+    """
+    # Create a copy of the RGB frame as float for blending
+    visualization = rgb_frame.astype(np.float32).copy()
+    
+    # Create a reverse mapping from ID to object name
+    id_to_name = {id_val: name for name, id_val in object_id_map.items()}
+
+    # Create a colored mask
+    colored_mask = np.zeros_like(visualization)
+    
+    # Extract unique object IDs from the id_map (excluding 0/background)
+    unique_ids = np.unique(id_map)
+    unique_ids = unique_ids[unique_ids > 0]
+    
+    # Track which pixels should be overlaid
+    overlay_mask = np.zeros(id_map.shape, dtype=bool)
+    
+    # For each object ID in the id_map
+    for obj_id in unique_ids:
+        # Get the object name
+        if obj_id in id_to_name:
+            obj_name = id_to_name[obj_id]
+            
+            # Skip objects below the minimum activeness threshold
+            if activeness_map is not None:
+                activeness = activeness_map.get(obj_name, 0)
+                if activeness < min_activeness:
+                    continue
+            
+            # Get the color for this object
+            if obj_name in object_colors:
+                base_color = np.array(object_colors[obj_name], dtype=np.float32)
+                
+                # Adjust color brightness based on activeness (if provided)
+                if activeness_map is not None:
+                    activeness = activeness_map.get(obj_name, 0)
+                    # Scale brightness: 
+                    # - activeness of 0.25 maps to 25% brightness
+                    # - activeness of 0.5 maps to 50% brightness
+                    # - activeness of 1.0 maps to 100% brightness
+                    brightness_factor = max(activeness, min_activeness) * 2  # Scale up for better visibility
+                    brightness_factor = min(brightness_factor, 1.0)  # Cap at 1.0
+                    color = base_color * brightness_factor
+                else:
+                    color = base_color
+                
+                # Create a binary mask for this object
+                obj_mask = (id_map == obj_id)
+                
+                # Add to overlay mask
+                overlay_mask = overlay_mask | obj_mask
+                
+                # Apply the color to this object in the colored mask
+                for c in range(3):  # RGB channels
+                    colored_mask[:,:,c][obj_mask] = color[c]
+    
+    # Blend the colored mask with the original frame
+    for c in range(3):  # RGB channels
+        visualization[:,:,c] = np.where(
+            overlay_mask,
+            (1 - alpha) * visualization[:,:,c] + alpha * colored_mask[:,:,c],
+            visualization[:,:,c]
+        )
+    
+    # Add activeness labels to each object if activeness_map is provided
+    if activeness_map is not None:
+        visualization = visualization.astype(np.uint8)
+        for obj_id in unique_ids:
+            if obj_id in id_to_name:
+                obj_name = id_to_name[obj_id]
+                if obj_name in activeness_map:
+                    activeness = activeness_map[obj_name]
+                    
+                    # Skip objects below threshold
+                    if activeness < min_activeness:
+                        continue
+                    
+                    # Create a binary mask for this object
+                    obj_mask = (id_map == obj_id)
+                    if not np.any(obj_mask):
+                        continue
+                    
+                    # Find center of mass for label placement
+                    y_indices, x_indices = np.where(obj_mask)
+                    center_y = int(np.mean(y_indices))
+                    center_x = int(np.mean(x_indices))
+                    
+                    # Add activeness text
+                    text = f"{obj_name}: {activeness:.2f}"
+                    cv2.putText(
+                        visualization,
+                        text,
+                        (center_x, center_y),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        (255, 255, 255),
+                        1,
+                        cv2.LINE_AA
+                    )
+    
+    # Convert back to uint8
+    visualization = np.clip(visualization, 0, 255).astype(np.uint8)
+    
+    return visualization
+import cv2
 if __name__ == "__main__":
     import random
     
     # Initialize the Motion-Filtered Loader
     session_name = "imi_session1_6"
     data_root_dir = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data"
-    
+    camera_view = 'cam_top'
     # Create a configuration with specific thresholds
     config = {
-        'score_threshold': 0.35,    # CNOS confidence threshold
+        'score_threshold': 0.40,    # CNOS confidence threshold
         'lower_threshold': 0.28,    # Lower bound for CNOS confidence
         'motion_threshold': 0.05,   # Threshold for determining motion
         'temporal_window': 2,       # Window for optical flow aggregation
@@ -536,57 +729,121 @@ if __name__ == "__main__":
         data_root_dir=data_root_dir, 
         config=config
     )
-    #print("Initialized MotionFilteredLoader")
+    print("Initialized MotionFilteredLoader")
     
     # Get valid frame indices from the CNOS loader
     valid_indices = motion_loader.combined_loader.cnos_loader.hamer_loader.get_valid_frame_idx()
-    #print(f"Available camera views: {motion_loader.camera_views}")
+    print(f"Available camera views: {motion_loader.camera_views}")
 
     # Choose a random valid frame
-    index = random.choice(valid_indices['cam_side_r']['left'])
-
-    #print(f"Processing frame {index} from cam_side_r")
-    features = motion_loader.load_features(camera_view='cam_side_r', frame_idx=index)
-
-    # Display results
-    moving_objects = motion_loader.get_all_moving_objects('cam_side_r', index)
-    #print(f"Moving objects: {moving_objects}")
+    index = random.choice(valid_indices[camera_view]['left'])
+    print(f"Processing frame {index} from cam_side_r")
     
-    # Create visualization
-    visualization = motion_loader.visualize_motion_filtered_masks(
-        camera_view='cam_side_r', 
-        frame_idx=index,
-        with_flow_vectors=True
-    )
-    
-    # Save visualization
-    cv2.imwrite('Motion_Filtered_Visualization.png', visualization)
-    #print("Visualization saved to Motion_Filtered_Visualization.png")
-    
-    # Get motion vectors for each moving object
-    for obj_name in moving_objects:
-        motion_info = motion_loader.get_motion_vectors('cam_side_r', index, obj_name)
-        #print(f"Object: {obj_name}, Motion vector: {motion_info['motion_vector']}, "
-        #      f"Magnitude: {motion_info['motion_magnitude']}")
+    # Load features
+    features = motion_loader.load_features(camera_view = camera_view, frame_idx=index)
 
-    #Combined
-    # Initialize the loader
+    # Get list of moving objects
+    moving_objects = motion_loader.get_all_moving_objects(camera_view, index)
+    print(f"Moving objects: {moving_objects}")
+    
+    # Combined Loader and Flow Loader
     combined_loader = CombinedLoader(session_name=session_name, data_root_dir=data_root_dir, config=config)
     flow_loader = FlowLoader(session_name=session_name, data_root_dir="/nas/project_data/B1_Behavior/rush/kaan/old_method/processed_data", config=config)
-    #print("Initialized CombinedLoader")
-    features = combined_loader.load_features(camera_view='cam_side_r', frame_idx=index)
-    final_mask = features['merged']['mask']
-    object_id_map = features['merged']['object_id_map']
-    frame = combined_loader._load_original_frame(camera_view='cam_side_r', frame_idx=index)
-    visualization = visualize_object_masks(final_mask, frame, object_id_map, combined_loader.object_colors)
     
-    #print(features)
-    cv2.imwrite('original.png', visualization)
-
-
-    ## on the flow frame
-    flow_frame = flow_loader._load_flow_frame(camera_view='cam_side_r', frame_idx=index)
-
-    visualization = visualize_object_masks(final_mask, flow_frame, object_id_map, combined_loader.object_colors)
-     #print(features)
-    cv2.imwrite('flow.png', visualization)
+    # Get original masks
+    combined_features = combined_loader.load_features(camera_view=camera_view, frame_idx=index)
+    original_mask = combined_features['merged']['mask']
+    object_id_map = combined_features['merged']['object_id_map']
+    
+    # Get RGB frame and flow frame
+    frame = combined_loader._load_original_frame(camera_view=camera_view, frame_idx=index)
+    flow_frame = flow_loader._load_flow_frame(camera_view=camera_view, frame_idx=index)
+    
+    # Get all objects
+    all_objects = list(object_id_map.keys())
+    
+    # Calculate activeness for each object
+    activeness_map = {}
+    for obj_name in all_objects:
+        obj_id = object_id_map[obj_name]
+        obj_mask = (original_mask == obj_id)
+        activeness = flow_loader.process_flow_in_mask_active_area(
+            camera_view=camera_view,
+            frame_idx=index,
+            mask=obj_mask
+        )
+        activeness_map[obj_name] = activeness
+        print(f"Object: {obj_name}, Activeness: {activeness:.4f}")
+    
+    # Create visualizations
+    
+    # 1. Original visualization (without activeness)
+    original_vis = visualize_object_masks(
+        original_mask, frame, object_id_map, combined_loader.object_colors
+    )
+    cv2.imwrite('original_masks.png', original_vis)
+    print("Saved original visualization")
+    
+    # 2. Enhanced visualization with activeness (all objects)
+    activeness_vis_all = visualize_object_masks(
+        original_mask, frame, object_id_map, combined_loader.object_colors, 
+        activeness_map=activeness_map, min_activeness=0  # Show all objects
+    )
+    cv2.imwrite('activeness_all_objects.png', activeness_vis_all)
+    print("Saved activeness visualization (all objects)")
+    
+    # 3. Enhanced visualization with activeness (only objects with activeness > 0.25)
+    activeness_vis_filtered = visualize_object_masks(
+        original_mask, frame, object_id_map, combined_loader.object_colors, 
+        activeness_map=activeness_map, min_activeness=0.40  # Default threshold
+    )
+    cv2.imwrite('activeness_filtered_objects.png', activeness_vis_filtered)
+    print("Saved activeness visualization (filtered objects)")
+    
+    # 4. Flow frame visualization with activeness
+    flow_vis = visualize_object_masks(
+        original_mask, flow_frame, object_id_map, combined_loader.object_colors,
+        activeness_map=activeness_map, min_activeness=0.25
+    )
+    cv2.imwrite('flow_activeness.png', flow_vis)
+    print("Saved flow frame visualization with activeness")
+    
+    # Create a side-by-side comparison
+    h, w, _ = frame.shape
+    composite = np.zeros((h, w*3, 3), dtype=np.uint8)
+    
+    # Add original visualization to first column
+    composite[:, 0:w, :] = original_vis
+    
+    # Add activeness-based visualization (all objects) to second column
+    composite[:, w:2*w, :] = activeness_vis_all
+    
+    # Add activeness-based visualization (filtered) to third column
+    composite[:, 2*w:3*w, :] = activeness_vis_filtered
+    
+    # Add column titles
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(composite, "Original", (w//4, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(composite, "Activeness (All)", (w + w//4, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(composite, "Activeness (>0.25)", (2*w + w//4, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+    
+    # Add activeness table
+    y_offset = h - 20*len(all_objects)
+    cv2.putText(composite, "Object Activeness:", (10, y_offset - 30), font, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
+    
+    # Sort objects by activeness
+    sorted_objects = sorted(all_objects, key=lambda x: activeness_map[x], reverse=True)
+    
+    for i, obj_name in enumerate(sorted_objects):
+        activeness = activeness_map[obj_name]
+        status = "VISIBLE" if activeness >= 0.25 else "HIDDEN"
+        text = f"{obj_name}: {activeness:.4f} - {status}"
+        y_pos = y_offset + i * 20
+        color = (255, 255, 255) if activeness >= 0.25 else (128, 128, 128)
+        cv2.putText(composite, text, (10, y_pos), font, 0.5, color, 1, cv2.LINE_AA)
+    
+    # Save the composite visualization
+    cv2.imwrite('comparison_visualization.png', composite)
+    print("Saved comparison visualization")
+    
+    print("Process completed successfully!")

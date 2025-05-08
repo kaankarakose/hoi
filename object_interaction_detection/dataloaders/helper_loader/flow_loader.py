@@ -9,9 +9,9 @@ import sys
 import math
 import logging
 import numpy as np
+import cv2
 from PIL import Image
 from typing import Dict, List, Tuple, Any, Optional, Union, Callable
-
 # Add the parent directory to the path dynamically
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(os.path.dirname(current_dir))
@@ -410,6 +410,72 @@ class FlowLoader(BaseDataLoader):
             'raw_u_vectors': all_u_vectors,
             'raw_v_vectors': all_v_vectors
         }
+
+
+    def _extract_activeness(self, features: Dict[str, Any], mask: np.ndarray):
+        """
+        Extract activeness from features and mask
+        
+        This function takes hsv_data and mask as input and returns activeness,
+        activeness is a value between 0 and 1 that indicates how active the object is.
+        Flow frame pretended to be binary mask, so we can use it to calculate activeness.
+        
+        Args:
+            features: Features dictionary containing hsv_data
+            mask: Boolean mask indicating region of interest
+        
+        Returns:
+            Activeness value between 0 and 1
+        """
+        
+        # Convert HSV data to grayscale
+        gray_mask = cv2.cvtColor(features['hsv_data'], cv2.COLOR_HSV2BGR)
+        gray_mask = cv2.cvtColor(gray_mask, cv2.COLOR_BGR2GRAY)
+        
+        # Invert the grayscale image so that activity (non-white areas) has higher values
+        # This makes 255 (white/inactive) become 0, and active areas have values > 0
+        inverted_mask = 255 - gray_mask
+
+        #binary_mask = cv2.adaptiveThreshold(inverted_mask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 1, 1) # 11 and 2 are parameters for adaptive thresholding
+        ret, binary_mask = cv2.threshold(inverted_mask, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        
+        # Calculate activeness with protection against division by zero
+        if np.sum(mask) > 0:
+            # Count the number of active pixels (255s) within the mask region
+            # Then divide by the total number of pixels in the mask
+            active_pixels = np.count_nonzero(binary_mask[mask] == 255)
+            total_mask_pixels = np.sum(mask)
+            activeness = active_pixels / total_mask_pixels
+            print(active_pixels, total_mask_pixels, activeness)
+        else:
+            activeness = 0.0
+        return activeness
+
+    def process_flow_in_mask_active_area(self, 
+                                camera_view: str, 
+                                frame_idx: int, 
+                                mask: np.ndarray) -> float:
+        """
+        Process optical flow within a specific mask and return the activeness value.
+        
+        Args:
+            camera_view: Camera view name
+            frame_idx: Frame index
+            mask: Boolean mask array indicating region of interest                
+        Returns:
+            Activeness value between 0 and 1
+        """
+        # Load features for the requested frame
+        features = self.load_features(camera_view, frame_idx)
+            
+        if not features['success'] or features['hsv_data'] is None:
+            raise ValueError("Loading features failed in optical flow!")
+            
+        # Extract activeness from masked region
+        activeness = self._extract_activeness(features, mask)
+        
+        return activeness
     
     def _extract_flow_vectors(self, 
                               hsv_data: np.ndarray, 
