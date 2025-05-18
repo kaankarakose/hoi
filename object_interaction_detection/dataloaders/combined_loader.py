@@ -75,7 +75,6 @@ class CombinedLoader(BaseDataLoader):
         
         # Add default score threshold configuration
         config.setdefault('score_threshold', 0.45)  # Default threshold of 0.5
-        config.setdefault('lower_threshold', 0.25)  # Default threshold of 0.5
         config.setdefault('frames_dir', os.path.join(data_root_dir, 'orginal_frames'))  # For visualization
         
         # Call parent constructor
@@ -95,7 +94,6 @@ class CombinedLoader(BaseDataLoader):
         }
         # Store the score threshold for filtering objects
         self.score_threshold = config['score_threshold']
-        self.lower_threshold = config['lower_threshold']
         # Set up object colors for visualization
         self.object_colors = OBJECT_COLORS
         #
@@ -187,10 +185,7 @@ class CombinedLoader(BaseDataLoader):
                 # Exclude the large 'mask' array
             }
         }            
-        return cache_features
-    
-    
-    
+        return cache_features  
     def _merge_objects_by_hand(self, features: Dict[str, Any]) -> None:
         """
         Merge overlapping objects from both hands based on scores using NumPy operations.
@@ -204,7 +199,7 @@ class CombinedLoader(BaseDataLoader):
             left_hand = features['cnos']['L_frames']
             for object_name, object_data in left_hand['objects'].items():
                 object_data = left_hand['objects'][object_name]
-                if object_data['max_score'] >= self.lower_threshold :
+                if object_data['max_score'] >= self.score_threshold :
                     left_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
         
         # Process right hand objects
@@ -213,7 +208,7 @@ class CombinedLoader(BaseDataLoader):
             right_hand = features['cnos']['R_frames']
             for object_name, object_data in right_hand['objects'].items():
                 object_data = right_hand['objects'][object_name]
-                if object_data['max_score'] >= self.lower_threshold:
+                if object_data['max_score'] >= self.score_threshold:
                     right_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
         
         # Combine all candidates
@@ -234,7 +229,7 @@ class CombinedLoader(BaseDataLoader):
         # Create a score map and ID map with same dimensions as masks
         score_map = np.zeros(mask_shape, dtype=np.float32)
         id_map = np.zeros(mask_shape, dtype=np.int32)
-        
+        all_candidates.sort(key=lambda x: x[2], reverse=True) # sort by score
         # Process each mask using NumPy operations
         for object_name, mask, score in all_candidates:
             object_id = object_id_map[object_name]
@@ -269,8 +264,6 @@ class CombinedLoader(BaseDataLoader):
         features['merged']['mask'] = id_map.copy()
         features['merged']['object_id_map'] = object_id_map
         features['merged']['success'] = True
-
-    
     def _load_original_frame(self, camera_view: str, frame_idx: int) -> Optional[np.ndarray]:
         """
         Load the original frame image.
@@ -366,7 +359,6 @@ if __name__ == "__main__":
     # Create a configuration with a specific score threshold
     config = {
         'score_threshold': 0.35,
-        'lower_threshold': 0.28,
         'frames_dir': f"{data_root_dir}/orginal_frames"
     }
     

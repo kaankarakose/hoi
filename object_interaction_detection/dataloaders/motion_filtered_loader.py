@@ -59,7 +59,6 @@ class MotionFilteredLoader(BaseDataLoader):
         flow_root_dir = "/nas/project_data/B1_Behavior/rush/kaan/old_method/processed_data"
 
         # Add default motion threshold configuration
-        config.setdefault('low_threshold', 0.28)
         config.setdefault('score_threshold', 0.45)
         config.setdefault('motion_threshold', 0.05)  # Default threshold for motion
         config.setdefault('temporal_window', 1)      # Default window for flow aggregation
@@ -717,8 +716,7 @@ if __name__ == "__main__":
     # Create a configuration with specific thresholds
     config = {
         'score_threshold': 0.40,    # CNOS confidence threshold
-        'lower_threshold': 0.28,    # Lower bound for CNOS confidence
-        'motion_threshold': 0.05,   # Threshold for determining motion
+        'motion_threshold': 0.05,   # Threshold for determining motion - old version
         'temporal_window': 2,       # Window for optical flow aggregation
         'frames_dir': f"{data_root_dir}/orginal_frames"
     }
@@ -737,7 +735,7 @@ if __name__ == "__main__":
 
     # Choose a random valid frame
     index = random.choice(valid_indices[camera_view]['left'])
-    print(f"Processing frame {index} from cam_side_r")
+    print(f"Processing frame {index} from {camera_view}")
     
     # Load features
     features = motion_loader.load_features(camera_view = camera_view, frame_idx=index)

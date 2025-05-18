@@ -1,0 +1,26 @@
+
+
+base_loader:
+  cache_enabled: True
+  cache_dir: "./cache"
+
+cnos_loader:
+  data_root_dir: "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data"
+  cache_enabled: True
+  cache_dir: "./cache/cnos"
+  results_dir: "./multi_cnos_result"
+  cropped_frames_dir: "./hand_detections"
+flow_loader:
+  cache_enabled: True
+  cache_dir: "./cache/flow"
+  flow_data_root : "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/memflow"
+  temporal_window: 1
+  motion_threshold: 0.05
+  scale_factor: 5.0
+  include_brightness: False
+  feature_types: ["direction"]
+hamer_loader:
+  data_root_dir: "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data"
+  cache_enabled: True
+  cache_dir: "./cache/hamer"
+  

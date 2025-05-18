@@ -186,7 +186,7 @@ class FlowLoader(BaseDataLoader):
             return None
         
         # Try different filename patterns
-        pattern = f"flow_{frame_idx:04d}_to_{frame_idx+1:04d}.png"
+        pattern = f"flow_{frame_idx+1:04d}_to_{frame_idx+2:04d}.png"
 
         
         file_path = os.path.join(flow_dir, pattern)
@@ -428,6 +428,7 @@ class FlowLoader(BaseDataLoader):
             Activeness value between 0 and 1
         """
         
+        
         # Convert HSV data to grayscale
         gray_mask = cv2.cvtColor(features['hsv_data'], cv2.COLOR_HSV2BGR)
         gray_mask = cv2.cvtColor(gray_mask, cv2.COLOR_BGR2GRAY)
@@ -447,7 +448,7 @@ class FlowLoader(BaseDataLoader):
             active_pixels = np.count_nonzero(binary_mask[mask] == 255)
             total_mask_pixels = np.sum(mask)
             activeness = active_pixels / total_mask_pixels
-            print(active_pixels, total_mask_pixels, activeness)
+            #print(active_pixels, total_mask_pixels, activeness)
         else:
             activeness = 0.0
         return activeness
@@ -468,7 +469,7 @@ class FlowLoader(BaseDataLoader):
         """
         # Load features for the requested frame
         features = self.load_features(camera_view, frame_idx)
-            
+        #print(features), print(frame_idx)
         if not features['success'] or features['hsv_data'] is None:
             raise ValueError("Loading features failed in optical flow!")
             
@@ -561,26 +562,6 @@ class FlowLoader(BaseDataLoader):
         """
         result = self.process_flow_in_mask(camera_view, frame_idx, mask, **kwargs)
         return result['avg_dir']
-    
-    def is_region_moving(self, 
-                         camera_view: str, 
-                         frame_idx: int, 
-                         mask: np.ndarray,
-                         **kwargs) -> bool:
-        """
-        Determine if a masked region is moving.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            mask: Boolean mask array indicating region of interest
-            **kwargs: Additional arguments passed to process_flow_in_mask
-            
-        Returns:
-            Boolean indicating if region is moving
-        """
-        result = self.process_flow_in_mask(camera_view, frame_idx, mask, **kwargs)
-        return result['is_moving']
     
     def load_frame_batch(self, 
                         camera_view: str, 

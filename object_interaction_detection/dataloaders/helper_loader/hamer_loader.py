@@ -61,14 +61,14 @@ class HAMERLoader(BaseDataLoader):
         
         # Define hand joint indices for specific landmarks
         # These indices are based on MANO model joints
-        self.landmark_indices = {
-            'wrist': 0,
-            'index_tip': 4,
-            'middle_tip': 8,
-            'ring_tip': 12,
-            'pinky_tip': 16,
-            'thumb_tip': 20
-        }
+        # self.landmark_indices = {
+        #     'wrist': 0,
+        #     'index_tip': 4,
+        #     'middle_tip': 8,
+        #     'ring_tip': 12,
+        #     'pinky_tip': 16,
+        #     'thumb_tip': 20
+        # }
     
     def load_features(self, camera_view: str, frame_idx: int) -> Dict[str, Any]:
         """
@@ -294,13 +294,18 @@ class HAMERLoader(BaseDataLoader):
             'right': features['right_hand']['success']
         }
 
-    def get_valid_frame_idx(self) -> Dict[str, Dict[str, List[int]]]:
+    def get_valid_frame_idx(self,camera_view: str = None) -> Dict[str, Dict[str, List[int]]]:
         """
         Get valid frame indices for each hand type and camera view.
         
+        Args:
+            camera_view: If provided, return merged list of frame indices for this camera view.
+                        If None, return indices for all camera views separately.
+            
         Returns:
-            Dictionary with camera views as keys, each containing a dictionary with
-            'left' and 'right' as keys and lists of valid frame indices as values.
+            If camera_view is provided: List of merged left and right hand frame indices
+            Otherwise: Dictionary with camera views as keys, each containing a dictionary with
+                    'left' and 'right' as keys and lists of valid frame indices as values.
         """
         valid_frames = {}
         
@@ -347,6 +352,12 @@ class HAMERLoader(BaseDataLoader):
                 except Exception as e:
                     logging.error(f"Error processing file {file_path}: {e}")
         
+    # If camera_view is specified, return merged indices for that camera
+        if camera_view:
+            left_indices = set(valid_frames[camera_view]['left'])
+            right_indices = set(valid_frames[camera_view]['right'])
+            return sorted(left_indices.union(right_indices))
+
         return valid_frames
         
 if __name__ == "__main__":

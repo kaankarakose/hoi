@@ -1,16 +1,20 @@
-CNOS_DATA :
+
+
+HELPERS
+
+CNOS_DATA : 
 ------	
 features = 
 		{
             'frame_idx': frame_idx,
             'camera_view': camera_view,
             'L_frames': {
-                'objects': {
-                    'mask_files': mask_files, -> Path of mask.rle s
-                    'scores': scores, -> List of object scors
-                    'max_score': max(scores) if scores else 0.0, 
-                    'max_score_idx': np.argmax(scores) if scores else -1
-                },
+                'objects': ["object_name" : {
+					                    'mask_files': mask_files, -> Path of mask.rle s
+					                    'scores': scores, -> List of object scors
+					                    'max_score': max(scores) if scores else 0.0, 
+					                    'max_score_idx': np.argmax(scores) if scores else -1
+					                }],
 
                 'success': False
             },
@@ -24,6 +28,7 @@ features =
                 'success': False
             }
         }
+
 HAMER_DATA:
 ------
 
@@ -31,15 +36,13 @@ HAMER_DATA:
         'frame_idx': frame_idx,
         'camera_view': camera_view,
         'left_hand': {
-            'pose_data': None, -> npz.data ()
             'success': False,
-            'vertices': None,
-            'cam_t': None,
-            'crop_bbox': None,
-            'bbox': None
+            'vertices': None, -> vertices from MANO
+            'cam_t': None, -> how hand looking from this camera translation
+            'crop_bbox': None, -> Where I cropped original image.
+            'bbox': None   -> actual bbox of the hand!
         },
         'right_hand': {
-            'pose_data': None,
             'success': False,
             'vertices': None,
             'cam_t': None,
@@ -47,3 +50,57 @@ HAMER_DATA:
             'bbox': None
         }
     }
+
+
+CNOS_HAMER
+
+features = 
+		{
+            'frame_idx': frame_idx,
+            'camera_view': camera_view,
+            'L_frames': {
+                'objects': ["object_name" : {
+					                    'mask_files': mask_files, -> Path of mask.rle s
+					                    'scores': scores, -> List of object scors
+					                    'max_score': max(scores) if scores else 0.0, 
+					                    'max_score_idx': np.argmax(scores) if scores else -1,
+					                    'masks' : list of np.array (cropped frame masks), 
+					                    'orig_masks' : list of np.array (original sized),
+					                    'orig_max_score_mask' : masks scored among the orig masks
+
+					                }],
+
+                'success': False
+            },
+            'R_frames': {
+                'objects': {
+                    'mask_files': mask_files, -> Path of mask.rle s
+                    'scores': scores, -> List of object scors
+                    'max_score': max(scores) if scores else 0.0, 
+                    'max_score_idx': np.argmax(scores) if scores else -1
+                },
+                'success': False
+            }
+        }
+
+
+
+
+ COMBINED_LOADER - NO MORE LEFT AND RIGHT HAND ANYMORE
+
+ 
+
+
+
+## TODO:
+
+- fix the yaml file, 
+- apply yaml file,
+
+- implement annotation loader for evaluation
+
+- wrap motion filtered loader to use it in mapping
+
+- creat main detections script with visualization
+
+-- Newton third law for each object as heap.
