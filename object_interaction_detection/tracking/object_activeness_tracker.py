@@ -3,11 +3,14 @@ import sys
 import numpy as np
 import json
 import logging
+import sys
+import gc
 from typing import Dict, List, Tuple, Any, Optional, Union
 import matplotlib.pyplot as plt
 from collections import defaultdict
 from matplotlib.patches import Rectangle
-
+from tqdm import tqdm
+import patch_loader
 # Add the project root directory to Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 if project_root not in sys.path:
@@ -59,56 +62,33 @@ class ObjectActivenessTracker:
         # Format: {object_name: {"activeness": [], "frame_idx": [], "object_id": id}}
         self.object_data = {}
         
-    def collect_data(self, progress_interval: int = 10):
+    def collect_data(self):
         """
         Collect activeness data for all objects across frames.
-        
-        Args:
-            progress_interval: Interval for progress reporting (default: 10 frames)
         """
         total_frames = len(self.frame_indices)
         
         for i, frame_idx in enumerate(self.frame_indices):
-            # Report progress
-            if i % progress_interval == 0:
-                logging.info(f"Processing frame {i+1}/{total_frames} ({(i+1)/total_frames*100:.1f}%)")
+            # Get activeness for this object
+            activeness_result = self.motion_loader.get_activeness(
+                self.camera_view, frame_idx
+            )
+            print(i)
+            if not activeness_result['success']: continue
             
-            # Load features for the current frame
-            features = self.motion_loader.load_features(self.camera_view, frame_idx)
-            
-            # Skip if features weren't loaded successfully
-            if not features['motion_filtered']['success']:
-                continue
-            
-            # Get object ID map
-            object_id_map = features['motion_filtered']['object_id_map']
-            
-            # Process each object
-            for obj_name in object_id_map.keys():
-                # Get activeness for this object
-                activeness_result = self.motion_loader.get_activeness(
-                    self.camera_view, frame_idx, obj_name
-                )
-                
-                # Skip if activeness calculation failed
-                if not activeness_result['success']:
-                    continue
-                
-                # Get activeness value
-                activeness = activeness_result['activeness']
-                
-                # Initialize object data if not already tracked
+            print(activeness_result['activeness'])
+            # Initialize object data if not already tracked
+            for obj_name, activeness in activeness_result['activeness'].items():
                 if obj_name not in self.object_data:
                     self.object_data[obj_name] = {
                         "activeness": [],
                         "frame_idx": [],
-                        "object_id": object_id_map[obj_name]
                     }
-                
                 # Append data
                 self.object_data[obj_name]["activeness"].append(activeness)
                 self.object_data[obj_name]["frame_idx"].append(frame_idx)
-        
+            
+            gc.collect()
         logging.info(f"Collected activeness data for {len(self.object_data)} objects across {total_frames} frames")
     
     def save_to_json(self, output_path: str):
@@ -273,7 +253,7 @@ class ObjectActivenessTracker:
         ax1.set_title(title or f"Major Object Activeness ({self.camera_view})")
         ax1.set_ylabel("Activeness")
         ax1.set_ylim(bottom=0)
-        ax1.set_xlim(0, 100)  # Changed to limit x-axis from 0 to 100
+        ax1.set_xlim(0, (start_time * 2))  # Changed to limit x-axis from 0 to 100
         ax1.grid(True, alpha=0.3)
         ax1.legend(loc="upper right", bbox_to_anchor=(1.1, 1))
         
@@ -455,6 +435,58 @@ class ObjectActivenessTracker:
         plt.tight_layout()
         plt.show()
 
+    def get_object_data_size(self):
+        """
+        Calculate the approximate memory size of the object_data dictionary in MB.
+        Also reports on process memory usage.
+        
+        Returns:
+            Size in megabytes
+        """
+        import sys
+        import numpy as np
+        import psutil
+        import os
+        
+        def get_size(obj, seen=None):
+            """Recursively find the size of an object"""
+            size = sys.getsizeof(obj)
+            if seen is None:
+                seen = set()
+            obj_id = id(obj)
+            if obj_id in seen:
+                return 0
+            
+            # Mark as seen
+            seen.add(obj_id)
+            
+            # Add size of contents for containers
+            if isinstance(obj, dict):
+                size += sum([get_size(v, seen) for v in obj.values()])
+                size += sum([get_size(k, seen) for k in obj.keys()])
+            elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+                try:
+                    size += sum([get_size(i, seen) for i in obj])
+                except TypeError:
+                    pass
+                    
+            return size
+        
+        # Get process memory info
+        try:
+            process = psutil.Process(os.getpid())
+            mem_info = process.memory_info()
+            rss_mb = mem_info.rss / (1024 * 1024)  # Resident Set Size in MB
+            vms_mb = mem_info.vms / (1024 * 1024)  # Virtual Memory Size in MB
+            logging.info(f"Process memory: RSS={rss_mb:.2f}MB, VMS={vms_mb:.2f}MB")
+        except (ImportError, AttributeError):
+            # If psutil isn't available, just skip this part
+            pass
+        
+        # Calculate size in MB
+        size_bytes = get_size(self.object_data)
+        return size_bytes / (1024 * 1024)  # Convert to MB
+    
     def create_interactive_visualization(self):
         """
         Creates an interactive HTML visualization using Plotly.
@@ -483,17 +515,17 @@ def parse_args():
     
     parser.add_argument("--session", type=str, required=True,
                        help="Session name to process")
-    parser.add_argument("--data-root", type=str, required=True,
+    parser.add_argument("--data-root", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data",
                        help="Root directory for data")
     parser.add_argument("--camera", type=str, default="cam_top",
                        help="Camera view to process (default: cam_top)")
-    parser.add_argument("--output-dir", type=str, default="./output",
+    parser.add_argument("--output-dir", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking",
                        help="Output directory for visualizations and data")
     parser.add_argument("--num-frames", type=int, default=100,
                        help="Number of frames to process (default: 100)")
     parser.add_argument("--threshold", type=float, default=0.25,
                        help="Activeness threshold (default: 0.25)")
-    parser.add_argument("--annotation-root", type=str, default=None,
+    parser.add_argument("--annotation-root", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/annotations",
                        help="Root directory for annotations (default: /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations)")
     parser.add_argument("--fps", type=float, default=30.0,
                        help="Frames per second for annotation timing (default: 30.0)")
@@ -541,14 +573,14 @@ def main():
     logging.info(f"Found {len(valid_frames)} valid frames from {min_frame} to {max_frame}")
     
     # Use a subset of frames for efficiency if requested
-    if args.num_frames and args.num_frames < len(valid_frames):
-        # Calculate step size to get approximately args.num_frames frames
-        step = len(valid_frames) // args.num_frames
-        frames_to_process = valid_frames[::step][:args.num_frames]
-        logging.info(f"Processing a subset of {len(frames_to_process)} frames")
-    else:
-        frames_to_process = valid_frames
-        logging.info(f"Processing all {len(frames_to_process)} frames")
+    # if args.num_frames and args.num_frames < len(valid_frames):
+    #     # Calculate step size to get approximately args.num_frames frames
+    #     step = len(valid_frames) // args.num_frames
+    #     frames_to_process = valid_frames[::step][:args.num_frames]
+    #     logging.info(f"Processing a subset of {len(frames_to_process)} frames")
+    # else:
+    frames_to_process = valid_frames[:450]
+    logging.info(f"Processing all {len(frames_to_process)} frames")
     
     # Create activeness tracker with annotation data
     tracker = ObjectActivenessTracker(
@@ -567,9 +599,6 @@ def main():
     else:
         logging.warning("No annotation data found or loaded")
     
-    # Collect data
-    tracker.collect_data()
-    
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
     
@@ -579,7 +608,8 @@ def main():
     basic_viz_path = os.path.join(output_dir, f"{base_filename}_visualization_basic.png")
     advanced_viz_path = os.path.join(output_dir, f"{base_filename}_visualization_advanced.png")
     heatmap_path = os.path.join(output_dir, f"{base_filename}_visualization_heatmap.png")
-    
+    # Collect data
+    tracker.collect_data()
     # Save data
     tracker.save_to_json(json_path)
     

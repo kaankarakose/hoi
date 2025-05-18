@@ -1,0 +1,978 @@
+nohup: ignoring input
+Starting processing of 30 session-camera combinations...
+[1/30] Processing session: zolti_session1_16, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-cfxy5meu because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_16
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_16 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_16 with motion threshold 0.05
+INFO:root:Found 1902 valid frames from 0 to 1901
+INFO:root:Processing all 1902 frames
+INFO:root:Loaded annotations for session zolti_session1_16 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_16/zolti_session1_16.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+total_frames 1902
+Processing frames: 0it [00:00, ?it/s]Processing frames: 1it [00:05,  5.95s/it]Processing frames: 2it [00:11,  5.44s/it]Processing frames: 3it [00:16,  5.33s/it]Processing frames: 4it [00:19,  4.60s/it]Processing frames: 5it [00:23,  4.22s/it]Processing frames: 6it [00:26,  4.04s/it]Processing frames: 7it [00:29,  3.66s/it]Processing frames: 8it [00:35,  4.15s/it]Processing frames: 9it [00:39,  4.16s/it]Processing frames: 10it [00:42,  3.93s/it]Processing frames: 11it [00:46,  3.82s/it]Processing frames: 12it [00:50,  4.04s/it]Processing frames: 13it [00:53,  3.69s/it]Processing frames: 14it [00:58,  3.96s/it]Processing frames: 15it [01:01,  3.80s/it]Processing frames: 16it [01:04,  3.52s/it]Processing frames: 17it [01:06,  3.16s/it]Processing frames: 18it [01:10,  3.38s/it]Processing frames: 19it [01:13,  3.35s/it]Processing frames: 20it [01:16,  2.97s/it]Processing frames: 21it [01:18,  2.83s/it]Processing frames: 22it [01:22,  3.01s/it]Processing frames: 23it [01:23,  2.6INFO:root:Processing frame 381/1902 (20.0%)
+INFO:root:Processing frame 391/1902 (20.6%)
+INFO:root:Processing frame 401/1902 (21.1%)
+INFO:root:Processing frame 411/1902 (21.6%)
+INFO:root:Processing frame 421/1902 (22.1%)
+]Processing frames: 29it [01:49,  5.06s/it]Processing frames: 30it [01:52,  4.45s/it]Processing frames: 31it [01:56,  4.21s/it]Processing frames: 32it [01:59,  3.73s/it]Processing frames: 33it [02:01,  3.38s/it]Processing frames: 34it [02:03,  3.00s/it]Processing frames: 35it [02:06,  2.80s/it]Processing frames: 36it [02:07,  2.54s/it]Processing frames: 37it [02:10,  2.61s/it]Processing frames: 38it [02:13,  2.76s/it]Processing frames: 39it [02:15,  2.54s/it]Processing frames: 40it [02:18,  2.51s/it]Processing frames: 41it [02:20,  2.38s/it]Processing frames: 42it [02:23,  2.63s/it]Processing frames: 43it [02:30,  4.00s/it]Processing frames: 44it [02:34,  3.76s/it]Processing frames: 45it [02:36,  3.46s/it]Processing frames: 46it [02:39,  3.29s/it]Processing frames: 47it [02:42,  3.25s/it]Processing frames: 48it [02:45,  3.06s/it]Processing frames: 49it [02:48,  2.92s/it]Processing frames: 50it [02:51,  3.01s/it]Processing frames: 51it [02:54,  3.09s/it]Processing frames: 52it [02:57,  2.97s/it]Processing frames: 53it [02:59,  2.73s/it]Processing frames: 54it [03:03,  3.00s/it]Processing frames: 55it [03:05,  2.79s/it]Processing frames: 56it [03:06,  2.43s/it]Processing frames: 57it [03:09,  2.35s/it]Processing frames: 58it [03:10,  2.11s/it]Processing frames: 59it [03:12,  2.13s/it]Processing frames: 60it [03:19,  3.58s/it]Processing frames: 61it [03:22,  3.21s/it]Processing frames: 62it [03:24,  2.82s/it]Processing frames: 63it [03:28,  3.38s/it]Processing frames: 64it [03:30,  2.84s/it]Processing frames: 65it [03:31,  2.50s/it]Processing frames: 66it [03:33,  2.28s/it]Processing frames: 67it [03:36,  2.41s/it]Processing frames: 68it [03:39,  2.72s/it]Processing frames: 69it [03:41,  2.51s/it]Processing frames: 70it [03:44,  2.53s/it]Processing frames: 71it [03:47,  2.67s/it]Processing frames: 72it [03:49,  2.48s/it]Processing frames: 73it [03:52,  2.51s/it]Processing frames: 74it [03:54,  2.36s/it]Processing frames: 75it [03:56,  2.36s/it]Processing frames: 76it [03:58,  2.28s/it]Processing frames: 77it [04:01,  2.45s/it]Processing frames: 78it [04:03,  2.34s/it]Processing frames: 79it [04:05,  2.38s/it]Processing frames: 80it [04:09,  2.59s/it]Processing frames: 81it [04:11,  2.54s/it]Processing frames: 82it [04:22,  5.13s/it]Processing frames: 83it [04:26,  4.59s/it]Processing frames: 84it [04:29,  4.31s/it]Processing frames: 85it [04:33,  4.19s/it]Processing frames: 86it [04:37,  4.10s/it]Processing frames: 87it [04:41,  4.14s/it]Processing frames: 88it [04:45,  4.11s/it]Processing frames: 89it [04:50,  4.22s/it]Processing frames: 90it [04:55,  4.54s/it]Processing frames: 91it [04:59,  4.33s/it]Processing frames: 92it [05:03,  4.28s/it]Processing frames: 93it [05:08,  4.54s/it]Processing frames: 94it [05:17,  5.69s/it]Processing frames: 95it [05:20,  5.07s/it]Processing frames: 96it [05:26,  5.38s/it]Processing frames: 97it [05:31,  5.15s/it]Processing frames: 98it [05:35,  4.81s/it]Processing frames: 99it [05:38,  4.38s/it]Processing frames: 100it [05:41,  3.85s/it]Processing frames: 101it [05:44,  3.52s/it]Processing frames: 102it [05:47,  3.36s/it]Processing frames: 103it [05:53,  4.37s/it]Processing frames: 104it [05:56,  4.01s/it]Processing frames: 105it [05:59,  3.59s/it]Processing frames: 106it [06:02,  3.27s/it]Processing frames: 107it [06:04,  3.14s/it]Processing frames: 108it [06:08,  3.12s/it]Processing frames: 109it [06:11,  3.08s/it]Processing frames: 110it [06:14,  3.07s/it]Processing frames: 111it [06:16,  3.03s/it]Processing frames: 112it [06:19,  2.91s/it]Processing frames: 113it [06:21,  2.61s/it]Processing frames: 114it [06:24,  2.61s/it]Processing frames: 115it [06:33,  4.55s/it]Processing frames: 116it [06:39,  4.90s/it]Processing frames: 117it [06:42,  4.62s/it]Processing frames: 118it [13:58, 134.01s/it]Processing frames: 119it [14:01, 94.58s/it] Processing frames: 120it [14:03, 66.95s/it]Processing frames: 121it [14:07, 47.88s/it]Processing frames: 122it [14:10, 34.34s/it]Processing frames: 123it [14:13, 24.95s/it]Processing frames: 124it [14:16, 18.33s/it]Processing frames: 125it [14:18, 13.53s/it]Processing frames: 126it [14:21, 10.27s/it]Processing frames: 127it [14:23,  7.83s/it]Processing frames: 128it [14:24,  5.93s/it]Processing frames: 129it [14:26,  4.75s/it]Processing frames: 130it [14:28,  3.84s/it]Processing frames: 131it [14:36,  5.17s/it]Processing frames: 132it [14:38,  4.29s/it]Processing frames: 133it [14:42,  4.00s/it]Processing frames: 134it [14:44,  3.55s/it]Processing frames: 135it [14:46,  3.07s/it]Processing frames: 136it [14:48,  2.64s/it]Processing frames: 137it [14:50,  2.40s/it]Processing frames: 138it [14:51,  2.12s/it]Processing frames: 139it [14:53,  1.97s/it]Processing frames: 140it [14:54,  1.86s/it]Processing frames: 141it [14:56,  1.70s/it]Processing frames: 142it [14:57,  1.68s/it]Processing frames: 143it [14:59,  1.83s/it]Processing frames: 144it [15:02,  2.05s/it]Processing frames: 145it [15:05,  2.37s/it]Processing frames: 146it [15:11,  3.42s/it]Processing frames: 147it [15:14,  3.26s/it]Processing frames: 148it [15:16,  2.90s/it]Processing frames: 149it [15:18,  2.76s/it]Processing frames: 150it [15:20,  2.50s/it]Processing frames: 151it [15:22,  2.32s/it]Processing frames: 152it [15:24,  2.26s/it]Processing frames: 153it [15:26,  2.11s/it]Processing frames: 154it [15:28,  2.10s/it]Processing frames: 155it [15:30,  2.08s/it]Processing frames: 156it [15:32,  2.09s/it]Processing frames: 157it [15:34,  2.02s/it]Processing frames: 158it [15:35,  1.81s/it]Processing frames: 159it [15:39,  2.24s/it]Processing frames: 160it [15:40,  2.09s/it]Processing frames: 161it [15:45,  2.78s/it]Processing frames: 162it [15:46,  2.42s/it]Processing frames: 163it [15:48,  2.26s/it]Processing frames: 164it [15:50,  2.10s/it]Processing frames: 165it [15:53,  2.27s/it]Processing frames: 166it [15:55,  2.34s/it]Processing frames: 167it [15:57,  2.25s/it]Processing frames: 168it [16:00,  2.31s/it]Processing frames: 169it [16:02,  2.24s/it]Processing frames: 170it [16:04,  2.10s/it]Processing frames: 171it [16:06,  2.22s/it]Processing frames: 172it [16:08,  2.26s/it]Processing frames: 173it [16:11,  2.37s/it]Processing frames: 174it [16:14,  2.62s/it]Processing frames: 175it [16:18,  3.13s/it]Processing frames: 176it [16:21,  2.86s/it]Processing frames: 177it [16:24,  2.91s/it]Processing frames: 178it [16:27,  2.86s/it]Processing frames: 179it [16:29,  2.71s/it]Processing frames: 180it [16:32,  2.88s/it]Processing frames: 181it [16:35,  2.84s/it]Processing frames: 182it [16:39,  3.09s/it]Processing frames: 183it [16:42,  3.21s/it]Processing frames: 184it [16:45,  3.26s/it]Processing frames: 185it [16:48,  3.02s/it]Processing frames: 186it [16:51,  2.92s/it]Processing frames: 187it [16:53,  2.81s/it]Processing frames: 188it [16:55,  2.57s/it]Processing frames: 189it [16:58,  2.55s/it]Processing frames: 190it [17:00,  2.61s/it]Processing frames: 191it [17:03,  2.59s/it]Processing frames: 192it [17:05,  2.35s/it]Processing frames: 193it [17:08,  2.69s/it]Processing frames: 194it [17:12,  3.00s/it]Processing frames: 195it [17:16,  3.33s/it]Processing frames: 196it [17:22,  4.14s/it]Processing frames: 197it [17:24,  3.60s/it]Processing frames: 198it [17:26,  3.05s/it]Processing frames: 199it [17:28,  2.77s/it]Processing frames: 200it [17:30,  2.53s/it]Processing frames: 201it [17:33,  2.63s/it]Processing frames: 202it [17:36,  2.58s/it]Processing frames: 203it [17:38,  2.55s/it]Processing frames: 204it [17:41,  2.71s/it]Processing frames: 205it [17:44,  2.75s/it]Processing frames: 206it [17:47,  2.71s/it]Processing frames: 207it [17:49,  2.65s/it]Processing frames: 208it [17:52,  2.62s/it]Processing frames: 209it [17:54,  2.63s/it]Processing frames: 210it [17:56,  2.48s/it]Processing frames: 211it [17:59,  2.59s/it]Processing frames: 212it [18:02,  2.72s/it]Processing frames: 213it [18:04,  2.52s/it]Processing frames: 214it [18:06,  2.31s/it]Processing frames: 215it [18:08,  2.19s/it]Processing frames: 216it [18:13,  2.97s/it]Processing frames: 217it [18:17,  3.31s/it]Processing frames: 218it [18:20,  3.36s/it]Processing frames: 219it [18:23,  3.12s/it]Processing frames: 220it [18:25,  2.80s/it]Processing frames: 221it [18:28,  2.87s/it]Processing frames: 222it [18:32,  3.04s/it]Processing frames: 223it [18:35,  3.16s/it]Processing frames: 224it [18:38,  3.19s/it]Processing frames: 225it [18:42,  3.23s/it]Processing frames: 226it [18:44,  2.91s/it]Processing frames: 227it [18:47,  2.97s/it]Processing frames: 228it [18:53,  3.80s/it]Processing frames: 229it [18:58,  4.26s/it]Processing frames: 230it [19:00,  3.71s/it]Processing frames: 231it [19:03,  3.50s/it]Processing frames: 232it [19:06,  3.14s/it]Processing frames: 233it [19:08,  2.76s/it]Processing frames: 234it [19:13,  3.50s/it]Processing frames: 235it [19:16,  3.37s/it]Processing frames: 236it [19:20,  3.63s/it]Processing frames: 237it [19:25,  3.89s/it]Processing frames: 238it [19:28,  3.82s/it]Processing frames: 239it [19:36,  4.97s/it]Processing frames: 240it [19:41,  4.88s/it]Processing frames: 241it [19:45,  4.80s/it]Processing frames: 242it [19:49,  4.53s/it]Processing frames: 243it [19:54,  4.54s/it]Processing frames: 244it [19:58,  4.54s/it]Processing frames: 245it [20:03,  4.70s/it]Processing frames: 246it [20:11,  5.55s/it]Processing frames: 247it [20:15,  5.28s/it]Processing frames: 248it [20:20,  4.98s/it]Processing frames: 249it [20:24,  4.86s/it]Processing frames: 250it [20:29,  4.85s/it]Processing frames: 251it [20:33,  4.52s/it]Processing frames: 252it [20:37,  4.53s/it]Processing frames: 253it [20:43,  4.88s/it]Processing frames: 254it [20:49,  5.08s/it]Processing frames: 255it [20:52,  4.69s/it]Processing frames: 256it [20:57,  4.58s/it]Processing frames: 257it [21:02,  4.78s/it]Processing frames: 258it [21:06,  4.45s/it]Processing frames: 259it [21:09,  4.22s/it]Processing frames: 260it [21:15,  4.51s/it]Processing frames: 261it [21:19,  4.42s/it]Processing frames: 262it [21:24,  4.72s/it]Processing frames: 263it [21:29,  4.69s/it]Processing frames: 264it [21:32,  4.23s/it]Processing frames: 265it [21:36,  4.13s/it]Processing frames: 266it [21:39,  3.70s/it]Processing frames: 267it [21:42,  3.61s/it]Processing frames: 268it [21:45,  3.35s/it]Processing frames: 269it [21:47,  3.09s/it]Processing frames: 270it [21:50,  2.93s/it]Processing frames: 271it [21:53,  3.07s/it]Processing frames: 272it [21:57,  3.33s/it]Processing frames: 273it [22:00,  3.30s/it]Processing frames: 274it [22:04,  3.39s/it]Processing frames: 275it [22:07,  3.16s/it]Processing frames: 276it [22:10,  3.20s/it]Processing frames: 277it [22:14,  3.50s/it]Processing frames: 278it [22:18,  3.52s/it]Processing frames: 279it [22:21,  3.47s/it]Processing frames: 280it [22:24,  3.42s/it]Processing frames: 281it [22:28,  3.43s/it]Processing frames: 282it [22:31,  3.46s/it]Processing frames: 283it [22:35,  3.49s/it]Processing frames: 284it [22:37,  3.24s/it]Processing frames: 285it [22:41,  3.23s/it]Processing frames: 286it [22:44,  3.24s/it]Processing frames: 287it [22:47,  3.08s/it]Processing frames: 288it [22:50,  3.09s/it]Processing frames: 289it [22:53,  3.26s/it]Processing frames: 290it [22:57,  3.38s/it]Processing frames: 291it [23:00,  3.33s/it]Processing frames: 292it [23:04,  3.56s/it]Processing frames: 293it [23:07,  3.33s/it]Processing frames: 294it [23:10,  3.26s/it]Processing frames: 295it [23:13,  3.13s/it]Processing frames: 296it [23:17,  3.24s/it]Processing frames: 297it [23:20,  3.33s/it]Processing frames: 298it [23:23,  3.30s/it]Processing frames: 299it [23:27,  3.34s/it]Processing frames: 300it [23:30,  3.31s/it]Processing frames: 301it [23:33,  3.31s/it]Processing frames: 302it [23:38,  3.72s/it]Processing frames: 303it [23:42,  3.80s/it]Processing frames: 304it [23:46,  3.84s/it]Processing frames: 305it [23:50,  3.89s/it]Processing frames: 306it [23:53,  3.55s/it]Processing frames: 307it [23:56,  3.42s/it]Processing frames: 308it [23:59,  3.30s/it]Processing frames: 309it [24:02,  3.16s/it]Processing frames: 310it [24:05,  3.12s/it]Processing frames: 311it [24:09,  3.37s/it]Processing frames: 312it [24:12,  3.37s/it]Processing frames: 313it [24:15,  3.39s/it]Processing frames: 314it [24:19,  3.49s/it]Processing frames: 315it [24:22,  3.31s/it]Processing frames: 316it [24:25,  3.09s/it]Processing frames: 317it [24:27,  2.97s/it]Processing frames: 318it [24:31,  3.26s/it]Processing frames: 319it [24:35,  3.44s/it]Processing frames: 320it [24:40,  3.88s/it]Processing frames: 321it [24:43,  3.65s/it]Processing frames: 322it [24:47,  3.77s/it]Processing frames: 323it [24:51,  3.80s/it]Processing frames: 324it [24:54,  3.52s/it]Processing frames: 325it [24:57,  3.49s/it]Processing frames: 326it [25:00,  3.24s/it]Processing frames: 327it [25:04,  3.37s/it]Processing frames: 328it [25:07,  3.25s/it]Processing frames: 329it [25:09,  3.00s/it]Processing frames: 330it [25:12,  2.86s/it]Processing frames: 331it [25:18,  3.93s/it]Processing frames: 332it [25:22,  3.80s/it]Processing frames: 333it [25:24,  3.26s/it]Processing frames: 334it [25:26,  3.15s/it]Processing frames: 335it [25:30,  3.36s/it]Processing frames: 336it [25:33,  3.21s/it]Processing frames: 337it [25:35,  2.76s/it]Processing frames: 338it [25:39,  3.24s/it]Processing frames: 339it [25:43,  3.51s/it]Processing frames: 340it [25:46,  3.30s/it]Processing frames: 341it [25:49,  3.10s/it]Processing frames: 342it [25:52,  3.23s/it]Processing frames: 343it [25:57,  3.61s/it]Processing frames: 344it [26:05,  4.91s/it]Processing frames: 345it [26:08,  4.52s/it]Processing frames: 346it [26:11,  3.98s/it]Processing frames: 347it [26:15,  3.91s/it]Processing frames: 348it [26:18,  3.56s/it]Processing frames: 349it [26:21,  3.52s/it]Processing frames: 350it [26:24,  3.46s/it]Processing frames: 351it [26:27,  3.28s/it]Processing frames: 352it [26:31,  3.43s/it]Processing frames: 353it [26:33,  3.12s/it]Processing frames: 354it [26:38,  3.56s/it]Processing frames: 355it [26:41,  3.37s/it]Processing frames: 356it [26:44,  3.25s/it]Processing frames: 357it [26:47,  3.19s/it]Processing frames: 358it [26:50,  3.12s/it]Processing frames: 359it [26:52,  2.94s/it]Processing frames: 360it [26:56,  3.08s/it]Processing frames: 361it [26:58,  2.88s/it]Processing frames: 362it [27:00,  2.58s/it]Processing frames: 363it [27:02,  2.54s/it]Processing frames: 364it [27:05,  2.53s/it]Processing frames: 365it [27:08,  2.62s/it]Processing frames: 366it [27:12,  3.00s/it]Processing frames: 367it [27:15,  3.09s/it]Processing frames: 368it [27:18,  3.09s/it]Processing frames: 369it [27:27,  4.76s/it]Processing frames: 370it [27:30,  4.36s/it]Processing frames: 371it [27:33,  4.05s/it]Processing frames: 372it [27:36,  3.66s/it]Processing frames: 373it [27:39,  3.43s/it]Processing frames: 374it [27:42,  3.27s/it]Processing frames: 375it [27:46,  3.59s/it]Processing frames: 376it [27:50,  3.58s/it]Processing frames: 377it [27:52,  3.25s/it]Processing frames: 378it [27:56,  3.37s/it]Processing frames: 379it [28:00,  3.46s/it]Processing frames: 380it [28:07,  4.72s/it]Processing frames: 381it [28:10,  4.21s/it]Processing frames: 382it [28:15,  4.23s/it]Processing frames: 383it [28:19,  4.11s/it]Processing frames: 384it [28:22,  3.97s/it]Processing frames: 385it [28:25,  3.65s/it]Processing frames: 386it [28:28,  3.36s/it]Processing frames: 387it [28:31,  3.30s/it]Processing frames: 388it [28:33,  3.07s/it]Processing frames: 389it [28:37,  3.29s/it]Processing frames: 390it [28:46,  4.83s/it]Processing frames: 391it [28:49,  4.43s/it]Processing frames: 392it [28:53,  4.15s/it]Processing frames: 393it [28:56,  3.80s/it]Processing frames: 394it [28:59,  3.61s/it]Processing frames: 395it [29:03,  3.72s/it]Processing frames: 396it [29:05,  3.40s/it]Processing frames: 397it [29:09,  3.59s/it]Processing frames: 398it [29:13,  3.55s/it]Processing frames: 399it [29:15,  3.24s/it]Processing frames: 400it [29:19,  3.27s/it]Processing frames: 401it [29:22,  3.16s/it]Processing frames: 402it [29:24,  2.95s/it]Processing frames: 403it [29:28,  3.33s/it]Processing frames: 404it [29:31,  3.09s/it]Processing frames: 405it [29:36,  3.55s/it]Processing frames: 406it [29:40,  3.96s/it]Processing frames: 407it [29:45,  3.99s/it]Processing frames: 408it [29:49,  4.21s/it]Processing frames: 409it [29:53,  3.96s/it]Processing frames: 410it [29:56,  3.79s/it]Processing frames: 411it [30:00,  3.84s/it]Processing frames: 412it [30:03,  3.58s/it]Processing frames: 413it [30:05,  3.27s/it]Processing frames: 414it [30:10,  3.69s/it]Processing frames: 415it [30:18,  4.83s/it]Processing frames: 416it [30:23,  5.05s/it]Processing frames: 417it [30:27,  4.57s/it]Processing frames: 418it [30:29,  4.03s/it]Processing frames: 419it [30:32,  3.60s/it]Processing frames: 420it [30:36,  3.69s/it]Processing frames: 421it [30:39,  3.63s/it]Processing frames: 422it [30:43,  3.58s/it]Processing frames: 423it [30:46,  3.48s/it]Processing frames: 424it [30:50,  3.55s/it]Processing frames: 425it [30:54,  3.61s/it]Processing frames: 426it [30:56,  3.38s/it]Processing frames: 427it [31:03,  4.23s/it]Processing frames: 428it [31:12,  5.89s/it]Processing frames: 429it [31:19,  6.15s/it]Processing frames: 430it [31:26,  6.39s/it]Processing frames: 431it [31:32,  6.16s/it]Processing frames: 432it [31:36,  5.67s/it]Processing frames: 433it [31:41,  5.36s/it]Processing frames: 434it [31:49,  6.15s/it]Processing frames: 435it [31:54,  5.80s/it]Processing frames: 436it [32:01,  6.06s/it]Processing frames: 437it [32:06,  5.73s/it]Processing frames: 438it [32:11,  5.60s/it]Processing frames: 439it [32:16,  5.56s/it]Processing frames: 440it [32:29,  7.68s/it]Processing frames: 441it [32:34,  7.01s/it]Processing frames: 442it [32:39,  6.42s/it]Processing frames: 443it [32:45,  6.19s/it]Processing frames: 444it [32:50,  5.89s/it]Processing frames: 445it [32:55,  5.57s/it]Processing frames: 446it [33:03,  6.33s/it]Processing frames: 447it [33:08,  6.02s/it]Processing frames: 448it [33:14,  5.84s/it]Processing frames: 449it [33:20,  5.82s/it]Processing frames: 450it [33:25,  5.62s/it]Processing frames: 451it [33:30,  5.45s/it]Processing frames: 452it [33:36,  5.57s/it]Processing frames: 453it [33:40,  5.29s/it]Processing frames: 454it [33:44,  4.94s/it]Processing frames: 455it [33:48,  4.62s/it]Processing frames: 456it [33:53,  4.52s/it]Processing frames: 457it [33:56,  4.32s/it]Processing frames: 458it [34:05,  5.49s/it]Processing frames: 459it [34:10,  5.30s/it]Processing frames: 460it [34:18,  6.38s/it]Processing frames: 461it [34:23,  5.81s/it]Processing frames: 462it [34:27,  5.28s/it]Processing frames: 463it [34:31,  4.85s/it]Processing frames: 464it [34:36,  4.90s/it]Processing frames: 465it [34:42,  5.24s/it]Processing frames: 466it [34:50,  6.00s/it]Processing frames: 467it [35:02,  7.95s/it]Processing frames: 468it [35:13,  8.76s/it]Processing frames: 469it [35:19,  7.88s/it]Processing frames: 470it [35:24,  7.09s/it]Processing frames: 471it [35:28,  6.24s/it]Processing frames: 472it [35:32,  5.57s/it]Processing frames: 473it [35:37,  5.49s/it]Processing frames: 474it [35:43,  5.40s/it]Processing frames: 475it [35:54,  7.07s/it]Processing frames: 476it [35:59,  6.44s/it]Processing frames: 477it [36:02,  5.58s/it]Processing frames: 478it [36:06,  5.21s/it]Processing frames: 479it [36:10,  4.80s/it]Processing frames: 480it [36:15,  4.67s/it]Processing frames: 481it [36:19,  4.47s/it]Processing frames: 482it [36:22,  4.16s/it]Processing frames: 483it [36:31,  5.64s/it]Processing frames: 484it [36:34,  4.77s/it]Processing frames: 485it [36:38,  4.62s/it]Processing frames: 486it [36:42,  4.24s/it]Processing frames: 487it [36:44,  3.78s/it]Processing frames: 488it [36:48,  3.86s/it]Processing frames: 489it [36:52,  3.70s/it]Processing frames: 490it [36:57,  4.19s/it]Processing frames: 491it [37:01,  4.14s/it]Processing frames: 492it [37:07,  4.65s/it]Processing frames: 493it [37:13,  5.02s/it]Processing frames: 494it [37:18,  4.99s/it]Processing frames: 495it [37:22,  4.81s/it]Processing frames: 496it [37:26,  4.46s/it]Processing frames: 497it [37:31,  4.62s/it]Processing frames: 498it [37:35,  4.62s/it]Processing frames: 499it [37:41,  4.95s/it]Processing frames: 500it [37:45,  4.61s/it]Processing frames: 501it [37:48,  4.28s/it]Processing frames: 502it [37:53,  4.45s/it]Processing frames: 503it [37:59,  4.82s/it]Processing frames: 504it [38:04,  5.01s/it]Processing frames: 505it [38:08,  4.61s/it]Processing frames: 506it [38:11,  4.06s/it]Processing frames: 507it [38:15,  4.21s/it]Processing frames: 508it [38:19,  3.97s/it]Processing frames: 509it [38:21,  3.55s/it]Processing frames: 510it [38:25,  3.75s/it]Processing frames: 511it [38:28,  3.43s/it]Processing frames: 512it [38:36,  4.71s/it]Processing frames: 513it [38:40,  4.42s/it]Processing frames: 514it [38:42,  3.95s/it]Processing frames: 515it [38:49,  4.78s/it]Processing frames: 516it [39:12, 10.05s/it]Processing frames: 517it [39:17,  8.77s/it]Processing frames: 518it [39:30,  9.85s/it]run_bash_part2.sh: line 23: 3930944 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_16 - cam_top
+-------------------------------------------
+[2/30] Processing session: zolti_session1_16, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-3nsw_mws because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_16
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_16 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_16 with motion threshold 0.05
+INFO:root:Found 1902 valid frames from 0 to 1901
+INFO:root:Processing all 1902 frames
+INFO:root:Loaded annotations for session zolti_session1_16 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_16/zolti_session1_16.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+total_frames 1902
+Processing frames: 0it [00:00, ?it/s]Processing frames: 1it [00:05,  5.28s/it]Processing frames: 2it [00:10,  5.35s/it]Processing frames: 3it [00:18,  6.32s/it]Processing frames: 4it [00:24,  6.28s/it]Processing frames: 5it [00:30,  6.22s/it]Processing frames: 6it [00:37,  6.46s/it]Processing frames: 7it [00:45,  6.99s/it]Processing frames: 8it [00:48,  5.61s/it]Processing frames: 9it [00:50,  4.54s/it]Processing frames: 10it [00:52,  3.95s/it]Processing frames: 11it [00:55,  3.42s/it]Processing frames: 12it [00:56,  2.82s/it]Processing frames: 13it [00:58,  2.45s/it]Processing frames: 14it [01:00,  2.43s/it]Processing frames: 15it [01:02,  2.36s/it]Processing frames: 16it [01:06,  2.76s/it]Processing frames: 17it [01:09,  2.70s/it]Processing frames: 18it [01:11,  2.51s/it]Processing frames: 19it [01:13,  2.62s/it]Processing frames: 20it [01:20,  3.65s/it]Processing frames: 21it [01:23,  3.65s/it]Processing frames: 22it [01:25,  3.21s/it]Processing frames: 23it [01:28,  3.15s/it]Processing frames: 24it [01:31,  3.01s/it]Processing frames: 25it [01:34,  2.87s/it]Processing frames: 26it [01:36,  2.69s/it]Processing frames: 27it [01:38,  2.52s/it]Processing frames: 28it [01:40,  2.44s/it]Processing frames: 29it [01:43,  2.48s/it]Processing frames: 30it [01:46,  2.73s/it]Processing frames: 31it [01:49,  2.70s/it]Processing frames: 32it [01:52,  2.77s/it]Processing frames: 33it [01:56,  3.14s/it]Processing frames: 34it [01:58,  3.02s/it]Processing frames: 35it [02:01,  2.87s/it]Processing frames: 36it [02:03,  2.67s/it]Processing frames: 37it [02:05,  2.51s/it]Processing frames: 38it [02:07,  2.38s/it]Processing frames: 39it [02:11,  2.61s/it]Processing frames: 40it [02:14,  2.76s/it]Processing frames: 41it [02:16,  2.72s/it]Processing frames: 42it [02:19,  2.81s/it]Processing frames: 43it [02:21,  2.54s/it]Processing frames: 44it [02:24,  2.53s/it]Processing frames: 45it [02:29,  3.45s/it]Processing frames: 46it [02:31,  3.01s/it]Processing frames: 47it [02:34,  3.02s/it]Processing frames: 48it [02:38,  3.29s/it]Processing frames: 49it [02:42,  3.41s/it]Processing frames: 50it [02:50,  4.76s/it]Processing frames: 51it [02:54,  4.64s/it]Processing frames: 52it [02:58,  4.38s/it]Processing frames: 53it [03:01,  3.91s/it]Processing frames: 54it [03:03,  3.47s/it]Processing frames: 55it [03:14,  5.52s/it]Processing frames: 56it [03:22,  6.28s/it]Processing frames: 57it [03:27,  5.95s/it]Processing frames: 58it [03:29,  4.72s/it]Processing frames: 59it [03:31,  3.91s/it]Processing frames: 60it [03:32,  3.29s/it]Processing frames: 61it [03:35,  3.16s/it]Processing frames: 62it [03:38,  3.04s/it]Processing frames: 63it [03:41,  2.94s/it]Processing frames: 64it [03:44,  2.87s/it]Processing frames: 65it [03:47,  3.18s/it]Processing frames: 66it [03:51,  3.19s/it]Processing frames: 67it [03:54,  3.20s/it]Processing frames: 68it [04:02,  4.56s/it]Processing frames: 69it [04:06,  4.61s/it]Processing frames: 70it [04:10,  4.21s/it]Processing frames: 71it [04:14,  4.19s/it]Processing frames: 72it [04:17,  3.94s/it]Processing frames: 73it [04:20,  3.74s/it]Processing frames: 74it [04:24,  3.70s/it]Processing frames: 75it [04:27,  3.63s/it]Processing frames: 76it [04:31,  3.51s/it]Processing frames: 77it [04:36,  4.10s/it]Processing frames: 78it [04:44,  5.19s/it]Processing frames: 79it [04:50,  5.36s/it]Processing frames: 80it [04:57,  5.91s/it]Processing frames: 81it [05:02,  5.74s/it]Processing frames: 82it [05:10,  6.22s/it]Processing frames: 83it [05:30, 10.44s/it]Processing frames: 84it [05:38,  9.63s/it]Processing frames: 85it [05:42,  8.07s/it]Processing frames: 86it [05:47,  7.01s/it]Processing frames: 87it [05:53,  6.88s/it]Processing frames: 88it [05:57,  6.06s/it]Processing frames: 89it [06:10,  7.93s/it]Processing frames: 90it [06:14,  6.77s/it]Processing frames: 91it [06:19,  6.41s/it]Processing frames: 92it [06:24,  5.83s/it]Processing frames: 93it [06:27,  5.22s/it]Processing frames: 94it [06:35,  5.87s/it]Processing frames: 95it [06:47,  7.71s/it]Processing frames: 96it [06:52,  6.90s/it]Processing frames: 97it [06:56,  6.11s/it]Processing frames: 98it [07:02,  6.15s/it]Processing frames: 99it [07:07,  5.67s/it]Processing frames: 100it [07:11,  5.24s/it]Processing frames: 101it [07:15,  4.82s/it]Processing frames: 102it [07:18,  4.32s/it]Processing frames: 103it [07:21,  3.90s/it]Processing frames: 104it [07:23,  3.46s/it]Processing frames: 105it [07:34,  5.59s/it]Processing frames: 106it [07:37,  4.91s/it]Processing frames: 107it [07:40,  4.37s/it]Processing frames: 108it [07:44,  4.02s/it]Processing frames: 109it [07:46,  3.66s/it]Processing frames: 110it [07:49,  3.38s/it]Processing frames: 111it [07:52,  3.06s/it]Processing frames: 112it [07:54,  2.96s/it]Processing frames: 113it [07:58,  3.09s/it]Processing frames: 114it [08:01,  3.10s/it]Processing frames: 115it [08:06,  3.77s/it]Processing frames: 116it [08:13,  4.77s/it]Processing frames: 117it [08:16,  4.04s/it]Processing frames: 118it [08:19,  3.76s/it]Processing frames: 119it [08:21,  3.38s/it]Processing frames: 120it [08:23,  2.98s/it]Processing frames: 121it [08:26,  3.03s/it]Processing frames: 122it [08:30,  3.10s/it]Processing frames: 123it [08:32,  2.94s/it]Processing frames: 124it [08:36,  3.15s/it]Processing frames: 125it [08:40,  3.49s/it]Processing frames: 126it [08:47,  4.56s/it]Processing frames: 127it [08:53,  4.80s/it]Processing frames: 128it [08:56,  4.29s/it]Processing frames: 129it [09:00,  4.18s/it]Processing frames: 130it [09:04,  4.25s/it]Processing frames: 131it [09:08,  4.33s/it]Processing frames: 132it [09:12,  3.98s/it]Processing frames: 133it [09:15,  3.78s/it]Processing frames: 134it [09:18,  3.57s/it]Processing frames: 135it [09:21,  3.55s/it]Processing frames: 136it [09:27,  3.99s/it]Processing frames: 137it [09:37,  5.84s/it]Processing frames: 138it [09:40,  5.00s/it]Processing frames: 139it [09:42,  4.07s/it]Processing frames: 140it [09:44,  3.71s/it]Processing frames: 141it [09:47,  3.47s/it]Processing frames: 142it [09:50,  3.21s/it]Processing frames: 143it [09:53,  3.26s/it]Processing frames: 144it [09:57,  3.28s/it]Processing frames: 145it [09:59,  3.11s/it]Processing frames: 146it [10:02,  2.99s/it]Processing frames: 147it [10:05,  3.10s/it]Processing frames: 148it [10:14,  4.65s/it]Processing frames: 149it [10:17,  4.22s/it]Processing frames: 150it [10:20,  3.88s/it]Processing frames: 151it [10:23,  3.50s/it]Processing frames: 152it [10:25,  3.23s/it]Processing frames: 153it [10:29,  3.32s/it]Processing frames: 154it [10:33,  3.47s/it]Processing frames: 155it [10:36,  3.42s/it]Processing frames: 156it [10:39,  3.31s/it]Processing frames: 157it [10:42,  3.37s/it]Processing frames: 158it [10:53,  5.44s/it]Processing frames: 159it [10:56,  4.81s/it]Processing frames: 160it [10:58,  4.09s/it]Processing frames: 161it [11:01,  3.68s/it]Processing frames: 162it [11:04,  3.53s/it]Processing frames: 163it [11:07,  3.19s/it]Processing frames: 164it [11:10,  3.12s/it]Processing frames: 165it [11:13,  3.21s/it]Processing frames: 166it [11:17,  3.29s/it]Processing frames: 167it [11:20,  3.21s/it]Processing frames: 168it [11:23,  3.25s/it]Processing frames: 169it [11:25,  2.99s/it]Processing frames: 170it [11:30,  3.35s/it]Processing frames: 171it [11:32,  3.16s/it]Processing frames: 172it [11:35,  3.08s/it]Processing frames: 173it [11:37,  2.81s/it]Processing frames: 174it [11:40,  2.86s/it]Processing frames: 175it [11:44,  2.97s/it]Processing frames: 176it [11:47,  3.14s/it]Processing frames: 177it [11:50,  3.04s/it]Processing frames: 178it [11:53,  2.94s/it]Processing frames: 179it [12:01,  4.50s/it]Processing frames: 180it [12:06,  4.79s/it]Processing frames: 181it [12:09,  4.25s/it]Processing frames: 182it [12:13,  4.02s/it]Processing frames: 183it [12:16,  3.72s/it]Processing frames: 184it [12:19,  3.49s/it]Processing frames: 185it [12:22,  3.53s/it]Processing frames: 186it [12:25,  3.39s/it]Processing frames: 187it [12:28,  3.16s/it]Processing frames: 188it [12:30,  2.89s/it]Processing frames: 189it [12:33,  2.89s/it]Processing frames: 190it [12:37,  3.04s/it]Processing frames: 191it [12:39,  2.97s/it]Processing frames: 192it [12:50,  5.20s/it]Processing frames: 193it [12:54,  4.98s/it]Processing frames: 194it [12:57,  4.44s/it]Processing frames: 195it [13:02,  4.43s/it]Processing frames: 196it [13:06,  4.38s/it]Processing frames: 197it [13:10,  4.15s/it]Processing frames: 198it [13:14,  4.19s/it]Processing frames: 199it [13:17,  3.97s/it]Processing frames: 200it [13:24,  4.82s/it]Processing frames: 201it [13:31,  5.47s/it]Processing frames: 202it [13:34,  4.61s/it]Processing frames: 203it [13:39,  4.82s/it]Processing frames: 204it [13:44,  4.81s/it]Processing frames: 205it [13:51,  5.44s/it]Processing frames: 206it [13:54,  4.89s/it]Processing frames: 207it [13:57,  4.26s/it]Processing frames: 208it [13:59,  3.65s/it]Processing frames: 209it [14:04,  4.00s/it]Processing frames: 210it [14:07,  3.70s/it]Processing frames: 211it [14:17,  5.51s/it]Processing frames: 212it [14:23,  5.55s/it]Processing frames: 213it [14:27,  5.17s/it]Processing frames: 214it [14:30,  4.46s/it]Processing frames: 215it [14:32,  3.78s/it]Processing frames: 216it [14:34,  3.40s/it]Processing frames: 217it [14:38,  3.41s/it]Processing frames: 218it [14:41,  3.35s/it]Processing frames: 219it [14:45,  3.39s/it]Processing frames: 220it [14:49,  3.62s/it]Processing frames: 221it [14:55,  4.28s/it]Processing frames: 222it [14:58,  4.12s/it]Processing frames: 223it [15:02,  3.92s/it]Processing frames: 224it [15:06,  3.89s/it]Processing frames: 225it [15:09,  3.78s/it]Processing frames: 226it [15:13,  3.92s/it]Processing frames: 227it [15:16,  3.63s/it]Processing frames: 228it [15:19,  3.45s/it]Processing frames: 229it [15:22,  3.34s/it]Processing frames: 230it [15:25,  3.22s/it]Processing frames: 231it [15:32,  4.30s/it]Processing frames: 232it [15:35,  3.93s/it]Processing frames: 233it [15:39,  3.91s/it]Processing frames: 234it [15:43,  3.76s/it]Processing frames: 235it [15:48,  4.19s/it]Processing frames: 236it [15:52,  4.20s/it]Processing frames: 237it [15:59,  4.94s/it]Processing frames: 238it [16:13,  7.78s/it]Processing frames: 239it [16:23,  7.99s/it]Processing frames: 240it [27:16, 201.89s/it]run_bash_part2.sh: line 23: 3945131 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_16 - cam_side_r
+-------------------------------------------
+[3/30] Processing session: zolti_session1_16, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-x3x1xdsu because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_16
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_16 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_16 with motion threshold 0.05
+INFO:root:Found 1902 valid frames from 0 to 1901
+INFO:root:Processing all 1902 frames
+INFO:root:Loaded annotations for session zolti_session1_16 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_16/zolti_session1_16.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+run_bash_part2.sh: line 23: 3956505 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_16 - cam_side_l
+-------------------------------------------
+[4/30] Processing session: zolti_session1_17, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-ey9el5g8 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_17
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_17 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_17 with motion threshold 0.05
+INFO:root:Found 1906 valid frames from 0 to 1905
+INFO:root:Processing all 1906 frames
+INFO:root:Loaded annotations for session zolti_session1_17 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_17/zolti_session1_17.txt
+INFO:root:Loaded annotations: 9 hand segments and 9 object segments
+run_bash_part2.sh: line 23: 3973557 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_17 - cam_top
+-------------------------------------------
+[5/30] Processing session: zolti_session1_17, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-is65xtui because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_17
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_17 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_17 with motion threshold 0.05
+INFO:root:Found 1906 valid frames from 0 to 1905
+INFO:root:Processing all 1906 frames
+INFO:root:Loaded annotations for session zolti_session1_17 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_17/zolti_session1_17.txt
+INFO:root:Loaded annotations: 9 hand segments and 9 object segments
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+total_frames 1906
+30
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 608, in <module>
+    main()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 571, in main
+    tracker.collect_data()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 78, in collect_data
+    features = self.motion_loader.load_features(self.camera_view, frame_idx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/motion_filtered_loader.py", line 104, in load_features
+    combined_features = self.combined_loader.load_features(camera_view, frame_idx)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/combined_loader.py", line 136, in load_features
+    self._merge_objects_by_hand(combined_features)
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/combined_loader.py", line 203, in _merge_objects_by_hand
+    left_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
+                                              ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'orig_max_score_mask'
+✗ Error processing zolti_session1_17 - cam_side_r
+-------------------------------------------
+[6/30] Processing session: zolti_session1_17, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-fmjc3l82 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_17
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_17 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_17 with motion threshold 0.05
+INFO:root:Found 1906 valid frames from 0 to 1905
+INFO:root:Processing all 1906 frames
+INFO:root:Loaded annotations for session zolti_session1_17 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_17/zolti_session1_17.txt
+INFO:root:Loaded annotations: 9 hand segments and 9 object segments
+run_bash_part2.sh: line 23: 3978892 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_17 - cam_side_l
+-------------------------------------------
+[7/30] Processing session: zolti_session1_18, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-_86ghem6 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_18
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_18 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_18 with motion threshold 0.05
+INFO:root:Found 1892 valid frames from 0 to 1891
+INFO:root:Processing all 1892 frames
+INFO:root:Loaded annotations for session zolti_session1_18 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_18/zolti_session1_18.txt
+INFO:root:Loaded annotations: 4 hand segments and 4 object segments
+run_bash_part2.sh: line 23: 3981307 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_18 - cam_top
+-------------------------------------------
+[8/30] Processing session: zolti_session1_18, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-3pmokb47 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_18
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_18 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_18 with motion threshold 0.05
+INFO:root:Found 1892 valid frames from 0 to 1891
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session1_18 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_18/zolti_session1_18.txt
+INFO:root:Loaded annotations: 4 hand segments and 4 object segments
+run_bash_part2.sh: line 23: 3985749 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_18 - cam_side_r
+-------------------------------------------
+[9/30] Processing session: zolti_session1_18, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-zplp5p76 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_18
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_18 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_18 with motion threshold 0.05
+INFO:root:Found 1892 valid frames from 0 to 1891
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session1_18 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_18/zolti_session1_18.txt
+INFO:root:Loaded annotations: 4 hand segments and 4 object segments
+run_bash_part2.sh: line 23: 3989766 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_18 - cam_side_l
+-------------------------------------------
+[10/30] Processing session: zolti_session1_19, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-dv_anuk4 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_19
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_19 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_19 with motion threshold 0.05
+INFO:root:Found 1894 valid frames from 0 to 1893
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session1_19 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_19/zolti_session1_19.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+run_bash_part2.sh: line 23: 3993676 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_19 - cam_top
+-------------------------------------------
+[11/30] Processing session: zolti_session1_19, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-kkdhovo3 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_19
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_19 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_19 with motion threshold 0.05
+INFO:root:Found 1894 valid frames from 0 to 1893
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session1_19 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_19/zolti_session1_19.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+total_frames 750
+7
+17
+18
+19
+20
+24
+37
+38
+39
+40
+43
+60
+61
+72
+82
+89
+94
+100
+106
+109
+110
+112
+117
+121
+123
+124
+125
+126
+130
+135
+138
+140
+142
+148
+150
+168
+170
+172
+173
+174
+178
+181
+187
+188
+189
+190
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 608, in <module>
+    main()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 571, in main
+    tracker.collect_data()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 78, in collect_data
+    features = self.motion_loader.load_features(self.camera_view, frame_idx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/motion_filtered_loader.py", line 104, in load_features
+    combined_features = self.combined_loader.load_features(camera_view, frame_idx)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/combined_loader.py", line 136, in load_features
+    self._merge_objects_by_hand(combined_features)
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/combined_loader.py", line 203, in _merge_objects_by_hand
+    left_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
+                                              ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'orig_max_score_mask'
+✗ Error processing zolti_session1_19 - cam_side_r
+-------------------------------------------
+[12/30] Processing session: zolti_session1_19, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-vvicl5cd because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_19
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_19 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_19 with motion threshold 0.05
+INFO:root:Found 1894 valid frames from 0 to 1893
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session1_19 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_19/zolti_session1_19.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+INFO:root:Collected activeness data for 0 objects across 750 frames
+INFO:root:Saved activeness data to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session1_19/cam_side_l/zolti_session1_19_cam_side_l_activeness.json
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:163: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cmap = plt.cm.get_cmap('tab10')
+INFO:root:Saved activeness visualization to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session1_19/cam_side_l/zolti_session1_19_cam_side_l_visualization_basic.png
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:194: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:235: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  major_cmap = plt.cm.get_cmap('tab10')
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:236: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  minor_cmap = plt.cm.get_cmap('Pastel1')
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+total_frames 750
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 608, in <module>
+    main()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 588, in main
+    tracker.visualize_advanced(
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 288, in visualize_advanced
+    min_frame = min(min(data["frame_idx"]) for data in self.object_data.values())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: min() iterable argument is empty
+✗ Error processing zolti_session1_19 - cam_side_l
+-------------------------------------------
+[13/30] Processing session: zolti_session1_20, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-sjpn51hi because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_20
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_20 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_20 with motion threshold 0.05
+INFO:root:Found 1901 valid frames from 0 to 1900
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session1_20 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_20/zolti_session1_20.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+run_bash_part2.sh: line 23: 3998755 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_20 - cam_top
+-------------------------------------------
+[14/30] Processing session: zolti_session1_20, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-8muv7zl9 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_20
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_20 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_20 with motion threshold 0.05
+INFO:root:Found 1901 valid frames from 0 to 1900
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session1_20 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_20/zolti_session1_20.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+run_bash_part2.sh: line 23: 4003226 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session1_20 - cam_side_r
+-------------------------------------------
+[15/30] Processing session: zolti_session1_20, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-vtabhdqs because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session1_20
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session1_20 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session1_20 with motion threshold 0.05
+INFO:root:Found 1901 valid frames from 0 to 1900
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session1_20 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session1_20/zolti_session1_20.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+INFO:root:Saved activeness data to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session1_20/cam_side_l/zolti_session1_20_cam_side_l_activeness.json
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:164: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  for i, (obj_name, data) in enumerate(self.object_data.items()):
+INFO:root:Saved activeness visualization to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session1_20/cam_side_l/zolti_session1_20_cam_side_l_visualization_basic.png
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:195: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  title: Optional[str] = None,
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:236: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  # Plot major objects
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:237: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  for i, (obj_name, data) in enumerate(major_objects.items()):
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+['cam_side_l', 'cam_side_r', 'cam_top']
+Found 3 camera views: ['cam_side_l', 'cam_side_r', 'cam_top']
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 664, in <module>
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 644, in main
+    threshold=args.threshold,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 289, in visualize_advanced
+    max_time = max_frame / fps
+                ~~~~~~~~~^~~~~~
+ValueError: min() iterable argument is empty
+✗ Error processing zolti_session1_20 - cam_side_l
+-------------------------------------------
+[16/30] Processing session: zolti_session2_21, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-6ws5vsdi because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_21
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_21 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_21 with motion threshold 0.05
+INFO:root:Found 1901 valid frames from 0 to 1900
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_21 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_21/zolti_session2_21.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+run_bash_part2.sh: line 23: 4014237 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_21 - cam_top
+-------------------------------------------
+[17/30] Processing session: zolti_session2_21, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-373q_fh1 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_21
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_21 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_21 with motion threshold 0.05
+INFO:root:Found 1901 valid frames from 0 to 1900
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_21 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_21/zolti_session2_21.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 656, in <module>
+    main()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 630, in main
+    tracker.collect_data()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 73, in collect_data
+    features = self.motion_loader.load_features(self.camera_view, frame_idx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/motion_filtered_loader.py", line 134, in load_features
+    motion_filtered_mask, moving_objects = self._filter_by_motion(
+                                           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/motion_filtered_loader.py", line 267, in _filter_by_motion
+    activeness = self.flow_loader.process_flow_in_mask_active_area(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/helper_loader/flow_loader.py", line 477, in process_flow_in_mask_active_area
+    activeness = self._extract_activeness(features, mask)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/helper_loader/flow_loader.py", line 448, in _extract_activeness
+    active_pixels = np.count_nonzero(binary_mask[mask] == 255)
+                                     ~~~~~~~~~~~^^^^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 368 but size of corresponding boolean axis is 1200
+✗ Error processing zolti_session2_21 - cam_side_r
+-------------------------------------------
+[18/30] Processing session: zolti_session2_21, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-fen5yvp8 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_21
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_21 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_21 with motion threshold 0.05
+INFO:root:Found 1901 valid frames from 0 to 1900
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_21 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_21/zolti_session2_21.txt
+INFO:root:Loaded annotations: 6 hand segments and 6 object segments
+INFO:root:Collected activeness data for 0 objects across 750 frames
+INFO:root:Saved activeness data to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_21/cam_side_l/zolti_session2_21_cam_side_l_activeness.json
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:161: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cmap = plt.cm.get_cmap('tab10')
+INFO:root:Saved activeness visualization to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_21/cam_side_l/zolti_session2_21_cam_side_l_visualization_basic.png
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:192: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:233: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  major_cmap = plt.cm.get_cmap('tab10')
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:234: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  minor_cmap = plt.cm.get_cmap('Pastel1')
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 656, in <module>
+    main()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 636, in main
+    tracker.visualize_advanced(
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 286, in visualize_advanced
+    min_frame = min(min(data["frame_idx"]) for data in self.object_data.values())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: min() iterable argument is empty
+✗ Error processing zolti_session2_21 - cam_side_l
+-------------------------------------------
+[19/30] Processing session: zolti_session2_22, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-awt19amb because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_22
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_22 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_22 with motion threshold 0.05
+INFO:root:Found 1927 valid frames from 0 to 1926
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_22 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_22/zolti_session2_22.txt
+INFO:root:Loaded annotations: 7 hand segments and 7 object segments
+run_bash_part2.sh: line 23: 4039762 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_22 - cam_top
+-------------------------------------------
+[20/30] Processing session: zolti_session2_22, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-p3fiaf1p because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_22
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_22 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_22 with motion threshold 0.05
+INFO:root:Found 1927 valid frames from 0 to 1926
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_22 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_22/zolti_session2_22.txt
+INFO:root:Loaded annotations: 7 hand segments and 7 object segments
+run_bash_part2.sh: line 23: 4179793 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_22 - cam_side_r
+-------------------------------------------
+[21/30] Processing session: zolti_session2_22, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-0mrjdzye because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_22
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_22 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_22 with motion threshold 0.05
+INFO:root:Found 1927 valid frames from 0 to 1926
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_22 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_22/zolti_session2_22.txt
+INFO:root:Loaded annotations: 7 hand segments and 7 object segments
+run_bash_part2.sh: line 23: 11150 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_22 - cam_side_l
+-------------------------------------------
+[22/30] Processing session: zolti_session2_23, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-ykpebfqf because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_23
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_23 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_23 with motion threshold 0.05
+INFO:root:Found 1828 valid frames from 62 to 1889
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_23 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_23/zolti_session2_23.txt
+INFO:root:Loaded annotations: 4 hand segments and 4 object segments
+run_bash_part2.sh: line 23: 286456 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_23 - cam_top
+-------------------------------------------
+[23/30] Processing session: zolti_session2_23, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-8czea_zq because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_23
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_23 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_23 with motion threshold 0.05
+INFO:root:Found 1828 valid frames from 62 to 1889
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_23 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_23/zolti_session2_23.txt
+INFO:root:Loaded annotations: 4 hand segments and 4 object segments
+run_bash_part2.sh: line 23: 293225 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_23 - cam_side_r
+-------------------------------------------
+[24/30] Processing session: zolti_session2_23, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-71x2nu3m because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_23
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_23 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_23 with motion threshold 0.05
+INFO:root:Found 1828 valid frames from 62 to 1889
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_23 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_23/zolti_session2_23.txt
+INFO:root:Loaded annotations: 4 hand segments and 4 object segments
+INFO:root:Collected activeness data for 0 objects across 750 frames
+INFO:root:Saved activeness data to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_23/cam_side_l/zolti_session2_23_cam_side_l_activeness.json
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:142: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cmap = plt.cm.get_cmap('tab10')
+INFO:root:Saved activeness visualization to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_23/cam_side_l/zolti_session2_23_cam_side_l_visualization_basic.png
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:173: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:214: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  major_cmap = plt.cm.get_cmap('tab10')
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:215: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  minor_cmap = plt.cm.get_cmap('Pastel1')
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 637, in <module>
+    main()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 617, in main
+    tracker.visualize_advanced(
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 267, in visualize_advanced
+    min_frame = min(min(data["frame_idx"]) for data in self.object_data.values())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: min() iterable argument is empty
+✗ Error processing zolti_session2_23 - cam_side_l
+-------------------------------------------
+[25/30] Processing session: zolti_session2_24, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-bg8a0bis because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_24
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_24 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_24 with motion threshold 0.05
+INFO:root:Found 1838 valid frames from 0 to 2019
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_24 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_24/zolti_session2_24.txt
+INFO:root:Loaded annotations: 2 hand segments and 2 object segments
+run_bash_part2.sh: line 23: 347348 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_24 - cam_top
+-------------------------------------------
+[26/30] Processing session: zolti_session2_24, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-5t2o5g39 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_24
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_24 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_24 with motion threshold 0.05
+INFO:root:Found 1838 valid frames from 0 to 2019
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_24 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_24/zolti_session2_24.txt
+INFO:root:Loaded annotations: 2 hand segments and 2 object segments
+run_bash_part2.sh: line 23: 397561 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_24 - cam_side_r
+-------------------------------------------
+[27/30] Processing session: zolti_session2_24, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-j_v2t5bt because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_24
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_24 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_24 with motion threshold 0.05
+INFO:root:Found 1838 valid frames from 0 to 2019
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_24 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_24/zolti_session2_24.txt
+INFO:root:Loaded annotations: 2 hand segments and 2 object segments
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 637, in <module>
+    main()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 611, in main
+    tracker.collect_data()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 73, in collect_data
+    activeness_result = self.motion_loader.get_activeness(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/motion_filtered_loader.py", line 296, in get_activeness
+    features = self.load_features(camera_view, frame_idx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/motion_filtered_loader.py", line 104, in load_features
+    combined_features = self.combined_loader.load_features(camera_view, frame_idx)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/combined_loader.py", line 136, in load_features
+    self._merge_objects_by_hand(combined_features)
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/dataloaders/combined_loader.py", line 203, in _merge_objects_by_hand
+    left_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
+                                              ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'orig_max_score_mask'
+✗ Error processing zolti_session2_24 - cam_side_l
+-------------------------------------------
+[28/30] Processing session: zolti_session2_25, camera: cam_top
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-q8ijftat because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_25
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_25 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_25 with motion threshold 0.05
+INFO:root:Found 1896 valid frames from 0 to 1895
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_25 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_25/zolti_session2_25.txt
+INFO:root:Loaded annotations: 5 hand segments and 5 object segments
+INFO:root:Collected activeness data for 1 objects across 750 frames
+INFO:root:Saved activeness data to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_25/cam_top/zolti_session2_25_cam_top_activeness.json
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:142: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cmap = plt.cm.get_cmap('tab10')
+INFO:root:Saved activeness visualization to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_25/cam_top/zolti_session2_25_cam_top_visualization_basic.png
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:173: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:214: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  major_cmap = plt.cm.get_cmap('tab10')
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:215: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  minor_cmap = plt.cm.get_cmap('Pastel1')
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:335: UserWarning: Attempting to set identical low and high xlims makes transformation singular; automatically expanding.
+  ax_annot.set_xlim(min_frame, max_frame)
+INFO:root:Saved advanced visualization to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_25/cam_top/zolti_session2_25_cam_top_visualization_advanced.png
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:357: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+INFO:root:Saved heatmap visualization to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_25/cam_top/zolti_session2_25_cam_top_visualization_heatmap.png
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:435: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+INFO:root:Saved annotation timeline to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_25/cam_top/zolti_session2_25_cam_top_annotation_timeline.png
+INFO:root:Processing complete. Results saved to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+{'WRENCH': np.float64(0.8313253012048193)}
+✓ Completed zolti_session2_25 - cam_top
+-------------------------------------------
+[29/30] Processing session: zolti_session2_25, camera: cam_side_r
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-0jaxir26 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_25
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_25 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_25 with motion threshold 0.05
+INFO:root:Found 1896 valid frames from 0 to 1895
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_25 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_25/zolti_session2_25.txt
+INFO:root:Loaded annotations: 5 hand segments and 5 object segments
+run_bash_part2.sh: line 23: 434975 Killed                  python object_activeness_tracker.py --session "$session" --camera "$camera" --output-dir "$OUTPUT_DIR"
+✗ Error processing zolti_session2_25 - cam_side_r
+-------------------------------------------
+[30/30] Processing session: zolti_session2_25, camera: cam_side_l
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-1amr4ik9 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session zolti_session2_25
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session zolti_session2_25 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session zolti_session2_25 with motion threshold 0.05
+INFO:root:Found 1896 valid frames from 0 to 1895
+INFO:root:Processing all 750 frames
+INFO:root:Loaded annotations for session zolti_session2_25 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/zolti_session2_25/zolti_session2_25.txt
+INFO:root:Loaded annotations: 5 hand segments and 5 object segments
+INFO:root:Collected activeness data for 0 objects across 750 frames
+INFO:root:Saved activeness data to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_25/cam_side_l/zolti_session2_25_cam_side_l_activeness.json
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:142: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cmap = plt.cm.get_cmap('tab10')
+INFO:root:Saved activeness visualization to /nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking/zolti_session2_25/cam_side_l/zolti_session2_25_cam_side_l_visualization_basic.png
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:173: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:214: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  major_cmap = plt.cm.get_cmap('tab10')
+/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py:215: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  minor_cmap = plt.cm.get_cmap('Pastel1')
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+['cam_side_l', 'cam_top', 'cam_side_r']
+Found 3 camera views: ['cam_side_l', 'cam_top', 'cam_side_r']
+Traceback (most recent call last):
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 637, in <module>
+    main()
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 617, in main
+    tracker.visualize_advanced(
+  File "/nas/project_data/B1_Behavior/rush/kaan/hoi/object_interaction_detection/tracking/object_activeness_tracker.py", line 267, in visualize_advanced
+    min_frame = min(min(data["frame_idx"]) for data in self.object_data.values())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: min() iterable argument is empty
+✗ Error processing zolti_session2_25 - cam_side_l
+-------------------------------------------
+All processing complete!

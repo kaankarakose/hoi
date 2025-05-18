@@ -96,9 +96,9 @@ class MotionFilteredLoader(BaseDataLoader):
             Dictionary containing motion-filtered features
         """
         # Check for cached features
-        cached_features = self._get_cached_features(camera_view, frame_idx)
-        if cached_features is not None:
-            return cached_features
+        # cached_features = self._get_cached_features(camera_view, frame_idx)
+        # if cached_features is not None:
+        #     return cached_features
         
         # Load combined features (object masks)
         combined_features = self.combined_loader.load_features(camera_view, frame_idx)
@@ -141,10 +141,10 @@ class MotionFilteredLoader(BaseDataLoader):
         motion_filtered_features['motion_filtered']['object_id_map'] = object_id_map
         motion_filtered_features['motion_filtered']['success'] = True
         motion_filtered_features['motion_filtered']['moving_objects'] = moving_objects
-        
-        # Cache features (without large arrays to save memory)
-        cache_features = self._prepare_cache_features(motion_filtered_features)
-        self._cache_features(camera_view, frame_idx, cache_features)
+        #TODO: Memory issue
+        # # Cache features (without large arrays to save memory)
+        # cache_features = self._prepare_cache_features(motion_filtered_features)
+        # self._cache_features(camera_view, frame_idx, cache_features)
         
         return motion_filtered_features
     
@@ -280,67 +280,56 @@ class MotionFilteredLoader(BaseDataLoader):
     
     def get_activeness(self, 
                           camera_view: str, 
-                          frame_idx: int, 
-                          object_name: str) -> Dict[str, Any]:
+                          frame_idx: int
+                          ) -> Dict[str, Any]:
         """
         Get activeness score for a specific object.
         
         Args:
             camera_view: Camera view name
             frame_idx: Frame index
-            object_name: Name of the object
             
         Returns:
             Dictionary containing activeness score and related information
         """
         # Load filtered features
         features = self.load_features(camera_view, frame_idx)
-        
         # Check if features were loaded successfully
         if not features['motion_filtered']['success']:
             return {
                 'success': False,
-                'object_name': object_name,
-                'activeness': 0
+                'activeness': None
             }
         
         # Get object ID map and filtered mask
         object_id_map = features['motion_filtered']['object_id_map']
         filtered_mask = features['motion_filtered']['mask']
-        
-        # Check if the object exists in the ID map
-        if object_name not in object_id_map:
-            return {
-                'success': False,
-                'object_name': object_name,
-                'activeness': 0,
-            }
-        
-        # Get the object ID
-        obj_id = object_id_map[object_name]
-        
-        # Create a binary mask for this object
-        obj_mask = (filtered_mask == obj_id)
-        
-        # Check if any pixels belong to this object after filtering
-        if not np.any(obj_mask):
-            return {
-                'success': True,
-                'object_name': object_name,
-                'activeness': 0,
-            }
+        object_names = [obj_name for obj_name in object_id_map.keys()] # get all avaliable objects
 
-        # Get flow information for this object
-        activeness = self.flow_loader.process_flow_in_mask_active_area(
-            camera_view=camera_view,
-            frame_idx=frame_idx,
-            mask=obj_mask,
-        )
+        object_activeness = {}
+
+        for object_name in object_names:
+            # Get the object ID
+            obj_id = object_id_map[object_name]
+            
+            # Create a binary mask for this object
+            obj_mask = (filtered_mask == obj_id)
+        
+            # Check if any pixels belong to this object after filtering
+            if not np.any(obj_mask):
+                continue
+
+            # Get flow information for this object
+            activeness = self.flow_loader.process_flow_in_mask_active_area(
+                camera_view=camera_view,
+                frame_idx=frame_idx,
+                mask=obj_mask,
+            )
+            object_activeness[object_name] = activeness
         
         return {
             'success': True,
-            'object_name': object_name,
-            'activeness': activeness
+            'activeness': object_activeness
         }
     
     def get_all_moving_objects(self, 
