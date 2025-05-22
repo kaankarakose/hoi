@@ -28,7 +28,7 @@ class ObjectActivenessTracker:
     saves the data to JSON, and creates visualizations.
     """
     
-    def __init__(self, motion_loader, camera_view: str, frame_indices: List[int], 
+    def __init__(self, camera_view: str, frame_indices: List[int], 
                  annotation_data: Optional[AnnotationData] = None, 
                  session_name: Optional[str] = None,
                  annotation_root: Optional[str] = None):
@@ -36,14 +36,12 @@ class ObjectActivenessTracker:
         Initialize the activeness tracker.
         
         Args:
-            motion_loader: Instance of MotionFilteredLoader
             camera_view: Camera view name to track
             frame_indices: List of frame indices to process
             annotation_data: Optional AnnotationData instance for visualization
             session_name: Session name to automatically load annotations if annotation_data is None
             annotation_root: Optional root directory for annotations
         """
-        self.motion_loader = motion_loader
         self.camera_view = camera_view
         self.frame_indices = frame_indices
         self.annotation_data = annotation_data
@@ -62,7 +60,7 @@ class ObjectActivenessTracker:
         # Format: {object_name: {"activeness": [], "frame_idx": [], "object_id": id}}
         self.object_data = {}
         
-    def collect_data(self):
+    def collect_data(self, motion_loader):
         """
         Collect activeness data for all objects across frames.
         """
@@ -70,7 +68,7 @@ class ObjectActivenessTracker:
         
         for i, frame_idx in enumerate(self.frame_indices):
             # Get activeness for this object
-            activeness_result = self.motion_loader.get_activeness(
+            activeness_result = motion_loader.get_activeness(
                 self.camera_view, frame_idx
             )
             print(i)
@@ -557,7 +555,8 @@ def main():
     
     # Create output directory
     output_dir = os.path.join(args.output_dir, args.session, args.camera)
-    os.makedirs(output_dir, exist_ok=True)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     
     # Get valid frame indices for this view
     valid_frames = motion_loader.combined_loader.hamer_loader.get_valid_frame_idx(camera_view)
@@ -584,7 +583,6 @@ def main():
     
     # Create activeness tracker with annotation data
     tracker = ObjectActivenessTracker(
-        motion_loader=motion_loader, 
         camera_view=camera_view, 
         frame_indices=frames_to_process,
         session_name=args.session,
@@ -609,7 +607,7 @@ def main():
     advanced_viz_path = os.path.join(output_dir, f"{base_filename}_visualization_advanced.png")
     heatmap_path = os.path.join(output_dir, f"{base_filename}_visualization_heatmap.png")
     # Collect data
-    tracker.collect_data()
+    tracker.collect_data(motion_loader)
     # Save data
     tracker.save_to_json(json_path)
     

@@ -154,11 +154,7 @@ class CNOSLoader(BaseDataLoader):
         Returns:
             Dictionary containing features for both left and right hands
         """
-        # Check for cached features
-        cached_features = self._get_cached_features(camera_view, frame_idx)
-        if cached_features is not None:
-            return cached_features
-        
+
         # Initialize features dictionary
         features = {
             'frame_idx': frame_idx,
@@ -201,9 +197,7 @@ class CNOSLoader(BaseDataLoader):
             # Mark as successful if we found any objects
             if features[frame_type]['objects']:
                 features[frame_type]['success'] = True
-        
-        # Cache features
-        self._cache_features(camera_view, frame_idx, features)
+
         
         return features
     

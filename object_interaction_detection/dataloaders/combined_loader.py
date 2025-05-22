@@ -96,8 +96,7 @@ class CombinedLoader(BaseDataLoader):
         self.score_threshold = config['score_threshold']
         # Set up object colors for visualization
         self.object_colors = OBJECT_COLORS
-        #
-        self.features_cache = {}
+
         logging.info(f"Initialized combined loader for session {session_name} with score threshold {self.score_threshold}")
     
     def load_features(self, camera_view: str, frame_idx: int) -> Dict[str, Any]:
@@ -111,12 +110,6 @@ class CombinedLoader(BaseDataLoader):
         Returns:
             Dictionary containing combined features -- Mask are merged!
         """
-        # Check for cached features
-        cached_features = self._get_cached_features(camera_view, frame_idx)
-        if cached_features is not None:
-            return cached_features
-        
-      
         # Load CNOS features (object segmentation)
         cnos_features = self.cnos_loader.load_original_masks(camera_view, frame_idx) # not load features because i need original mask
         # Initialize combined features dictionary
@@ -130,62 +123,10 @@ class CombinedLoader(BaseDataLoader):
                     'success': False,
                 }
         }
-        
-
         # Merge overlapping objects from both hands
         self._merge_objects_by_hand(combined_features)
-        
-        # Cache features (without large arrays to save memory)
-        cache_features = self._prepare_cache_features(combined_features)
-        self._cache_features(camera_view, frame_idx, cache_features)
-
-
         return combined_features
-    def _cache_features(self, camera_view: str, frame_idx: int, features: Dict[str, Any]) -> None:
-        """
-        Cache features for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            features: Features dictionary to cache
-        """
-        # Create cache key
-        cache_key = f"{camera_view}_{frame_idx}"
-        
-        # Store in cache
-        self.features_cache[cache_key] = features
-    def _prepare_cache_features(self, features: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Prepare a memory-efficient version of features for caching.
-        
-        Args:
-            features: Full features dictionary
-            
-        Returns:
-            Memory-efficient features dictionary for caching
-        """
-        # Create a deep copy without the large data arrays
-        cache_features = {
-            'frame_idx': features['frame_idx'],
-            'camera_view': features['camera_view'],
-            'cnos': {
-                'L_frames': {
-                    'success': features['cnos']['L_frames']['success'],
-                    'objects': {}
-                },
-                'R_frames': {
-                    'success': features['cnos']['R_frames']['success'],
-                    'objects': {}
-                }
-            },
-            'merged': {
-                'success': features['merged']['success'],
-                'object_id_map': features['merged']['object_id_map']
-                # Exclude the large 'mask' array
-            }
-        }            
-        return cache_features  
+
     def _merge_objects_by_hand(self, features: Dict[str, Any]) -> None:
         """
         Merge overlapping objects from both hands based on scores using NumPy operations.
@@ -199,7 +140,7 @@ class CombinedLoader(BaseDataLoader):
             left_hand = features['cnos']['L_frames']
             for object_name, object_data in left_hand['objects'].items():
                 object_data = left_hand['objects'][object_name]
-                if object_data['max_score'] >= self.score_threshold :
+                if object_data['max_score'] >= self.score_threshold and 'orig_max_score_mask' in object_data:
                     left_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
         
         # Process right hand objects
@@ -208,7 +149,7 @@ class CombinedLoader(BaseDataLoader):
             right_hand = features['cnos']['R_frames']
             for object_name, object_data in right_hand['objects'].items():
                 object_data = right_hand['objects'][object_name]
-                if object_data['max_score'] >= self.score_threshold:
+                if object_data['max_score'] >= self.score_threshold and 'orig_max_score_mask' in object_data:
                     right_mask_candidates.append((object_name, object_data['orig_max_score_mask'], object_data['max_score']))
         
         # Combine all candidates
@@ -264,6 +205,7 @@ class CombinedLoader(BaseDataLoader):
         features['merged']['mask'] = id_map.copy()
         features['merged']['object_id_map'] = object_id_map
         features['merged']['success'] = True
+    
     def _load_original_frame(self, camera_view: str, frame_idx: int) -> Optional[np.ndarray]:
         """
         Load the original frame image.

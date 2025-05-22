@@ -141,10 +141,6 @@ class FrameLoader(BaseDataLoader):
         Returns:
             Dictionary containing frame path and metadata
         """
-        # Check for cached features
-        cached_features = self._get_cached_features(camera_view, frame_idx)
-        if cached_features is not None:
-            return cached_features
         
         # Get frame path
         frame_path = self.get_frame_path(camera_view, frame_idx)
@@ -156,10 +152,7 @@ class FrameLoader(BaseDataLoader):
             'frame_path': frame_path,
             'success': frame_path is not None
         }
-        
-        # Cache features
-        self._cache_features(camera_view, frame_idx, features)
-        
+
         return features
     
     def load_frame(self, camera_view: str, frame_idx: int) -> Optional[np.ndarray]:

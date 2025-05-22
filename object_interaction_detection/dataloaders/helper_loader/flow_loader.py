@@ -127,10 +127,6 @@ class FlowLoader(BaseDataLoader):
         Returns:
             Dictionary containing flow features
         """
-        # Check for cached features
-        cached_features = self._get_cached_features(camera_view, frame_idx)
-        if cached_features is not None:
-            return cached_features
         
         # Initialize features dictionary
         features = {
@@ -144,22 +140,18 @@ class FlowLoader(BaseDataLoader):
         # Load optical flow frame
         flow_frame = self._load_flow_frame(camera_view, frame_idx)
         if flow_frame is None:
-            self._cache_features(camera_view, frame_idx, features)
-            return features
+             return features
         
         # Convert to HSV for easier processing
         hsv_data = self._convert_flow_to_hsv(flow_frame)
-        if hsv_data is None:
-            self._cache_features(camera_view, frame_idx, features)
-            return features
+        # if hsv_data is None:
+        #     self._cache_features(camera_view, frame_idx, features)
+        #     return features
         
         # Update features
         features['flow_data'] = flow_frame
         features['hsv_data'] = hsv_data
         features['success'] = True
-        
-        # Cache features
-        self._cache_features(camera_view, frame_idx, features)
         
         return features
     
@@ -182,7 +174,7 @@ class FlowLoader(BaseDataLoader):
         )
         
         if not os.path.exists(flow_dir):
-            logging.warning(f"Flow directory not found: {flow_dir}")
+            raise ValueError(f"Flow directory not found: {flow_dir}")
             return None
         
         # Try different filename patterns
@@ -191,15 +183,14 @@ class FlowLoader(BaseDataLoader):
         
         file_path = os.path.join(flow_dir, pattern)
         if os.path.exists(file_path):
-        
             # Load the flow frame as an image
-            flow_image = Image.open(file_path)
-            flow_array = np.array(flow_image)
-            return flow_array
-           
+            try:
+                flow_image = Image.open(file_path)
+                flow_array = np.array(flow_image)
+                return flow_array
+            except Exception as e:
+                raise ValueError(f"Flow frame couldn't read {e}")           
     
-        logging.warning(f"No flow frame found for {camera_view}, frame {frame_idx}")
-        return None
     
     def _convert_flow_to_hsv(self, flow_frame: np.ndarray) -> Optional[np.ndarray]:
         """
@@ -219,7 +210,7 @@ class FlowLoader(BaseDataLoader):
             return hsv_array
         except Exception as e:
             logging.error(f"Error converting flow frame to HSV: {e}")
-            return None
+            raise ValueError(f"Error converting flow frame to HSV : {e}")
     def _extract_flow_brightness(self, hsv_data: np.ndarray, mask: np.ndarray) -> List[float]:
         """
         Extract flow intensity values from HSV data within a masked region.
@@ -260,7 +251,6 @@ class FlowLoader(BaseDataLoader):
         # For optical flow, saturation represents magnitude which is more meaningful
         # Convert to float to avoid potential overflow errors
         return valid_hsv[:, 1].astype(float).tolist()
-
     def get_flow_brightness(self, 
                         camera_view: str, 
                         frame_idx: int, 
@@ -410,8 +400,6 @@ class FlowLoader(BaseDataLoader):
             'raw_u_vectors': all_u_vectors,
             'raw_v_vectors': all_v_vectors
         }
-
-
     def _extract_activeness(self, features: Dict[str, Any], mask: np.ndarray):
         """
         Extract activeness from features and mask
@@ -452,7 +440,6 @@ class FlowLoader(BaseDataLoader):
         else:
             activeness = 0.0
         return activeness
-
     def process_flow_in_mask_active_area(self, 
                                 camera_view: str, 
                                 frame_idx: int, 
@@ -477,7 +464,6 @@ class FlowLoader(BaseDataLoader):
         activeness = self._extract_activeness(features, mask)
         
         return activeness
-    
     def _extract_flow_vectors(self, 
                               hsv_data: np.ndarray, 
                               mask: np.ndarray) -> Tuple[List[float], List[float]]:
@@ -541,8 +527,7 @@ class FlowLoader(BaseDataLoader):
         direction_vector_us = length * np.cos(angle_radians)
         direction_vector_vs = length * np.sin(angle_radians)
         
-        return direction_vector_us.tolist(), direction_vector_vs.tolist()
-    
+        return direction_vector_us.tolist(), direction_vector_vs.tolist()   
     def get_flow_direction(self, 
                            camera_view: str, 
                            frame_idx: int, 
@@ -562,7 +547,6 @@ class FlowLoader(BaseDataLoader):
         """
         result = self.process_flow_in_mask(camera_view, frame_idx, mask, **kwargs)
         return result['avg_dir']
-    
     def load_frame_batch(self, 
                         camera_view: str, 
                         frame_indices: List[int]) -> Dict[int, np.ndarray]:
@@ -583,7 +567,6 @@ class FlowLoader(BaseDataLoader):
                 result[idx] = features['flow_data']
         
         return result
-    
     def process_flow_features(self,
                             camera_view: str,
                             frame_idx: int,

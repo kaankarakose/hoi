@@ -22,6 +22,7 @@ src/hamer/hand/testing_outputs/*.png
 src/visualization
 visualization
 
+@eaDir
 
 __pycache__/
 *.py[cod]

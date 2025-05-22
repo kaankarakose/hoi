@@ -58,17 +58,6 @@ class HAMERLoader(BaseDataLoader):
         # HAMER specific attributes
         self.hand_types = ['left', 'right']
         self.camera_views = ['cam_top', 'cam_side_l', 'cam_side_r']
-        
-        # Define hand joint indices for specific landmarks
-        # These indices are based on MANO model joints
-        # self.landmark_indices = {
-        #     'wrist': 0,
-        #     'index_tip': 4,
-        #     'middle_tip': 8,
-        #     'ring_tip': 12,
-        #     'pinky_tip': 16,
-        #     'thumb_tip': 20
-        # }
     
     def load_features(self, camera_view: str, frame_idx: int) -> Dict[str, Any]:
         """
@@ -81,11 +70,6 @@ class HAMERLoader(BaseDataLoader):
         Returns:
             Dictionary containing hand pose features
         """
-        # Check for cached features
-        cached_features = self._get_cached_features(camera_view, frame_idx)
-        if cached_features is not None:
-            return cached_features
-        
         # Initialize features dictionary
         features = {
             'frame_idx': frame_idx,
@@ -130,34 +114,10 @@ class HAMERLoader(BaseDataLoader):
             features[hand_key]['crop_bbox'] = pose_data.get(crop_bbox_key)
             features[hand_key]['bbox'] = pose_data.get('bbox')
         
-        # Cache features (store a copy without the raw vertices data to save memory)
-        cache_features = self._prepare_cache_features(features)
-        self._cache_features(camera_view, frame_idx, cache_features)
+
         
         return features
-    
-    def _prepare_cache_features(self, features: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Prepare a memory-efficient version of features for caching.
-        
-        Args:
-            features: Full features dictionary
-            
-        Returns:
-            Memory-efficient features dictionary for caching
-        """
-        cache_features = features.copy()
-        
-        for hand_type in self.hand_types:
-            hand_key = f'{hand_type}_hand'
-            if features[hand_key]['success']:
-                # Create a copy without the large data fields
-                hand_data = features[hand_key].copy()
-                hand_data['vertices'] = None   # Don't cache the vertices
-                cache_features[hand_key] = hand_data
-        
-        return cache_features
-    
+      
     def _load_pose_data(self, camera_view: str, frame_idx: int, hand_type: str = None) -> Optional[Dict[str, Any]]:
         """
         Load raw pose data for a specific hand at a specific frame.

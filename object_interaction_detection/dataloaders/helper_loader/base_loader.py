@@ -34,10 +34,6 @@ class BaseDataLoader(ABC):
         self.data_root_dir = data_root_dir
         self.config = config or {}
         
-        # Set up cache
-        self.cache_enabled = self.config.get('cache_enabled', True)
-        self._feature_cache = {}  # Type: Dict[str, Dict[int, Any]]
-        
         # Discover camera views
         self.camera_views = self._discover_camera_views()
         
@@ -128,11 +124,7 @@ class BaseDataLoader(ABC):
         
         return None
     
-    def clear_cache(self):
-        """Clear the feature cache."""
-        self._feature_cache = {}
-        print("Cache cleared")
-    
+
     @abstractmethod
     def load_features(self, camera_view: str, frame_idx: int) -> Dict[str, Any]:
         """
@@ -164,49 +156,3 @@ class BaseDataLoader(ABC):
         frame_indices = list(range(start_frame, end_frame + 1))
         return self.load_features_batch(camera_view, frame_indices)
     
-    def _get_cache_key(self, camera_view: str, frame_idx: int) -> str:
-        """
-        Generate a cache key for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            
-        Returns:
-            Cache key string
-        """
-        return f"{camera_view}_{frame_idx}"
-    
-    def _cache_features(self, camera_view: str, frame_idx: int, 
-                       features: Dict[str, Any]):
-        """
-        Cache features for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            features: Feature dictionary to cache
-        """
-        if not self.cache_enabled:
-            return
-            
-        cache_key = self._get_cache_key(camera_view, frame_idx)
-        self._feature_cache[cache_key] = features
-    
-    def _get_cached_features(self, camera_view: str, 
-                            frame_idx: int) -> Optional[Dict[str, Any]]:
-        """
-        Get cached features for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            
-        Returns:
-            Cached feature dictionary, or None if not in cache
-        """
-        if not self.cache_enabled:
-            return None
-            
-        cache_key = self._get_cache_key(camera_view, frame_idx)
-        return self._feature_cache.get(cache_key)

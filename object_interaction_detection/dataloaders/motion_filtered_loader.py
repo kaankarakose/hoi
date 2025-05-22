@@ -78,9 +78,6 @@ class MotionFilteredLoader(BaseDataLoader):
         self.motion_threshold = config['motion_threshold']
         self.temporal_window = config['temporal_window']
         
-        # Initialize features cache
-        self.features_cache = {}
-        
         logging.info(f"Initialized motion-filtered loader for session {session_name} "
                      f"with motion threshold {self.motion_threshold}")
     
@@ -95,11 +92,7 @@ class MotionFilteredLoader(BaseDataLoader):
         Returns:
             Dictionary containing motion-filtered features
         """
-        # Check for cached features
-        # cached_features = self._get_cached_features(camera_view, frame_idx)
-        # if cached_features is not None:
-        #     return cached_features
-        
+
         # Load combined features (object masks)
         combined_features = self.combined_loader.load_features(camera_view, frame_idx)
         
@@ -119,7 +112,6 @@ class MotionFilteredLoader(BaseDataLoader):
         
         # Check if combined features were loaded successfully
         if not combined_features.get('merged', {}).get('success', False):
-            self._cache_features(camera_view, frame_idx, motion_filtered_features)
             return motion_filtered_features
         
         # Get the merged mask and object ID map
@@ -127,7 +119,6 @@ class MotionFilteredLoader(BaseDataLoader):
         object_id_map = combined_features['merged']['object_id_map']
 
         if merged_mask is None or object_id_map is None:
-            self._cache_features(camera_view, frame_idx, motion_filtered_features)
             return motion_filtered_features
         
         # Apply motion filtering to the merged mask
@@ -142,75 +133,9 @@ class MotionFilteredLoader(BaseDataLoader):
         motion_filtered_features['motion_filtered']['success'] = True
         motion_filtered_features['motion_filtered']['moving_objects'] = moving_objects
         #TODO: Memory issue
-        # # Cache features (without large arrays to save memory)
-        # cache_features = self._prepare_cache_features(motion_filtered_features)
-        # self._cache_features(camera_view, frame_idx, cache_features)
-        
         return motion_filtered_features
     
-    def _prepare_cache_features(self, features: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Prepare a memory-efficient version of features for caching.
-        
-        Args:
-            features: Full features dictionary
-            
-        Returns:
-            Memory-efficient features dictionary for caching
-        """
-        # Create a deep copy without the large data arrays
-        cache_features = {
-            'frame_idx': features['frame_idx'],
-            'camera_view': features['camera_view'],
-            'combined': {
-                'frame_idx': features['combined']['frame_idx'],
-                'camera_view': features['combined']['camera_view'],
-                'merged': {
-                    'success': features['combined']['merged']['success'],
-                    'object_id_map': features['combined']['merged']['object_id_map']
-                    # Exclude the large 'mask' array
-                }
-            },
-            'motion_filtered': {
-                'success': features['motion_filtered']['success'],
-                'object_id_map': features['motion_filtered']['object_id_map'],
-                'moving_objects': features['motion_filtered']['moving_objects'],
-                'mask': features['motion_filtered']['mask']
-                # Exclude the large 'mask' array
-            }
-        }            
-        return cache_features
-    def _get_cached_features(self, camera_view: str, frame_idx: int) -> Optional[Dict[str, Any]]:
-        """
-        Get cached features for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            
-        Returns:
-            Cached features dictionary or None if not in cache
-        """
-        # Create cache key
-        cache_key = f"{camera_view}_{frame_idx}"
-        
-        # Return cached features if available
-        return self.features_cache.get(cache_key)
 
-    def _cache_features(self, camera_view: str, frame_idx: int, features: Dict[str, Any]) -> None:
-        """
-        Cache features for a specific camera view and frame.
-        
-        Args:
-            camera_view: Camera view name
-            frame_idx: Frame index
-            features: Features dictionary to cache
-        """
-        # Create cache key
-        cache_key = f"{camera_view}_{frame_idx}"
-        
-        # Store in cache
-        self.features_cache[cache_key] = features
     def _load_original_frame(self, camera_view: str, frame_idx: int) -> Optional[np.ndarray]:
             """
             Load the original frame image (delegate to combined loader).
@@ -223,6 +148,7 @@ class MotionFilteredLoader(BaseDataLoader):
                 Frame image as numpy array or None if not available
             """
             return self.combined_loader._load_original_frame(camera_view, frame_idx)
+
     def _filter_by_motion(self, 
                      camera_view: str, 
                      frame_idx: int, 
@@ -404,10 +330,6 @@ class MotionFilteredLoader(BaseDataLoader):
         
         return visualization
     
-    
-    
-    
-
     def _calculate_object_activeness(self, 
                                 camera_view: str, 
                                 frame_idx: int, 
@@ -573,8 +495,6 @@ class MotionFilteredLoader(BaseDataLoader):
         return visualization    
 
 
-
-
 def visualize_object_masks(id_map, rgb_frame, object_id_map, object_colors, activeness_map=None, alpha=0.5, min_activeness=0.40):
     """
     Create a visualization of object masks overlaid on an RGB frame, with brightness controlled by activeness.
@@ -694,7 +614,7 @@ def visualize_object_masks(id_map, rgb_frame, object_id_map, object_colors, acti
     visualization = np.clip(visualization, 0, 255).astype(np.uint8)
     
     return visualization
-import cv2
+
 if __name__ == "__main__":
     import random
     

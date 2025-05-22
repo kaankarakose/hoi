@@ -215,14 +215,11 @@ def main():
     videos_list = all_videos_list[start_idx:end_idx]
 
 
-
-    
-    
     for video_name in videos_list:
-        video_path = os.path.join(args.frames_dir, video_name)
-  
-        process_video_session(video_name, video_path, args.objects_dir, objects_list, args.output_dir, 
-                            args.conf_threshold, camera_filters)
+        if args.session == video_name:
+            video_path = os.path.join(args.frames_dir, video_name)
+            process_video_session(video_name, video_path, args.objects_dir, objects_list, args.output_dir, 
+                                args.conf_threshold, camera_filters)
 
         
 

@@ -88,10 +88,6 @@ class CNOSHAMERLoader(BaseDataLoader):
         Returns:
             Dictionary containing combined features
         """
-        # Check for cached features
-        cached_features = self._get_cached_features(camera_view, frame_idx)
-        if cached_features is not None:
-            return cached_features
         
         # Load features from both loaders
         cnos_features = self.cnos_loader.load_features(camera_view, frame_idx)
@@ -99,7 +95,6 @@ class CNOSHAMERLoader(BaseDataLoader):
         # print(frame_idx)
         # print(hamer_features['left_hand']['success'])
         # print(hamer_features['right_hand']['success'])
-
         # print(hamer_features['right_hand']['crop_bbox'])
         # raise ValueError
         # Initialize combined features dictionary
@@ -130,8 +125,6 @@ class CNOSHAMERLoader(BaseDataLoader):
             if cnos_features[frame_type]['success']:
                 features[frame_type]['objects'] = cnos_features[frame_type]['objects']
         
-        # Cache features
-        self._cache_features(camera_view, frame_idx, features)
         
         return features
     
@@ -251,7 +244,6 @@ class CNOSHAMERLoader(BaseDataLoader):
             raise e
         
         return transformed_mask
-
 
     def _transform_masks_to_original(self, masks: List[np.ndarray], crop_bbox: List[int]) -> List[np.ndarray]:
         """

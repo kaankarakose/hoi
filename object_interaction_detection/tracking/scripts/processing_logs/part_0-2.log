@@ -1,0 +1,25 @@
+nohup: ignoring input
+Processing part 0 of 2
+Total combinations: 23
+Processing combinations 0 to 11
+-------------------------------------------
+[1/12] Processing session: imi_session1_2, camera: cam_side_r
+Memory before running:
+               total        used        free      shared  buff/cache   available
+Mem:            62Gi       1,2Gi        57Gi       1,0Mi       3,6Gi        60Gi
+Swap:          2,0Gi       705Mi       1,3Gi
+/home/kaan/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-5z3b_yo7 because there was an issue with the default path (/home/kaan/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+INFO:root:Initializing MotionFilteredLoader for session imi_session1_2
+INFO:root:Found 10 objects for cam_top/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_top/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_l/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/L_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Found 10 objects for cam_side_r/R_frames: ['AMF1', 'AMF2', 'AMF3', 'BOX', 'CUP', 'DINOSAUR', 'FIRETRUCK', 'HAIRBRUSH', 'PINCER', 'WRENCH']
+INFO:root:Initialized combined loader for session imi_session1_2 with score threshold 0.45
+INFO:root:Initialized motion-filtered loader for session imi_session1_2 with motion threshold 0.05
+INFO:root:Found 1864 valid frames from 29 to 1892
+INFO:root:Processing all 450 frames
+INFO:root:Loaded annotations for session imi_session1_2 from /nas/project_data/B1_Behavior/rush/kaan/hoi/annotations/imi_session1_2/imi_session1_2.txt
+INFO:root:Loaded annotations: 4 hand segments and 1 object segments
