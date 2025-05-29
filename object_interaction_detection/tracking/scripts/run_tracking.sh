@@ -1,7 +1,7 @@
 #!/bin/bash
 #activate conda env
-source /home/kaan/miniconda3/etc/profile.d/conda.sh
-conda activate oid
+# source /home/kaan/miniconda3/etc/profile.d/conda.sh
+# conda activate oid
 
 # Check if parameters are provided
 if [ $# -lt 2 ]; then
@@ -32,8 +32,8 @@ OUTPUT_DIR="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking"
 #     "zolti_session1_18" "zolti_session1_19" "zolti_session1_20" "zolti_session2_21" 
 #     "zolti_session2_24" "zolti_session2_25" )
 ## Define arrays for sessions and cameras
-SESSIONS=(
-   "zolti_session2_15" )
+# SESSIONS=(
+#    "zolti_session2_25" )
 # SESSIONS=(
 #    "imi_session1_2" "imi_session1_4" "imi_session1_5" 
 #    "imi_session1_6" "imi_session1_7" "imi_session1_8" "imi_session1_9" 
@@ -41,7 +41,30 @@ SESSIONS=(
 #    "imi_session2_14" "imi_session2_15"  "zolti_session1_16" "zolti_session1_17" 
 #    "zolti_session1_18" "zolti_session1_19" "zolti_session1_20" "zolti_session2_21" 
 #    "zolti_session2_22" "zolti_session2_23" "zolti_session2_24" "zolti_session2_25" )
-
+SESSIONS=(
+    "imi_session1_2" 
+    "imi_session1_4"
+    "imi_session1_5"
+    "imi_session1_6"
+    "imi_session1_7"
+    "imi_session1_8"
+    "imi_session1_9"
+    "imi_session2_10"
+    "imi_session2_11"
+    "imi_session2_12"
+    "imi_session2_14"
+    "imi_session2_15"
+    "zolti_session1_16"
+    "zolti_session1_17"
+    "zolti_session1_18"
+    "zolti_session1_19"
+    "zolti_session1_20"
+    "zolti_session2_21"
+    "zolti_session2_22"
+    "zolti_session2_23"
+    "zolti_session2_24"
+    "zolti_session2_25"
+    )
 
 CAMERAS=("cam_side_l" "cam_top" )
 

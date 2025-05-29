@@ -108,11 +108,10 @@ class AnnotationData:
             if len(parts) < 10:
                 continue  # Skip invalid lines
                 
-            # Using the user-provided column structure:
             # First column: annotation type
-            # Columns 2-4: start time in different formats 
-            # Columns 5-7: end time in different formats
-            # Columns 8-10: duration in different formats
+            # Columns 2-4: start time 
+            # Columns 5-7: end time 
+            # Columns 8-10: duration 
             # Column 11: metadata (hand type or objects)
                 
             annotation_type = parts[0]

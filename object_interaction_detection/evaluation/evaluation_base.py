@@ -273,7 +273,46 @@ class Evaluator:
         result.compute_summary_metrics()
         
         return result
-    
+
+    def evaluate_session_multi_camera(self, session_name: str) -> EvaluationResult:
+        """
+        Evaluate detections for a session against annotations.
+        
+        Args:
+            session_name: Name of the session (e.g., 'imi_session1_2')
+            
+        Returns:
+            EvaluationResult with metrics and hits
+        """
+        logger.info(f"Evaluating session {session_name}, multi")
+        
+        # Initialize result
+        result = EvaluationResult(session_name)
+        
+        # Load detection data
+        detection_data = DetectionData(session_name=session_name,
+                                      detection_root=self.config.detection_root)
+ 
+        # Process detections with energy
+        logger.info("Processing detections with energy calculation")
+        detections = detection_data.process_with_energy(
+            energy_threshold=self.config.energy_threshold,
+            activeness_threshold=self.config.activeness_threshold
+        )
+        
+        # Load annotation data
+        logger.info("Loading annotation data")
+        annotation_data = AnnotationData(session_name=session_name)
+        annotation_data.set_fps(self.config.fps)
+        
+        # Find first annotations and compare with detections
+        self._evaluate_object_identities(result, annotation_data, detections)
+        
+        # Compute summary metrics based on hits
+        result.compute_summary_metrics()
+        
+        return result
+      
 
     def _evaluate_object_identities(self, result: EvaluationResult, 
                                    annotation_data: AnnotationData,
@@ -402,6 +441,43 @@ class Evaluator:
         self.print_aggregate_summary(results, camera_view)
         
         return results
+    
+
+    def evaluate_multiple_sessions_multi_camera(self, session_list: List[str],
+                                  save_results: bool = True) -> Dict[str, EvaluationResult]:
+        """
+        Evaluate multiple sessions for multi camera.
+        
+        Args:
+            session_list: List of session names to evaluate
+            save_results: Whether to save results to JSON files
+            
+        Returns:
+            Dictionary mapping session names to EvaluationResults
+        """
+        results = {}
+        for session_name in session_list:
+            try:
+                result = self.evaluate_session_multi_camera(session_name)
+                results[session_name] = result
+                
+                # Print summary
+                result.print_summary()
+                
+                # Save to JSON if requested
+                if save_results:
+                    output_dir = os.path.join(self.config.output_root, session_name)
+                    os.makedirs(output_dir, exist_ok=True)
+                    file_path = os.path.join(output_dir, f"{session_name}_multi_evaluation.json")
+                    result.save_to_json(file_path)
+                    logger.info(f"Saved results to {file_path}")
+            except Exception as e:
+                logger.error(f"Error evaluating session {session_name}, multi camera: {e}")
+        
+        # Print aggregate summary across all sessions
+        self.print_aggregate_summary(results,camera_view = "multi")
+        
+        return results
         
     def print_aggregate_summary(self, results: Dict[str, EvaluationResult], camera_view: str) -> None:
         """Print an aggregate summary of results across all sessions.
@@ -421,9 +497,10 @@ class Evaluator:
         # Set up summary metrics
         successful_sessions = 0
         all_sessions_data = []
-        
+        # For calculating overall average time diff
+        all_time_diffs = []  # Store all time diffs across sessions
         print(f"\n{'=' * 80}")
-        print(f"{'SESSION':<20} {'SUCCESS RATIO':<15} {'STATUS':<10} {'DETECTED OBJECTS':<20}")
+        print(f"{'SESSION':<20} {'SUCCESS RATIO':<15} {'STATUS':<10} {'TIME DIFF' :<10} {'DETECTED OBJECTS':<20}")
         print(f"{'-'*20} {'-'*15} {'-'*10} {'-'*20}")
         
         for session_name, result in sorted(results.items()):
@@ -439,14 +516,28 @@ class Evaluator:
             # Check if any first play detection exists (should be boolean per session)
             first_play_detection = any(any(hit.isFirstPlayDetection for hit in obj_hits) for obj_name, obj_hits in hits.items())
 
-            
+            #Time diff per
+
+
+            # Calculate time diff for this session - FIXED VERSION
+            session_time_diffs = []
+            for obj_name, obj_hits in hits.items():
+                for hit in obj_hits:  # Iterate through individual hits
+                    if hit.hit_within_window:
+                        session_time_diffs.append(abs(hit.time_diff))
+                        all_time_diffs.append(abs(hit.time_diff))  # Add to overall collection
+            # Calculate average time diff for this session
+            avg_time_diff = sum(session_time_diffs) / len(session_time_diffs) if session_time_diffs else 0
+
+
             # Store data for overall calculation
             all_sessions_data.append({
                 'session': session_name,
                 'hit_objects': hit_objects,
                 'total_objects': total_objects,
                 'success_rate': success_rate,
-                'first_play_detection': first_play_detection
+                'first_play_detection': first_play_detection,
+                'avg_time_diff': avg_time_diff
             })
             
 
@@ -455,7 +546,7 @@ class Evaluator:
             status = "✅ OK" if first_play_detection else "❌ NOT"
             
             # Print session summary row
-            print(f"{session_name:<20} {success_ratio:<15} {status:<10} {success_ratio:<20}")
+            print(f"{session_name:<20} {success_ratio:<15} {status:<10} {avg_time_diff:<15.2f} {hit_objects}")
         
         # Calculate and display overall stats
         total_sessions = len(results)
@@ -465,10 +556,21 @@ class Evaluator:
         
         # Count sessions with first play detection
         sessions_with_first_play = sum(1 for data in all_sessions_data if data.get('first_play_detection', False))
+
+        ##
+        # Calculate overall average time diff across ALL hits
+        overall_avg_time_diff = sum(all_time_diffs) / len(all_time_diffs) if all_time_diffs else 0
         
+        # Calculate average of session averages (alternative metric)
+        session_avg_time_diff = sum(data['avg_time_diff'] for data in all_sessions_data) / len(all_sessions_data) if all_sessions_data else 0
+        
+        
+
         print(f"\n{'=' * 80}")
         print(f"OVERALL DETECTION RATE: {total_hit_objects}/{total_objects} ({overall_success_rate:.2f})")
         print(f"SESSIONS WITH FIRST PLAY DETECTION: {sessions_with_first_play}/{total_sessions} sessions")
+        print(f"OVERALL AVERAGE TIME DIFF: {overall_avg_time_diff:.2f}s (across {len(all_time_diffs)} hits)")
+        print(f"AVERAGE OF SESSION AVERAGES: {session_avg_time_diff:.2f}s")
         print(f"{'=' * 80}\n")
     
     def add_metric(self, name: str, value: float):

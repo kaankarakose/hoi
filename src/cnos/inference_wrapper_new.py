@@ -121,10 +121,8 @@ def mask_to_bbox(mask):
         mask = Image.open(mask).convert('L')
     elif isinstance(mask, Image.Image):
         mask = mask.convert('L')
-  
     
     mask_array = np.array(mask)
-    
     # Find the indices of non-zero elements
     rows = np.any(mask_array, axis=1)
     cols = np.any(mask_array, axis=0)

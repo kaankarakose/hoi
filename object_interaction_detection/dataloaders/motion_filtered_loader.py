@@ -42,6 +42,9 @@ class MotionFilteredLoader(BaseDataLoader):
     def __init__(self, 
                  session_name: str, 
                  data_root_dir: str,
+                 score_threshold: float = 0.45,
+                 motion_threshold: float = 0.05,
+                 temporal_window: int = 1,
                  config: Optional[Dict[str, Any]] = None):
         """
         Initialize the motion-filtered loader.
@@ -59,11 +62,11 @@ class MotionFilteredLoader(BaseDataLoader):
         flow_root_dir = "/nas/project_data/B1_Behavior/rush/kaan/old_method/processed_data"
 
         # Add default motion threshold configuration
-        config.setdefault('score_threshold', 0.45)
-        config.setdefault('motion_threshold', 0.05)  # Default threshold for motion
-        config.setdefault('temporal_window', 1)      # Default window for flow aggregation
+        config.setdefault('score_threshold', score_threshold)
+        config.setdefault('motion_threshold', motion_threshold)  # Default threshold for motion
+        config.setdefault('temporal_window', temporal_window)      # Default window for flow aggregation
         config.setdefault('frames_dir', os.path.join(data_root_dir, 'orginal_frames'))  # For visualization
-        
+        print(config, "motionFiltered")
         # Call parent constructor
         super().__init__(session_name, data_root_dir, config)
         
@@ -188,7 +191,7 @@ class MotionFilteredLoader(BaseDataLoader):
             
             # Create a binary mask for this object
             obj_mask = (merged_mask == obj_id)
-            
+            print(frame_idx)
             # Check the activeness of the object using the flow loader
             activeness = self.flow_loader.process_flow_in_mask_active_area(
                 camera_view=camera_view,
@@ -258,28 +261,72 @@ class MotionFilteredLoader(BaseDataLoader):
             'activeness': object_activeness
         }
     
-    def get_all_moving_objects(self, 
-                              camera_view: str, 
-                              frame_idx: int) -> List[str]:
+    
+    
+    
+    def get_activeness_by_object(self, 
+                                camera_view: str, 
+                                frame_idx: int,
+                                obj_name: str
+                                ) -> Dict[str, Any]:
         """
-        Get a list of all moving objects in a frame.
+        Get activeness score for a specific object by object name.
         
         Args:
             camera_view: Camera view name
             frame_idx: Frame index
+            obj_name: Name of the object to get activeness for
             
         Returns:
-            List of moving object names
+            Dictionary containing activeness score and related information
         """
         # Load filtered features
         features = self.load_features(camera_view, frame_idx)
+        # Check if features were loaded successfully
+        if not features['motion_filtered']['success']:
+            return {
+                'success': False,
+                'activeness': None
+            }
         
-        # Return moving objects if features were loaded successfully
-        if features['motion_filtered']['success']:
-            return features['motion_filtered']['moving_objects']
+        # Get object ID map and filtered mask
+        object_id_map = features['motion_filtered']['object_id_map']
+        filtered_mask = features['motion_filtered']['mask']
         
-        # Return empty list if features could not be loaded
-        return []
+        # Check if the specified object exists
+        if obj_name not in object_id_map:
+            return {
+                'success': False,
+                'activeness': None,
+                'error': f'Object "{obj_name}" not found in object ID map'
+            }
+        
+        # Get the object ID
+        obj_id = object_id_map[obj_name]
+        
+        # Create a binary mask for this object
+        obj_mask = (filtered_mask == obj_id)
+
+        # Check if any pixels belong to this object after filtering
+        if not np.any(obj_mask):
+            return {
+                'success': False,
+                'activeness': None,
+                'error': f'No pixels found for object "{obj_name}" after filtering'
+            }
+
+        # Get flow information for this object
+        activeness = self.flow_loader.process_flow_in_mask_active_area(
+            camera_view=camera_view,
+            frame_idx=frame_idx,
+            mask=obj_mask,
+        )
+        
+        return {
+            'success': True,
+            'activeness': activeness
+        }
+    
     
     def visualize_motion_filtered_masks(self, 
                                        camera_view: str, 
@@ -649,9 +696,6 @@ if __name__ == "__main__":
     # Load features
     features = motion_loader.load_features(camera_view = camera_view, frame_idx=index)
 
-    # Get list of moving objects
-    moving_objects = motion_loader.get_all_moving_objects(camera_view, index)
-    print(f"Moving objects: {moving_objects}")
     
     # Combined Loader and Flow Loader
     combined_loader = CombinedLoader(session_name=session_name, data_root_dir=data_root_dir, config=config)

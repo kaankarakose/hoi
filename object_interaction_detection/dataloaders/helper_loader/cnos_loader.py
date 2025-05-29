@@ -99,7 +99,7 @@ class CNOSLoader(BaseDataLoader):
                 
                 available_objects[cam_view][frame_type] = object_names
                 
-                logging.info(f"Found {len(object_names)} objects for {cam_view}/{frame_type}: {object_names}")
+                #logging.info(f"Found {len(object_names)} objects for {cam_view}/{frame_type}: {object_names}")
         
         return available_objects
     def get_frame_count(self, camera_view: str, frame_type: str) -> int:
@@ -270,7 +270,7 @@ class CNOSLoader(BaseDataLoader):
         
         if not os.path.exists(object_dir):
             return [], []
-        
+
         # Format frame name with leading zeros (try different formats)
         frame_names = [
             f"frame_{frame_idx:06d}"

@@ -55,12 +55,12 @@ class BaseDataLoader(ABC):
         # Get all subdirectories as camera views
         camera_views = [d for d in os.listdir(frames_dir) 
                        if os.path.isdir(os.path.join(frames_dir, d))]
-        print(camera_views)
+        
         assert 'cam_top' in camera_views
         assert 'cam_side_l' in camera_views
         assert 'cam_side_r' in camera_views
         
-        print(f"Found {len(camera_views)} camera views: {camera_views}")
+        
         return camera_views
     
 

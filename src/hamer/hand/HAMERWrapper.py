@@ -401,7 +401,6 @@ def demo():
     # Load an image
     img_path = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data/orginal_frames/imi_session1_2/cam_side_l"
     if not os.path.exists(img_path):
-        print(f"Demo image not found: {img_path}")
         # Try to find any image in the example_data directory
         example_data_dir = thirdparty_path / "hamer/example_data"
         image_files = list(example_data_dir.glob("*.jpg")) + list(example_data_dir.glob("*.png"))

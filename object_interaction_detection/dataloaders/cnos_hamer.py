@@ -54,7 +54,6 @@ class CNOSHAMERLoader(BaseDataLoader):
         config = config or {}
         
         # Add default score threshold configuration
-        config.setdefault('score_threshold', 0.45)  # Default threshold of 0.5
         config.setdefault('frames_dir', os.path.join(data_root_dir, 'orginal_frames'))  # For visualization
         
         # Call parent constructor

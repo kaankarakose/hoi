@@ -7,82 +7,201 @@ from typing import Dict, List, Tuple, Any, Optional, Union
 import matplotlib.pyplot as plt
 from collections import defaultdict
 from matplotlib.patches import Rectangle
+from matplotlib.lines import Line2D
+
 from tqdm import tqdm
+
 # Add the project root directory to Python path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
-from object_interaction_detection.dataloaders.motion_filtered_loader import MotionFilteredLoader
-from object_interaction_detection.tracking.annotation_parser import AnnotationData
+from  object_interaction_detection.dataloaders.motion_filtered_loader import MotionFilteredLoader
+from  object_interaction_detection.tracking.annotation_parser import AnnotationData
+
+
+def get_frame_sequence(frame_indices, start_time, duration=100):
+    """
+    Get a sequence of frames starting from start_time.
+    
+    Args:
+        frame_indices: List of available frame indices (may be non-sequential)
+        start_time: Starting frame index
+        duration: Number of frames to get after start_time
+    
+    Returns:
+        List of frame indices
+    """
+    # Convert to sorted list for easier handling
+    available_frames = sorted(set(frame_indices))
+    
+    # Find the starting position
+    start_idx = None
+    for i, frame in enumerate(available_frames):
+        if frame >= start_time:
+            start_idx = i
+            break
+    
+    if start_idx is None:
+        return []  # No frames at or after start_time
+    
+    # Get up to 'duration' frames starting from start_idx
+    selected_frames = available_frames[:start_idx + duration]
+    
+    return selected_frames
+
+
 class ObjectActivenessTracker:
     """
     Tracks object activeness over time using the MotionFilteredLoader.
     
-    This class collects activeness data for objects across frames,
-    saves the data to JSON, and creates visualizations.
+    This class collects activeness data for objects across frames and CAMERA VIEW - Slight different from 
+    object_activeness_tracker.py, saves the data to JSON, and creates visualizations.
     """
     
-    def __init__(self, camera_view: str, frame_indices: List[int], 
+    def __init__(self,frame_indices: List[int], 
                  annotation_data: Optional[AnnotationData] = None, 
                  session_name: Optional[str] = None,
-                 annotation_root: Optional[str] = None):
+                 annotation_root: Optional[str] = None,
+                 fps = 30):
         """
         Initialize the activeness tracker.
         
         Args:
-            camera_view: Camera view name to track
             frame_indices: List of frame indices to process
             annotation_data: Optional AnnotationData instance for visualization
-            session_name: Session name to automatically load annotations if annotation_data is None
+            session_name: Session name to automatically load annotations
             annotation_root: Optional root directory for annotations
         """
-        self.camera_view = camera_view
-        self.frame_indices = frame_indices
+        self.camera_views = ['cam_top', 'cam_side_r', 'cam_side_l'] # Camera views to process
+        
+      
         self.annotation_data = annotation_data
         self.session_name = session_name
-        
+
         # Load annotations from session name if provided and annotation_data is None
         if annotation_data is None and session_name is not None:
             self.annotation_data = AnnotationData()
             if not self.annotation_data.load_from_session(session_name, annotation_root):
                 logging.warning(f"Failed to load annotations for session: {session_name}")
-                self.annotation_data = None
-        # print(self.annotation_data.annotations['HandUsed'][0].start_time)
-        # raise ValueError
-        
+                raise ValueError(f"Failed to load annotations for session: {session_name}")
+        self.fps = fps
+        self.start_time = int(self.annotation_data.annotations['HandUsed'][0].start_time * self.fps)
+
+
+        #self.frame_indices = frame_indices[:self.start_time + min(frame_idx)] # frame_indices may not start from 0 and sequence may not be continuous
+        self.frame_indices = get_frame_sequence(frame_indices, self.start_time, duration=120)
+
         # Dictionary to store activeness data for each object
         # Format: {object_name: {"activeness": [], "frame_idx": [], "object_id": id}}
         self.object_data = {}
         
     def collect_data(self, motion_loader):
         """
-        Collect activeness data for all objects across frames.
+        Collect activeness data for all objects across frames by comparing mask sizes across camera views
+        and choosing the camera view with the largest mask for each object.
+        
+        Args:
+            motion_loader: MotionFilteredLoader instance
         """
+        
         total_frames = len(self.frame_indices)
-        for i, frame_idx in enumerate(self.frame_indices):
-            # Get activeness for this object
-            activeness_result = motion_loader.get_activeness(
-                self.camera_view, frame_idx
-            )
-            print(i)
-            if not activeness_result['success']: continue
+        logging.info(f"{total_frames} is processing")
+        for i, frame_idx in tqdm(enumerate(self.frame_indices),desc = "Processing frames"):
+            # Load features from ALL camera views for this frame
+            camera_features = {}
+            camera_object_maps = {}
             
-            # Initialize object data if not already tracked
-            for obj_name, activeness in activeness_result['activeness'].items():
+            for camera_view in self.camera_views:
+                features = motion_loader.load_features(camera_view, frame_idx)
+                if features['motion_filtered']['success']:
+                    camera_features[camera_view] = features
+                    camera_object_maps[camera_view] = features['motion_filtered']['object_id_map']
+            
+            # Skip frame if no camera views have valid features
+            if not camera_features:
+                continue
+            
+
+            # Get all unique objects across all camera views
+            all_objects = set()
+            for obj_map in camera_object_maps.values():
+                all_objects.update(obj_map.keys())
+            
+            # For each object, find the camera view with the largest mask
+            for obj_name in all_objects:
+                best_camera_view = None
+                largest_mask_size = 0
+                
+                # Compare mask sizes across camera views for this object
+                for camera_view, features in camera_features.items():
+                    if obj_name in camera_object_maps[camera_view]:
+                        # Get mask size for this object in this camera view
+                        mask_size = self.get_mask_size(features, obj_name)                        
+                        if mask_size > largest_mask_size:
+                            largest_mask_size = mask_size
+                            best_camera_view = camera_view
+                
+                # Skip if no valid mask found for this object
+                if best_camera_view is None:
+                    continue
+                print(best_camera_view)
+                print(frame_idx)
+                print(obj_name)
+                # Get activeness using the camera view with the largest mask
+                activeness_result = motion_loader.get_activeness_by_object(
+                    best_camera_view, frame_idx, obj_name
+                    )
+                
+                # Skip if activeness calculation failed
+                if not activeness_result['success']:
+                    continue
+                
+                # Get activeness value
+                activeness = activeness_result['activeness']
+                
+                # Initialize object data if not already tracked
                 if obj_name not in self.object_data:
                     self.object_data[obj_name] = {
                         "activeness": [],
                         "frame_idx": [],
+                        "camera_view": [],  # Track which camera view was used
+                        "object_id": camera_object_maps[best_camera_view][obj_name]
                     }
+                
                 # Append data
                 self.object_data[obj_name]["activeness"].append(activeness)
                 self.object_data[obj_name]["frame_idx"].append(frame_idx)
+                self.object_data[obj_name]["camera_view"].append(best_camera_view)
             
-            gc.collect()
         logging.info(f"Collected activeness data for {len(self.object_data)} objects across {total_frames} frames")
+
+    def get_mask_size(self, features, obj_name):
+        """
+        Extract mask size for a given object from features.
+        You'll need to implement this based on your data structure.
+        
+        Args:
+            features: Features dictionary for a camera view
+            obj_name: Name of the object
+            
+        Returns:
+            int: Size of the mask (e.g., number of pixels, area, etc.)
+        """
+
+        object_id = features['motion_filtered']['object_id_map'][obj_name]
+        mask = features['motion_filtered']['mask']
+
+        # Count pixels that belong to this object ID
+        if hasattr(mask, 'shape'):  # numpy array
+            mask_size = np.sum(mask == object_id)
+        else:  # regular list/array
+            mask_size = sum(1 for pixel in mask.flat if pixel == object_id) if hasattr(mask, 'flat') else \
+                    sum(1 for row in mask for pixel in row if pixel == object_id)
+        
+        return int(mask_size)
     
     def save_to_json(self, output_path: str):
         """
@@ -91,9 +210,9 @@ class ObjectActivenessTracker:
         Args:
             output_path: Path to the output JSON file
         """
+        print(self.object_data)
         # Create the data structure to save
         data = {
-            "camera_view": self.camera_view,
             "objects": self.object_data,
             "metadata": {
                 "num_frames": len(self.frame_indices),
@@ -150,7 +269,7 @@ class ObjectActivenessTracker:
         # Add labels and legend
         plt.xlabel("Frame Index")
         plt.ylabel("Activeness")
-        plt.title(title or f"Object Activeness Over Time ({self.camera_view})")
+        plt.title(title or f"Object Activeness Over Time")
         plt.legend(loc="upper right", bbox_to_anchor=(1.1, 1))
         plt.grid(True, alpha=0.3)
         
@@ -207,16 +326,32 @@ class ObjectActivenessTracker:
         # Get colormaps
         major_cmap = plt.cm.get_cmap('tab10')
         minor_cmap = plt.cm.get_cmap('Pastel1')
-        
+        # Camera markers
+        camera_markers = {
+            'cam_top': '^',      # triangle up
+            'cam_side_r': 's',   # square  
+            'cam_side_l': 'o'    # circle
+        }
+        camera_colors = {
+            'cam_top': '#E31A1C',       # Bright red
+            'cam_side_r': '#1F78B4',    # Steel blue
+            'cam_side_l': '#33A02C'     # Forest green
+        }
         # Plot major objects
         for i, (obj_name, data) in enumerate(major_objects.items()):
             color = major_cmap(i % 10)
             frame_indices = data["frame_idx"]
             activeness = data["activeness"]
-            
+            camera_views = data["camera_view"]
             # Plot the activeness line
             ax1.plot(frame_indices, activeness, label=obj_name, color=color, linewidth=2)
-            
+            # Scatter points with markers based on camera view
+            for frame_idx, active_val, cam_view in zip(frame_indices, activeness, camera_views):
+                marker = camera_markers[cam_view]
+                cam_color = camera_colors[cam_view]
+                ax1.scatter(frame_idx, active_val, marker=marker, 
+                   facecolors=cam_color, edgecolors='black', 
+                   s=80, alpha=0.8, linewidths=0.5, zorder=5)
             # Highlight active regions
             active_regions = []
             start_idx = None
@@ -243,14 +378,47 @@ class ObjectActivenessTracker:
         ax1.axvline(x=start_time, color='g', linestyle='-', linewidth=3, alpha=0.7,
                     label = "Annotation")
         # Configure main plot
-        ax1.set_title(title or f"Major Object Activeness ({self.camera_view})")
+        ax1.set_title(title or f"Object Activeness")
         ax1.set_ylabel("Activeness")
         ax1.set_ylim(bottom=0)
         ax1.set_xlim(0, (start_time * 2))  # Changed to limit x-axis from 0 to 100
         ax1.grid(True, alpha=0.3)
         ax1.legend(loc="upper right", bbox_to_anchor=(1.1, 1))
-        
+        # Create legend elements for camera markers
 
+        camera_legend_elements = []
+        # Create a descriptive label for the camera
+        cam_labels = {
+            'cam_top': 'Top Camera',
+            'cam_side_r': 'Right Side Camera', 
+            'cam_side_l': 'Left Side Camera'
+        }
+        for cam_view, marker in camera_markers.items():
+            color = camera_colors[cam_view]
+            label = cam_labels[cam_view]
+            
+            # Create legend element
+            legend_element = Line2D([0], [0], marker=marker, color='w', 
+                                markerfacecolor=color, markeredgecolor=color,
+                                markersize=10, label=label, linestyle='None')
+            camera_legend_elements.append(legend_element)
+
+        # Add Camera legends
+        # Create the original object legend first and save it
+        original_legend = ax1.legend(loc="upper right", bbox_to_anchor=(1.1, 1))
+
+        # Add separate camera marker legend in upper left
+        camera_legend = ax1.legend(camera_legend_elements, 
+                                [elem.get_label() for elem in camera_legend_elements],
+                                loc="upper left", 
+                                title="Camera Views", 
+                                frameon=True, 
+                                fancybox=True, 
+                                shadow=True,
+                                fontsize=10)
+
+        # Add the original legend back (since the second legend call replaced it)
+        ax1.add_artist(original_legend)
         
         # Add annotation data if available
         if use_annotation_subplot:
@@ -390,7 +558,7 @@ class ObjectActivenessTracker:
         # Add labels
         plt.ylabel('Object')
         plt.xlabel('Frame Index')
-        plt.title(title or f"Object Activeness Heatmap ({self.camera_view})")
+        plt.title(title or f"Object Activeness Heatmap")
         
         # Set tick labels
         plt.yticks(range(len(objects)), objects)
@@ -428,6 +596,7 @@ class ObjectActivenessTracker:
         plt.tight_layout()
         plt.show()
 
+
 import argparse
 
 def parse_args():
@@ -436,14 +605,16 @@ def parse_args():
     
     parser.add_argument("--session", type=str, required=True,
                        help="Session name to process")
-    parser.add_argument("--data-root", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data",
+    parser.add_argument("--data-root", type=str,default="/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data",
                        help="Root directory for data")
     parser.add_argument("--camera", type=str, default="cam_top",
                        help="Camera view to process (default: cam_top)")
-    parser.add_argument("--output-dir", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking",
+    parser.add_argument("--output-dir", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking_multi",
                        help="Output directory for visualizations and data")
     parser.add_argument("--num-frames", type=int, default=100,
                        help="Number of frames to process (default: 100)")
+    parser.add_argument("--score-threshold", type=float, default=0.47)
+                       
     parser.add_argument("--threshold", type=float, default=0.25,
                        help="Activeness threshold (default: 0.25)")
     parser.add_argument("--annotation-root", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/annotations",
@@ -466,48 +637,32 @@ def main():
     logging.info(f"Initializing MotionFilteredLoader for session {args.session}")
     motion_loader = MotionFilteredLoader(
         session_name=args.session,
-        data_root_dir=args.data_root
+        data_root_dir=args.data_root,
+        score_threshold=args.score_threshold,
+        
     )
-    
-    # Get camera view and detect if it's valid
-    camera_view = args.camera
-    if camera_view not in motion_loader.camera_views:
-        available_views = ", ".join(motion_loader.camera_views)
-        logging.error(f"Invalid camera view '{camera_view}'. Available views: {available_views}")
-        return
-    
     # Create output directory
-    output_dir = os.path.join(args.output_dir, args.session, args.camera)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    output_dir = os.path.join(args.output_dir, args.session)
+    os.makedirs(output_dir, exist_ok=True)
     
-    # Get valid frame indices for this view
-    valid_frames = motion_loader.combined_loader.hamer_loader.get_valid_frame_idx(camera_view)
-    
-    if not valid_frames:
-        logging.error(f"No valid frames found for camera view '{camera_view}'")
-        return
+  # Get valid frame indices for all camera views and find intersection
+    valid_frame_by_camera = []
+    for camera_view in motion_loader.camera_views:
+        valid_frames = motion_loader.combined_loader.hamer_loader.get_valid_frame_idx(camera_view)
+        valid_frame_by_camera.append(valid_frames)
+    # Find frames that are valid in ALL camera views
+    if valid_frame_by_camera:
+        common_valid_frames = list(set.intersection(*map(set, valid_frame_by_camera)))
+    else:
+        raise ValueError("No valid frames found for any camera view?")
     
     # Determine frame range to process
-    min_frame = min(valid_frames)
-    max_frame = max(valid_frames)
-    
-    logging.info(f"Found {len(valid_frames)} valid frames from {min_frame} to {max_frame}")
-    
-    # Use a subset of frames for efficiency if requested
-    # if args.num_frames and args.num_frames < len(valid_frames):
-    #     # Calculate step size to get approximately args.num_frames frames
-    #     step = len(valid_frames) // args.num_frames
-    #     frames_to_process = valid_frames[::step][:args.num_frames]
-    #     logging.info(f"Processing a subset of {len(frames_to_process)} frames")
-    # else:
-    frames_to_process = valid_frames
-    logging.info(f"Processing all {len(frames_to_process)} frames")
+    min_frame = min(common_valid_frames)
+    max_frame = max(common_valid_frames)
     
     # Create activeness tracker with annotation data
     tracker = ObjectActivenessTracker(
-        camera_view=camera_view, 
-        frame_indices=frames_to_process,
+        frame_indices=common_valid_frames,
         session_name=args.session,
         annotation_root=args.annotation_root
     )
@@ -520,17 +675,19 @@ def main():
     else:
         logging.warning("No annotation data found or loaded")
     
+    # Collect data
+    tracker.collect_data(motion_loader)
+    
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
     
     # Generate output paths
-    base_filename = f"{args.session}_{camera_view}"
+    base_filename = f"{args.session}"
     json_path = os.path.join(output_dir, f"{base_filename}_activeness.json")
     basic_viz_path = os.path.join(output_dir, f"{base_filename}_visualization_basic.png")
     advanced_viz_path = os.path.join(output_dir, f"{base_filename}_visualization_advanced.png")
     heatmap_path = os.path.join(output_dir, f"{base_filename}_visualization_heatmap.png")
-    # Collect data
-    tracker.collect_data(motion_loader)
+    
     # Save data
     tracker.save_to_json(json_path)
     
@@ -543,7 +700,7 @@ def main():
     )
     tracker.create_heatmap(
         output_path=heatmap_path, 
-        title=f"Object Activeness Heatmap - {args.session} ({args.camera})",
+        title=f"Object Activeness Heatmap - {args.session}",
         threshold=args.threshold
     )
     

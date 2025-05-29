@@ -94,7 +94,6 @@ def main():
     
     # Session/camera selection
     parser.add_argument("--session", type=str, help="Specific session to evaluate")
-    parser.add_argument("--camera", type=str, help="Specific camera view to evaluate")
     parser.add_argument("--all-sessions", action="store_true", help="Evaluate all available sessions", default = True)
     
     # Configuration
@@ -108,10 +107,10 @@ def main():
                         default="/nas/project_data/B1_Behavior/rush/kaan/hoi/annotations",
                         help="Root directory for annotations")
     parser.add_argument("--detection-root", type=str, 
-                        default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking",
+                        default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking_multi",
                         help="Root directory for detection results")
     parser.add_argument("--output-root", type=str, 
-                        default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/evaluation",
+                        default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/evaluation_multi",
                         help="Output directory for results")
     
     # Extra options
@@ -135,11 +134,8 @@ def main():
         for session in sorted(available['detections']):
             print(f"  - {session}")
             
-            # List camera views for this session
-            cameras = get_camera_views_for_session(session, args.detection_root)
-            for camera in cameras:
-                print(f"    - {camera}")
-        
+
+    
     
     # Create configuration
     config = EvaluationConfig(
@@ -173,32 +169,15 @@ def main():
         logger.error("Must specify either --session or --all-sessions")
         return
     
-    # Determine camera views to evaluate
-    if args.camera:
-        camera_views = [args.camera]
-    else:
-        # Get all camera views for the first session (assume same for all)
-        if sessions_to_evaluate:
-            camera_views = get_camera_views_for_session(sessions_to_evaluate[0], args.detection_root)
-        else:
-            camera_views = []
-        
-        if not camera_views:
-            logger.error("No camera views found. Please specify with --camera.")
-            return
+
     
-    # Evaluate each camera view
-    for camera_view in camera_views:
-        logger.info(f"Evaluating camera view: {camera_view}")
-        
-        # Evaluate all sessions for this camera
-        results = evaluator.evaluate_multiple_sessions(
-            sessions_to_evaluate,
-            camera_view,
-            save_results=True
-        )
-        
-        print(f"\n=== Evaluation complete for camera: {camera_view} ===\n")
+  
+    # Evaluate all sessions for this camera
+    results = evaluator.evaluate_multiple_sessions_multi_camera(
+        sessions_to_evaluate,
+        save_results=True
+    )
+    print(f"\n=== Evaluation complete for multi camera ===\n")
     
     # Output path information
     print(f"\nResults saved to: {args.output_root}")

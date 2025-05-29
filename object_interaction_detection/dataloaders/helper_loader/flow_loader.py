@@ -428,7 +428,7 @@ class FlowLoader(BaseDataLoader):
         #binary_mask = cv2.adaptiveThreshold(inverted_mask, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 1, 1) # 11 and 2 are parameters for adaptive thresholding
         ret, binary_mask = cv2.threshold(inverted_mask, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-        
+  
         # Calculate activeness with protection against division by zero
         if np.sum(mask) > 0:
             # Count the number of active pixels (255s) within the mask region
@@ -459,7 +459,6 @@ class FlowLoader(BaseDataLoader):
         #print(features), print(frame_idx)
         if not features['success'] or features['hsv_data'] is None:
             raise ValueError("Loading features failed in optical flow!")
-            
         # Extract activeness from masked region
         activeness = self._extract_activeness(features, mask)
         

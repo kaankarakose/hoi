@@ -55,7 +55,7 @@ class Detection:
 class DetectionData:
     """Container for detection results from object tracker."""
     
-    def __init__(self, session_name: str = None, camera_view: str = None, 
+    def __init__(self, session_name: str = None, camera_view: str = "multi", 
                  detection_root: str = None):
         """Initialize detection data container.
         
@@ -77,12 +77,22 @@ class DetectionData:
     
     def load_data(self):
         """Load detection data from saved JSON file."""
-        file_path = os.path.join(
-            self.detection_root, 
-            self.session_name, 
-            self.camera_view,
-            f"{self.session_name}_{self.camera_view}_activeness.json"
-        )
+        if self.camera_view != "multi":
+            file_path = os.path.join(
+                self.detection_root, 
+                self.session_name, 
+                self.camera_view ,
+                f"{self.session_name}_{self.camera_view}_activeness.json"
+            )
+        else:
+            
+            file_path = os.path.join(
+                self.detection_root, 
+                self.session_name, 
+                f"{self.session_name}_activeness.json"
+            )
+
+        print(file_path)
         
         if not os.path.exists(file_path):
             logger.warning(f"Detection file not found: {file_path}")
