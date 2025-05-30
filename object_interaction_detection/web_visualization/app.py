@@ -35,9 +35,23 @@ app.config['JSON_SORT_KEYS'] = False
 DATA_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data"
 FLOW_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/old_method/processed_data"
 EVALUATION_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/evaluation"
+ANNOTATION_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/annotation"
 DEFAULT_SESSION = "imi_session1_6"
 DEFAULT_CAMERA = "cam_top"
 DEFAULT_FRAME = 200
+
+# Function to get available sessions
+def get_available_sessions():
+    """Get list of available sessions from annotation directory"""
+    import os
+    try:
+        # List all directories in the annotation root
+        sessions = [d for d in os.listdir(ANNOTATION_ROOT_DIR) 
+                   if os.path.isdir(os.path.join(ANNOTATION_ROOT_DIR, d))]
+        return sorted(sessions)
+    except Exception as e:
+        logger.error(f"Error getting available sessions: {str(e)}")
+        return []
 
 # Set configuration for the motion filtered loader
 config = {

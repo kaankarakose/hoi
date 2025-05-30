@@ -21,9 +21,14 @@ def register_motion_routes(app, motion_loader, detection_manager):
         default_frame = 200
         if valid_frames:
             default_frame = valid_frames[0]
+        # Get available sessions
+        available_sessions = app.get_available_sessions()
         return render_template('index.html', 
                                 valid_frames=valid_frames, 
-                                default_frame=default_frame)
+                                default_frame=default_frame,
+                                available_sessions=available_sessions,
+                                default_session=motion_loader.session_name,
+                                default_camera=motion_loader.camera_view)
     
     @app.route('/api/valid-frames')
     def get_valid_frames():
@@ -126,7 +131,8 @@ def register_motion_routes(app, motion_loader, detection_manager):
             return jsonify({
                 'success': True,
                 'image': vis_base64,
-                'flow_info': flow_info
+                'flow_info': flow_info,
+                'object_name': object_name if object_name else None
             })
                 
         except Exception as e:
@@ -136,6 +142,26 @@ def register_motion_routes(app, motion_loader, detection_manager):
                 'success': False,
                 'message': f'Error processing flow data: {str(e)}'
             })
+    @app.route('/api/available-sessions')
+    def get_available_sessions_route():
+        """Get list of available sessions"""
+        try:
+            # Get available sessions
+            sessions = app.get_available_sessions()
+            
+            return jsonify({
+                'success': True,
+                'sessions': sessions,
+                'current_session': motion_loader.session_name
+            })
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return jsonify({
+                'success': False,
+                'message': f'Error fetching available sessions: {str(e)}'
+            })
+            
     @app.route('/api/evaluation-data', methods=['POST'])
     def get_evaluation_data():
         """API endpoint to get evaluation data for a specific session and camera view"""
@@ -143,6 +169,10 @@ def register_motion_routes(app, motion_loader, detection_manager):
             # Get parameters from request
             session_name = request.form.get('session_name', motion_loader.session_name)
             camera_view = request.form.get('camera_view', motion_loader.camera_view)
+            
+            # Update the detection manager with the new session and camera
+            detection_manager.session_name = session_name
+            detection_manager.camera_view = camera_view
             
             # Load detection data using the DetectionManager
             detection_data = detection_manager.load_data(session_name, camera_view)

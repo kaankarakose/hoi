@@ -13,13 +13,23 @@
         
         <div class="control-panel">
             <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="session-select">Session:</label>
+                        <select id="session-select" class="form-control auto-update">
+                            {% for session in available_sessions %}
+                            <option value="{{ session }}" {% if session == default_session %}selected{% endif %}>{{ session }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
                 <div class="col-md-2">
                     <div class="form-group">
                         <label for="camera-select">Camera View:</label>
                         <select id="camera-select" class="form-control auto-update">
-                            <option value="cam_top">Top Camera</option>
-                            <option value="cam_side_l">Left Side Camera</option>
-                            <option value="cam_side_r">Right Side Camera</option>
+                            <option value="cam_top" {% if default_camera == 'cam_top' %}selected{% endif %}>Top Camera</option>
+                            <option value="cam_side_l" {% if default_camera == 'cam_side_l' %}selected{% endif %}>Left Side Camera</option>
+                            <option value="cam_side_r" {% if default_camera == 'cam_side_r' %}selected{% endif %}>Right Side Camera</option>
                         </select>
                     </div>
                     <small id="valid-frames-count" class="text-info mt-1">

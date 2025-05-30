@@ -28,8 +28,8 @@ class ApiService {
 
     static getEvaluationData(cameraView, frameIdx) {
         const formData = new FormData();
+        formData.append('session_name', sessionName);
         formData.append('camera_view', cameraView);
-        formData.append('frame_idx', frameIdx);
         
         return fetch('/api/evaluation-data', {
             method: 'POST',
@@ -44,6 +44,15 @@ class ApiService {
      */
     static getValidFrames(cameraView) {
         return fetch(`/api/valid-frames?camera_view=${cameraView}`)
+            .then(response => response.json());
+    }
+    
+    /**
+     * Get available sessions
+     * @returns {Promise} - Promise with the API response containing available sessions
+     */
+    static getAvailableSessions() {
+        return fetch('/api/available-sessions')
             .then(response => response.json());
     }
 }
