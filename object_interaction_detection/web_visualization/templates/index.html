@@ -23,8 +23,7 @@
                         </select>
                     </div>
                     <small id="valid-frames-count" class="text-info mt-1">
-                        Left: {{ valid_frames.get("cam_top", {}).get("left", [])|length }} frames / 
-                        Right: {{ valid_frames.get("cam_top", {}).get("right", [])|length }} frames
+                        Frames: {{ valid_frames|length }} frames / 
                     </small>
                 </div>
                 <div class="col-md-3">
@@ -32,51 +31,15 @@
                         <label for="frame-select">Frame Index:</label>
                         <div class="d-flex align-items-center">
                             <input type="range" id="frame-select" class="form-range flex-grow-1 auto-update" 
-                                min="{{ valid_frames.get('cam_top', {}).get('left', [])[0] if valid_frames.get('cam_top', {}).get('left', []) else 0 }}" 
-                                max="{{ valid_frames.get('cam_top', {}).get('left', [])[-1] if valid_frames.get('cam_top', {}).get('left', []) else 100 }}" 
-                                value="{{ default_frame }}" 
+                                min="{{ valid_frames|default([0])|min }}" 
+                                max="{{ valid_frames|default([0])|max }}" 
+                                value="{{ default_frame|default(0) }}" 
                                 step="1">
                             <span id="frame-value" class="ms-2">{{ default_frame }}</span>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="frame-type-select">Frame Type (CNOS):</label>
-                        <select id="frame-type-select" class="form-control auto-update">
-                            <option value="L_frames">Left Hand (L_frames)</option>
-                            <option value="R_frames">Right Hand (R_frames)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="object-select">Object for Flow Analysis:</label>
-                        <select id="object-select" class="form-control auto-update">
-                            <option value="">-- All Objects --</option>
-                            <option value="AMF1">AMF1</option>
-                            <option value="AMF2">AMF2</option>
-                            <option value="AMF3">AMF3</option>
-                            <option value="BOX">BOX</option>
-                            <option value="CUP">CUP</option>
-                            <option value="DINOSAUR">DINOSAUR</option>
-                            <option value="FIRETRUCK">FIRETRUCK</option>
-                            <option value="HAIRBRUSH">HAIRBRUSH</option>
-                            <option value="PINCER">PINCER</option>
-                            <option value="WRENCH">WRENCH</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label for="flow-feature-type">Flow Feature Type:</label>
-                        <select id="flow-feature-type" class="form-control auto-update">
-                            <option value="all">All Features</option>
-                            <option value="direction">Direction</option>
-                            <option value="brightness">Brightness</option>
-                        </select>
-                    </div>
-                </div>
+
                 <div class="col-md-2">
                     <button id="update-btn" class="btn btn-primary mt-4">Update Visualizations</button>
                 </div>
@@ -92,7 +55,7 @@
         
         <div class="row">
             <!-- Flow Visualization -->
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <div class="visualization-container">
                     <h3>Optical Flow Data</h3>
                     <div id="flow-loading" class="loading d-none">
@@ -103,61 +66,44 @@
                     <div id="flow-error" class="error-message d-none"></div>
                     <img id="flow-image" class="visualization-image" src="" alt="Flow Visualization">
                     <div id="flow-data" class="data-info">
-                        <p>Select parameters and click 'Update Visualizations' to load data.</p>
+                        <p>Click 'Update Visualizations' to load data.</p>
                     </div>
                 </div>
             </div>
             
-            <!-- CNOS Visualization -->
-            <div class="col-md-6">
-                <div class="visualization-container">
-                    <h3>CNOS Data (Object Segmentation)</h3>
-                    <div id="cnos-loading" class="loading d-none">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+            <!-- Evaluation Data -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Evaluation Data</h3>
+                        <button id="fetch-evaluation-btn" class="btn btn-sm btn-primary">Fetch Evaluation Data</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="evaluation-loading" class="loading d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="evaluation-error" class="error-message d-none"></div>
+                        
+                        <!-- Simplified layout for side-by-side -->
+                        <div id="general-metrics" class="mb-3">
+                            <h6>General Metrics</h6>
+                            <div>Select session and camera, then click "Fetch Evaluation Data"</div>
+                        </div>
+                        
+                        <div id="detection-timeline" class="mb-3">
+                            <h6>Object Detection Timeline</h6>
+                            <div>No data available</div>
+                        </div>
+                        
+                        <div id="object-hits" class="table-responsive">
+                            <h6>Object Hit Details</h6>
+                            <div>No data available</div>
                         </div>
                     </div>
-                    <div id="cnos-error" class="error-message d-none"></div>
-                    <img id="cnos-image" class="visualization-image" src="" alt="CNOS Visualization">
-                    <div id="cnos-data" class="data-info">
-                        <p>Select parameters and click 'Update Visualizations' to load data.</p>
-                    </div>
                 </div>
-            </div>
-            
-            <!-- HAMER Visualization -->
-            <div class="col-md-6">
-                <div class="visualization-container">
-                    <h3>HAMER Data (Hand Mesh)</h3>
-                    <div id="hamer-loading" class="loading d-none">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    <div id="hamer-error" class="error-message d-none"></div>
-                    <img id="hamer-image" class="visualization-image" src="" alt="HAMER Visualization">
-                    <div id="hamer-data" class="data-info">
-                        <p>Select parameters and click 'Update Visualizations' to load data.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Combined Visualization -->
-            <div class="col-md-6">
-                <div class="visualization-container">
-                    <h3>Combined Visualization</h3>
-                    <div id="combined-loading" class="loading d-none">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    <div id="combined-error" class="error-message d-none"></div>
-                    <img id="combined-image" class="visualization-image" src="" alt="Combined Visualization">
-                    <div id="combined-data" class="data-info">
-                        <p>Select parameters and click 'Update Visualizations' to load data.</p>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
 

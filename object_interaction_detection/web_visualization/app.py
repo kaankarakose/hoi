@@ -20,6 +20,9 @@ from dataloaders.motion_filtered_loader import MotionFilteredLoader
 # Import routes
 from routes.motion_routes import register_motion_routes
 
+from utils.detection import DetectionManager
+
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,6 +34,7 @@ app.config['JSON_SORT_KEYS'] = False
 # Configuration
 DATA_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data"
 FLOW_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/old_method/processed_data"
+EVALUATION_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/evaluation"
 DEFAULT_SESSION = "imi_session1_6"
 DEFAULT_CAMERA = "cam_top"
 DEFAULT_FRAME = 200
@@ -49,11 +53,16 @@ motion_loader = MotionFilteredLoader(
     data_root_dir=DATA_ROOT_DIR, 
     config=config
 )
-
 logger.info(f"Initialized MotionFilteredLoader for session {DEFAULT_SESSION}")
+# Initialize the DetectionManager
+detection_manager = DetectionManager(data_dir=EVALUATION_ROOT_DIR, 
+                                     session_name=DEFAULT_SESSION, 
+                                     camera_view=DEFAULT_CAMERA)
+
+logger.info(f"Initialized DetectionManager for session {DEFAULT_SESSION} and camera {DEFAULT_CAMERA}")
 
 # Register routes
-register_motion_routes(app, motion_loader)
+register_motion_routes(app, motion_loader, detection_manager)
 
 if __name__ == '__main__':
     logger.info("Starting web visualization server")
