@@ -5,51 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Loader Visualization</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        .visualization-container {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            height: 450px;
-            overflow: hidden;
-        }
-        .visualization-image {
-            max-width: 100%;
-            max-height: 300px;
-            display: block;
-            margin: 0 auto;
-        }
-        .data-info {
-            margin-top: 10px;
-            max-height: 100px;
-            overflow-y: auto;
-            font-size: 0.9em;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-        }
-        .loading img {
-            width: 50px;
-            height: 50px;
-        }
-        .error-message {
-            color: #dc3545;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1400px;
-        }
-        .control-panel {
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
     <div class="container mt-4">
@@ -60,7 +16,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label for="camera-select">Camera View:</label>
-                        <select id="camera-select" class="form-control">
+                        <select id="camera-select" class="form-control auto-update">
                             <option value="cam_top">Top Camera</option>
                             <option value="cam_side_l">Left Side Camera</option>
                             <option value="cam_side_r">Right Side Camera</option>
@@ -75,7 +31,7 @@
                     <div class="form-group">
                         <label for="frame-select">Frame Index:</label>
                         <div class="d-flex align-items-center">
-                            <input type="range" id="frame-select" class="form-range flex-grow-1" 
+                            <input type="range" id="frame-select" class="form-range flex-grow-1 auto-update" 
                                 min="{{ valid_frames.get('cam_top', {}).get('left', [])[0] if valid_frames.get('cam_top', {}).get('left', []) else 0 }}" 
                                 max="{{ valid_frames.get('cam_top', {}).get('left', [])[-1] if valid_frames.get('cam_top', {}).get('left', []) else 100 }}" 
                                 value="{{ default_frame }}" 
@@ -87,7 +43,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label for="frame-type-select">Frame Type (CNOS):</label>
-                        <select id="frame-type-select" class="form-control">
+                        <select id="frame-type-select" class="form-control auto-update">
                             <option value="L_frames">Left Hand (L_frames)</option>
                             <option value="R_frames">Right Hand (R_frames)</option>
                         </select>
@@ -96,7 +52,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="object-select">Object for Flow Analysis:</label>
-                        <select id="object-select" class="form-control">
+                        <select id="object-select" class="form-control auto-update">
                             <option value="">-- All Objects --</option>
                             <option value="AMF1">AMF1</option>
                             <option value="AMF2">AMF2</option>
@@ -114,7 +70,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label for="flow-feature-type">Flow Feature Type:</label>
-                        <select id="flow-feature-type" class="form-control">
+                        <select id="flow-feature-type" class="form-control auto-update">
                             <option value="all">All Features</option>
                             <option value="direction">Direction</option>
                             <option value="brightness">Brightness</option>
@@ -124,6 +80,13 @@
                 <div class="col-md-2">
                     <button id="update-btn" class="btn btn-primary mt-4">Update Visualizations</button>
                 </div>
+            </div>
+            <!-- Auto-update toggle (optional enhancement) -->
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="auto-update-toggle">
+                <label class="form-check-label" for="auto-update-toggle">
+                    Auto-update when changing parameters
+                </label>
             </div>
         </div>
         
@@ -198,305 +161,12 @@
         </div>
     </div>
 
+    <!-- jQuery and Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Store valid frames data from server
-            const validFramesData = {
-                {% for camera, hands in valid_frames.items() %}
-                "{{ camera }}": {
-                    "left": {{ hands.get("left", [])|tojson }},
-                    "right": {{ hands.get("right", [])|tojson }}
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            };
-            
-            // Function to update frame select slider with valid frames
-            function updateValidFrames() {
-                const cameraView = $('#camera-select').val();
-                const frameType = $('#frame-type-select').val();
-                const handType = frameType === 'L_frames' ? 'left' : 'right';
-                
-                // Display frame counts
-                const leftCount = validFramesData[cameraView]?.left?.length || 0;
-                const rightCount = validFramesData[cameraView]?.right?.length || 0;
-                $('#valid-frames-count').html(`Left: ${leftCount} frames / Right: ${rightCount} frames`);
-                
-                // Get current selected frame
-                const currentFrame = parseInt($('#frame-select').val());
-                
-                // Get valid frames and update slider
-                const frames = validFramesData[cameraView]?.[handType] || [];
-                const frameSelect = $('#frame-select');
-                
-                if (frames.length === 0) {
-                    // No valid frames available
-                    frameSelect.attr('min', 0);
-                    frameSelect.attr('max', 100);
-                    frameSelect.val(0);
-                    $('#frame-value').text(0);
-                    return;
-                }
-                
-                // Sort frames to ensure correct min/max
-                frames.sort((a, b) => a - b);
-                
-                // Set min and max values for the slider
-                const minFrame = frames[0];
-                const maxFrame = frames[frames.length - 1];
-                
-                frameSelect.attr('min', minFrame);
-                frameSelect.attr('max', maxFrame);
-                
-                // If current frame is not in valid frames, select the first valid frame
-                if (!frames.includes(currentFrame) && frames.length > 0) {
-                    frameSelect.val(minFrame);
-                    $('#frame-value').text(minFrame);
-                } else {
-                    // Keep current frame if it's valid
-                    $('#frame-value').text(currentFrame);
-                }
-            }
-            
-            // Function to get selected object
-            function getSelectedObject() {
-                return $('#object-select').val();
-            }
-            
-            // Function to get selected flow feature type
-            function getFlowFeatureType() {
-                return $('#flow-feature-type').val();
-            }
-            
-            // Function to fetch flow visualization
-            function fetchFlowVisualization() {
-                // Get values from form
-                const cameraView = $('#camera-select').val();
-                const frameIdx = $('#frame-select').val();
-                const objectName = getSelectedObject();
-                
-                $('#flow-loading').removeClass('d-none');
-                $('#flow-error').addClass('d-none');
-                $('#flow-container').addClass('d-none');
-                
-                $.ajax({
-                    url: '/api/flow',
-                    method: 'POST',
-                    data: {
-                        camera_view: cameraView,
-                        frame_idx: frameIdx,
-                        object_name: objectName,
-                        feature_type: getFlowFeatureType()
-                    },
-                    success: function(response) {
-                        $('#flow-loading').addClass('d-none');
-                        
-                        if (response.success) {
-                            $('#flow-image').attr('src', response.original_image);
-                            
-                            // Display flow data
-                            let flowDataHtml = '';
-                            if (response.direction_data) {
-                                flowDataHtml += `<p>Moving: ${response.direction_data.is_moving}</p>`;
-                                flowDataHtml += `<p>Average Speed: ${response.direction_data.avg_len.toFixed(4)}</p>`;
-                                flowDataHtml += `<p>Direction: (${response.direction_data.avg_u.toFixed(4)}, ${response.direction_data.avg_v.toFixed(4)})</p>`;
-                            }
-                            
-                            if (response.intensity_data) {
-                                flowDataHtml += `<p>Average Intensity: ${response.intensity_data.avg_brightness.toFixed(4)}</p>`;
-                            }
-                            
-                            $('#flow-data').html(flowDataHtml);
-                        } else {
-                            $('#flow-error').removeClass('d-none').text(response.message || 'Failed to load flow data');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        $('#flow-loading').addClass('d-none');
-                        $('#flow-error').removeClass('d-none').text('Error: ' + error);
-                    }
-                });
-            }
-            
-            // Function to fetch CNOS visualization
-            function fetchCNOSVisualization() {
-                // Get values from form
-                const cameraView = $('#camera-select').val();
-                const frameIdx = $('#frame-select').val();
-                const frameType = $('#frame-type-select').val();
-                
-                $('#cnos-loading').removeClass('d-none');
-                $('#cnos-error').addClass('d-none');
-                
-                $.ajax({
-                    url: '/api/cnos',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        camera_view: cameraView,
-                        frame_idx: frameIdx,
-                        frame_type: frameType
-                    }),
-                    success: function(response) {
-                        $('#cnos-loading').addClass('d-none');
-                        
-                        if (response.success) {
-                            $('#cnos-image').attr('src', response.visualization);
-                            
-                            // Display CNOS data summary
-                            let cnosDataHtml = '';
-                            if (response.data && response.data.objects) {
-                                cnosDataHtml += `<p>Found ${response.data.objects.length} objects</p>`;
-                                response.data.objects.forEach((obj, index) => {
-                                    cnosDataHtml += `<p>Object ${index + 1}: Score ${obj.score ? obj.score.toFixed(4) : 'N/A'}</p>`;
-                                });
-                            } else {
-                                cnosDataHtml = '<p>No objects detected</p>';
-                            }
-                            
-                            $('#cnos-data').html(cnosDataHtml);
-                        } else {
-                            $('#cnos-error').removeClass('d-none').text(response.message || 'Failed to load CNOS data');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        $('#cnos-loading').addClass('d-none');
-                        $('#cnos-error').removeClass('d-none').text('Error: ' + error);
-                    }
-                });
-            }
-            
-            // Function to fetch HAMER visualization
-            function fetchHAMERVisualization() {
-                // Get values from form
-                const cameraView = $('#camera-select').val();
-                const frameIdx = $('#frame-select').val();
-                
-                $('#hamer-loading').removeClass('d-none');
-                $('#hamer-error').addClass('d-none');
-                
-                $.ajax({
-                    url: '/api/hamer',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        camera_view: cameraView,
-                        frame_idx: frameIdx
-                    }),
-                    success: function(response) {
-                        $('#hamer-loading').addClass('d-none');
-                        
-                        if (response.success) {
-                            $('#hamer-image').attr('src', response.visualization);
-                            
-                            // Display HAMER data summary
-                            let hamerDataHtml = '';
-                            if (response.data && response.data.hands) {
-                                hamerDataHtml += `<p>Found ${response.data.hands.length} hands</p>`;
-                                response.data.hands.forEach((hand, index) => {
-                                    hamerDataHtml += `<p>Hand ${index + 1}: ${hand.hand_type || 'Unknown'}, Score: ${hand.score ? hand.score.toFixed(4) : 'N/A'}</p>`;
-                                });
-                            } else {
-                                hamerDataHtml = '<p>No hands detected</p>';
-                            }
-                            
-                            $('#hamer-data').html(hamerDataHtml);
-                        } else {
-                            $('#hamer-error').removeClass('d-none').text(response.message || 'Failed to load HAMER data');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        $('#hamer-loading').addClass('d-none');
-                        $('#hamer-error').removeClass('d-none').text('Error: ' + error);
-                    }
-                });
-            }
-            
-            // Function to fetch combined visualization
-            function fetchCombinedVisualization() {
-                // Get values from form
-                const cameraView = $('#camera-select').val();
-                const frameIdx = $('#frame-select').val();
-                const objectName = getSelectedObject();
-                const frameType = $('#frame-type-select').val();
-                
-                $('#combined-loading').removeClass('d-none');
-                $('#combined-error').addClass('d-none');
-                $('#combined-container').addClass('d-none');
-                
-                $.ajax({
-                    url: '/api/combined',
-                    method: 'POST',
-                    data: {
-                        camera_view: cameraView,
-                        frame_idx: frameIdx,
-                        object_name: objectName,
-                        frame_type: frameType,
-                        feature_type: getFlowFeatureType()
-                    },
-                    success: function(response) {
-                        $('#combined-loading').addClass('d-none');
-                        
-                        if (response.success) {
-                            $('#combined-image').attr('src', response.visualization);
-                            
-                            // Display combined data summary
-                            let combinedDataHtml = '<p>Combined visualization of all loaders</p>';
-                            if (response.flow_data && response.flow_data.success) {
-                                if (response.flow_data.direction_data) {
-                                    combinedDataHtml += `<p>Flow: ${response.flow_data.direction_data.is_moving ? 'Movement detected' : 'No movement'}</p>`;
-                                }
-                            }
-                            
-                            $('#combined-data').html(combinedDataHtml);
-                        } else {
-                            $('#combined-error').removeClass('d-none').text(response.message || 'Failed to load combined visualization');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        $('#combined-loading').addClass('d-none');
-                        $('#combined-error').removeClass('d-none').text('Error: ' + error);
-                    }
-                });
-            }
-            
-            // Camera change handler
-            $('#camera-select').change(function() {
-                updateValidFrames();
-            });
-            
-            // Frame type change handler
-            $('#frame-type-select').change(function() {
-                updateValidFrames();
-            });
-            
-            // Frame slider change handler - auto-update visualizations when slider changes
-            $('#frame-select').on('change', function() {
-                // Only fetch new visualizations when the slider stops moving
-                fetchFlowVisualization();
-                fetchCNOSVisualization();
-                fetchHAMERVisualization();
-                fetchCombinedVisualization();
-            });
-            
-            // Also update the frame value display when sliding
-            $('#frame-select').on('input', function() {
-                $('#frame-value').text($(this).val());
-            });
-            
-            // Update button click handler
-            $('#update-btn').click(function() {
-                fetchFlowVisualization();
-                fetchCNOSVisualization();
-                fetchHAMERVisualization();
-                fetchCombinedVisualization();
-            });
-            
-            // Initial load
-            updateValidFrames();
-            $('#update-btn').click();
-        });
-    </script>
+    
+    <!-- Application JS -->
+    <script src="{{ url_for('static', filename='js/api-service.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/visualization-ui.js') }}"></script>
 </body>
 </html>
