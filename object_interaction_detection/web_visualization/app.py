@@ -35,7 +35,7 @@ app.config['JSON_SORT_KEYS'] = False
 DATA_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/processed_data"
 FLOW_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/old_method/processed_data"
 EVALUATION_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/evaluation"
-ANNOTATION_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/annotation"
+ANNOTATION_ROOT_DIR = "/nas/project_data/B1_Behavior/rush/kaan/hoi/annotations"
 DEFAULT_SESSION = "imi_session1_6"
 DEFAULT_CAMERA = "cam_top"
 DEFAULT_FRAME = 200
@@ -52,7 +52,8 @@ def get_available_sessions():
     except Exception as e:
         logger.error(f"Error getting available sessions: {str(e)}")
         return []
-
+# Add the get_available_sessions function to the Flask app
+app.get_available_sessions = get_available_sessions
 # Set configuration for the motion filtered loader
 config = {
     'score_threshold': 0.40,    # CNOS confidence threshold
@@ -63,7 +64,7 @@ config = {
 
 # Initialize the MotionFilteredLoader
 motion_loader = MotionFilteredLoader(
-    session_name=DEFAULT_SESSION, 
+    session_name=DEFAULT_SESSION,
     data_root_dir=DATA_ROOT_DIR, 
     config=config
 )
@@ -80,5 +81,5 @@ register_motion_routes(app, motion_loader, detection_manager)
 
 if __name__ == '__main__':
     logger.info("Starting web visualization server")
-    app.run(debug=True, host='0.0.0.0', port=8888)
+    app.run(debug=True, host='0.0.0.0', port=8899)
     logger.info("Server stopped")

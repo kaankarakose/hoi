@@ -28,7 +28,7 @@ def register_motion_routes(app, motion_loader, detection_manager):
                                 default_frame=default_frame,
                                 available_sessions=available_sessions,
                                 default_session=motion_loader.session_name,
-                                default_camera=motion_loader.camera_view)
+                                default_camera="cam_top",)
     
     @app.route('/api/valid-frames')
     def get_valid_frames():
