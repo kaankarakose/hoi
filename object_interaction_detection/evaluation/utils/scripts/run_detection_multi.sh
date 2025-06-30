@@ -1,8 +1,9 @@
+
 #!/bin/bash
 #activate conda env
-source /home/kaan/miniconda3/etc/profile.d/conda.sh
-conda activate oid
-export MPLCONFIGDIR=/home/kaan/.config/matplotlib
+# source /home/kaan/miniconda3/etc/profile.d/conda.sh
+# conda activate oid
+
 # Check if parameters are provided
 if [ $# -lt 2 ]; then
     echo "Usage: $0 num_part process_part"
@@ -22,9 +23,7 @@ if [ $PROCESS_PART -ge $NUM_PART ]; then
 fi
 
 # Define the output directory
-OUTPUT_DIR="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking_multi_05"
-
-# Define arrays for sessions and cameras
+OUTPUT_DIR="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/detection_plots_multi_only_object"
 
 SESSIONS=(
     "imi_session1_2" 
@@ -52,11 +51,11 @@ SESSIONS=(
     )
 
 
-
 # Create an array of all combinations
 COMBINATIONS=()
 for session in "${SESSIONS[@]}"; do
-        COMBINATIONS+=("$session")
+    COMBINATIONS+=("$session:")
+
 done
 
 # Calculate total combinations and how to divide them
@@ -80,25 +79,26 @@ echo "-------------------------------------------"
 
 # Process assigned combinations
 for i in $(seq $START_IDX $END_IDX); do
+    # Split the combination back into session and camera
     IFS=':' read -r session camera <<< "${COMBINATIONS[$i]}"
     
-    echo "[$(( i - START_IDX + 1 ))/$((END_IDX - START_IDX + 1))] Processing session: $session"
+    echo "[$(( i - START_IDX + 1 ))/$((END_IDX - START_IDX + 1))] Processing session: $session, camera: $camera"
+    	
     echo "Memory before running:"
     free -h 
    
     python -c "import gc; gc.collect()"
 
     # Run the Python script with the current parameters
-    python ../object_activeness_tracker_m.py \
-        --session "$session" \
-        --output-dir "$OUTPUT_DIR" \
-
+    python ../detection_parser.py \
+        --session $session \
+        --output $OUTPUT_DIR
     sleep 1
     # Check if the command was successful
     if [ $? -eq 0 ]; then
-        echo "✓ Completed $session "
+        echo "✓ Completed $session - $camera"
     else
-        echo "✗ Error processing $session"
+        echo "✗ Error processing $session - $camera"
     fi
     
     echo "-------------------------------------------"

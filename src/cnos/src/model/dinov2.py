@@ -83,7 +83,7 @@ class CustomDINOv2(pl.LightningModule):
 
         if token_name == "x_norm_clstoken":
             if images.shape[0] > self.chunk_size:
-                features = self.forward_by_chunk(images)
+                features = self.                                                                           (images)
             else:
                 features = self.model(images)
         else:  # get both features
@@ -95,7 +95,7 @@ class CustomDINOv2(pl.LightningModule):
         batch_rgbs = BatchedData(batch_size=self.chunk_size, data=processed_rgbs)
         del processed_rgbs  # free memory
         features = BatchedData(batch_size=self.chunk_size)
-        for idx_batch in range(len(batch_rgbs)):
+        for idx_batch in range(len(batch_rgbs)):   
             feats = self.compute_features(
                 batch_rgbs[idx_batch], token_name="x_norm_clstoken"
             )

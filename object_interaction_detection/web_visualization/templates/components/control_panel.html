@@ -1,0 +1,35 @@
+<div class="control-panel">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="session-select">Session:</label>
+                <select id="session-select" class="form-control auto-update">
+                    {% for session in available_sessions %}
+                    <option value="{{ session }}" {% if session == default_session %}selected{% endif %}>
+                        {{ session }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            {% include 'components/camera_selector.html' %}
+        </div>
+        
+        <div class="col-md-3">
+            {% include 'components/frame_selector.html' %}
+        </div>
+
+        <div class="col-md-2">
+            <button id="update-btn" class="btn btn-primary mt-4">Update Visualizations</button>
+        </div>
+    </div>
+    
+    <div class="form-check mt-2">
+        <input class="form-check-input" type="checkbox" id="auto-update-toggle">
+        <label class="form-check-label" for="auto-update-toggle">
+            Auto-update when changing parameters
+        </label>
+    </div>
+</div>

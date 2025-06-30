@@ -124,16 +124,19 @@ class AnnotationData:
             
             # The last part is the metadata (hand type or objects)
             metadata = parts[10] if len(parts) > 10 else ''
+            print(f"{duration} {start_time} {end_time} {metadata}")
+
+            ## ENSURE DURATION IS VALID check video
+            if duration > 2:
+                segment = AnnotationSegment(
+                    start_time=start_time,
+                    end_time=end_time,
+                    duration=duration,
+                    metadata=metadata
+                )
             
-            segment = AnnotationSegment(
-                start_time=start_time,
-                end_time=end_time,
-                duration=duration,
-                metadata=metadata
-            )
-            
-            if annotation_type in self.annotations:
-                self.annotations[annotation_type].append(segment)
+                if annotation_type in self.annotations:
+                    self.annotations[annotation_type].append(segment)
     
     def load_from_file(self, file_path: str):
         """Load annotations from a file."""
@@ -415,13 +418,14 @@ def create_annotation_overlay(frame, frame_idx, annotation_data,
 if __name__ == "__main__":
     
 
-    annotation_data = AnnotationData(session_name="imi_session1_4")
+    annotation_data = AnnotationData(session_name="imi_session2_15")
 
 
     all_objects = annotation_data.get_all_objects()
     first_annotated_time = annotation_data.get_first_segment("ObjectIdentity").start_time
 
     first_played_object = annotation_data.get_first_segment("ObjectIdentity").get_objects()[0]
+    print('main')
     print(first_played_object)
     print(first_annotated_time)
     print(annotation_data.get_first_played_object(combine=True))

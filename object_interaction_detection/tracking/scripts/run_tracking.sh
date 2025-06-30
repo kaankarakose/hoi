@@ -22,25 +22,9 @@ if [ $PROCESS_PART -ge $NUM_PART ]; then
 fi
 
 # Define the output directory
-OUTPUT_DIR="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking"
+OUTPUT_DIR="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking_05"
 
 # Define arrays for sessions and cameras
-# SESSIONS=(
-#     "imi_session1_6" "imi_session1_7" "imi_session1_8" "imi_session1_9" 
-#     "imi_session2_11" "imi_session2_12" 
-#     "imi_session2_15"  "zolti_session1_17" 
-#     "zolti_session1_18" "zolti_session1_19" "zolti_session1_20" "zolti_session2_21" 
-#     "zolti_session2_24" "zolti_session2_25" )
-## Define arrays for sessions and cameras
-# SESSIONS=(
-#    "zolti_session2_25" )
-# SESSIONS=(
-#    "imi_session1_2" "imi_session1_4" "imi_session1_5" 
-#    "imi_session1_6" "imi_session1_7" "imi_session1_8" "imi_session1_9" 
-#    "imi_session2_10" "imi_session2_11" "imi_session2_12" 
-#    "imi_session2_14" "imi_session2_15"  "zolti_session1_16" "zolti_session1_17" 
-#    "zolti_session1_18" "zolti_session1_19" "zolti_session1_20" "zolti_session2_21" 
-#    "zolti_session2_22" "zolti_session2_23" "zolti_session2_24" "zolti_session2_25" )
 SESSIONS=(
     "imi_session1_2" 
     "imi_session1_4"
@@ -66,7 +50,7 @@ SESSIONS=(
     "zolti_session2_25"
     )
 
-CAMERAS=("cam_side_l" "cam_top" )
+CAMERAS=("cam_side_l" "cam_top" "cam_side_r" )
 
 # Create an array of all combinations
 COMBINATIONS=()
@@ -110,8 +94,9 @@ for i in $(seq $START_IDX $END_IDX); do
     # Run the Python script with the current parameters
     python ../object_activeness_tracker.py \
         --session "$session" \
-        --camera "$camera"
-    sleep 30
+        --camera "$camera" \
+        --output-dir "$OUTPUT_DIR"
+    sleep 5
     # Check if the command was successful
     if [ $? -eq 0 ]; then
         echo "✓ Completed $session - $camera"

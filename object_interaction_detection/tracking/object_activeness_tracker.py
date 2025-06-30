@@ -81,7 +81,7 @@ class ObjectActivenessTracker:
                 self.object_data[obj_name]["activeness"].append(activeness)
                 self.object_data[obj_name]["frame_idx"].append(frame_idx)
             
-            gc.collect()
+
         logging.info(f"Collected activeness data for {len(self.object_data)} objects across {total_frames} frames")
     
     def save_to_json(self, output_path: str):
@@ -440,8 +440,7 @@ def parse_args():
                        help="Root directory for data")
     parser.add_argument("--camera", type=str, default="cam_top",
                        help="Camera view to process (default: cam_top)")
-    parser.add_argument("--output-dir", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking",
-                       help="Output directory for visualizations and data")
+    parser.add_argument("--output-dir", type=str, help="Output directory for visualizations and data")
     parser.add_argument("--num-frames", type=int, default=100,
                        help="Number of frames to process (default: 100)")
     parser.add_argument("--threshold", type=float, default=0.25,
@@ -457,7 +456,6 @@ def main():
     """Main function to track object activeness."""
     # Parse arguments
     args = parse_args()
-    
     # Set up logging
     logging.basicConfig(level=logging.INFO,
                        format='%(asctime)s - %(levelname)s - %(message)s')

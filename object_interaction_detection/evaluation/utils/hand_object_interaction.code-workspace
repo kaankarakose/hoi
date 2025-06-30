@@ -1,0 +1,19 @@
+{
+    "folders": [
+        {
+            "path": "../../.."
+        },
+        {
+            "path": "../../../../../../../../nas/project_data/B1_Behavior/rush/kaan/hoi"
+        },
+        {
+            "path": "../../../../../../apptainer_build"
+        },
+        {
+            "path": "../../../../../../../../nas/project_data/B1_Behavior/rush"
+        },
+        {
+            "path": "../../../../../../../../nas/project_data/B1_Behavior/rush/kaan"
+        }
+    ]
+}

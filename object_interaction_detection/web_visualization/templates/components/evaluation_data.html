@@ -1,0 +1,33 @@
+ <!-- Evaluation Data -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Evaluation Data</h3>
+                        <button id="fetch-evaluation-btn" class="btn btn-sm btn-primary">Fetch Evaluation Data</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="evaluation-loading" class="loading d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="evaluation-error" class="error-message d-none"></div>
+                        
+                        <!-- Simplified layout for side-by-side -->
+                        <div id="general-metrics" class="mb-3">
+                            <h6>General Metrics</h6>
+                            <div>Select session and camera, then click "Fetch Evaluation Data"</div>
+                        </div>
+                        
+                        <div id="detection-timeline" class="mb-3">
+                            <h6>Object Detection Timeline</h6>
+                            <div>No data available</div>
+                        </div>
+                        
+                        <div id="object-hits" class="table-responsive">
+                            <h6>Object Hit Details</h6>
+                            <div>No data available</div>
+                        </div>
+                    </div>
+                </div>
+            </div>

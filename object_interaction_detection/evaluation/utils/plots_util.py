@@ -12,13 +12,13 @@ from typing import List, Dict, Optional, Tuple, Union, TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from object_interaction_detection.evaluation.utils.detection_parser import DetectionData
 
-def plot_detection_energy(
+def plot_detection_en123123ergy(
     detection_data: Any,  # Type will be DetectionData
     object_names: Optional[List[str]] = None,
     activeness_threshold: float = 0.5,
     energy_threshold: float = 0.3,
     first_annotated_time: float = 0.0,
-    figsize: Tuple[int, int] = (12, 8),
+    figsize: Tuple[int, int] = (60, 40),
     time_based: bool = True,
     highlight_detections: bool = True,
     save_path: Optional[str] = None
@@ -122,7 +122,7 @@ def plot_detection_energy(
         ax1.set_ylabel('Activeness')
         ax1.set_title(f'{obj_name} - Activeness')
         ax1.grid(True, alpha=0.3)
-        ax1.legend(loc='best')
+        
         
         # Plot energy
         ax2 = axes[i, 1]
@@ -139,21 +139,19 @@ def plot_detection_energy(
         ax2.set_ylabel('Energy')
         ax2.set_title(f'{obj_name} - Energy')
         ax2.grid(True, alpha=0.3)
-        ax2.legend(loc='best')
-    
-    # Draw vertical line and rectangle for annotation time if provided
-    if first_annotated_time > 0:
+        
+
         # Calculate range for rectangular highlight (±2 seconds)
         if time_based:
-            rect_start = first_annotated_time - 2.0
-            rect_end = first_annotated_time + 2.0
+            rect_start = first_annotated_time - 1.0
+            rect_end = first_annotated_time + 1.0
             # Ensure we don't have negative time
             rect_start = max(0, rect_start)
         else:
             # Convert to frame numbers
             fps = detection_data.fps
-            rect_start = int(max(0, (first_annotated_time - 2.0) * fps))
-            rect_end = int((first_annotated_time + 2.0) * fps)
+            rect_start = int(max(0, (first_annotated_time - 1.0) * fps))
+            rect_end = int((first_annotated_time + 1.0) * fps)
         
         # Rectangle width
         rect_width = rect_end - rect_start
@@ -161,17 +159,19 @@ def plot_detection_energy(
         # For the activeness plot
         # Vertical line at annotation time
         ax1.axvline(x=first_annotated_time if time_based else int(first_annotated_time * detection_data.fps), 
-                  color='r', linestyle='--', alpha=0.5, label=f'Annotation ({first_annotated_time:.2f}s)')
+                color='r', linestyle='--', alpha=0.5, label=f'Annotation ({first_annotated_time:.2f}s)')
         # Add rectangle spanning ±2 seconds
         ax1.axvspan(rect_start, rect_end, alpha=0.2, color='yellow', label='±2s Window')
         
         # For the energy plot
         # Vertical line at annotation time
         ax2.axvline(x=first_annotated_time if time_based else int(first_annotated_time * detection_data.fps), 
-                  color='r', linestyle='--', alpha=0.5, label=f'Annotation ({first_annotated_time:.2f}s)')
+                color='r', linestyle='--', alpha=0.5, label=f'Annotation ({first_annotated_time:.2f}s)')
         # Add rectangle spanning ±2 seconds
         ax2.axvspan(rect_start, rect_end, alpha=0.2, color='yellow', label='±2s Window')
-
+    #LEGENDS
+    ax1.legend(loc='best')
+    ax2.legend(loc='best')
     # Set common labels
     fig.supxlabel(x_label)
     fig.suptitle('Object Detection: Activeness vs Energy', fontsize=16)

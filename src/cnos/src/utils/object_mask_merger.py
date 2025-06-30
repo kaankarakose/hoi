@@ -119,7 +119,7 @@ class ObjectAwareMaskMerger:
         Args:
             image: RGB image as numpy array
             detections: List of detection objects with masks
-            ref_features: Reference features to compare against [N_images, D]
+            ref_features: Reference features to compare against [N_objects, D]
             
         Returns:
             List of MergedDetection objects

@@ -146,14 +146,21 @@ class DetectionManager:
     
     
     
-    def get_detected_objects(self) -> List[str]:
-        """
-        Get a list of all detected objects
-        
-        Returns:
-            List of object names
-        """
-        detected_objects = set()
+   
 
-        
-        return list(detected_objects)
+if __name__ == "__main__":
+    # Example usage
+    data_dir = "/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/evaluation"
+    session_name = "imi_session1_2"
+    camera_view = "cam_top"
+    
+    manager = DetectionManager(data_dir, session_name, camera_view)
+    
+    # Load detection data
+    detection_data = manager.load_data(session_name, camera_view)
+    
+    if detection_data:
+        print("Detection data loaded successfully!")
+        print(detection_data.to_json())
+    else:
+        print("No detection data found for the specified session and camera view.")

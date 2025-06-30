@@ -57,31 +57,61 @@ class CombinedLoader(BaseDataLoader):
     This merged Left and Right hand features into one.
 
     """
-    
+
+
     def __init__(self, 
-                 session_name: str, 
-                 data_root_dir: str,
-                 config: Optional[Dict[str, Any]] = None):
+                session_name: str, 
+                data_root_dir: str,
+                score_threshold: float = 0.52,
+                config: Optional[Dict[str, Any]] = None):
         """
         Initialize the combined loader.
         
         Args:
             session_name: Name of the session to process
             data_root_dir: Root directory for all data
+            score_threshold: Score threshold for filtering objects (default: 0.52)
             config: Configuration parameters (optional)
+        """
+        # Store initial parameters
+        self._init_params = {
+            'score_threshold': score_threshold,
+            'data_root_dir': data_root_dir,
+            'config': config or {}
+        }
+        
+        # Initialize with provided parameters
+        self._initialize_with_params(session_name, data_root_dir, config)
+
+
+
+    def _initialize_with_params(self, 
+                            session_name: str, 
+                            data_root_dir: str,
+                            config: Optional[Dict[str, Any]] = None):
+        """
+        Internal method to initialize/re-initialize with parameters.
         """
         # Set defaults for paths
         config = config or {}
         
+        # Get score threshold from config or use stored parameter
+        score_threshold = config.get('score_threshold', 0.45)
+        
         # Add default score threshold configuration
+        config.setdefault('score_threshold', score_threshold)
         config.setdefault('frames_dir', os.path.join(data_root_dir, 'orginal_frames'))  # For visualization
-        print(config, "combined")
+
+        self.score_threshold = score_threshold
+        print("HERE")
+        print('score_threshold',self.score_threshold)
         # Call parent constructor
         super().__init__(session_name, data_root_dir, config)
         
         # Initialize CNOS and HAMER loaders
         self.cnos_loader = CNOSHAMERLoader(session_name, data_root_dir, config)
-        self.hamer_loader = HAMERLoader(session_name, data_root_dir, config) # just need for valid index somehow
+        self.hamer_loader = HAMERLoader(session_name, data_root_dir, config)  # just need for valid index somehow
+        
         # Get camera views and frame types from CNOS loader
         self.camera_views = self.cnos_loader.camera_views
         self.frame_types = self.cnos_loader.frame_type_to_hand_type
@@ -91,12 +121,28 @@ class CombinedLoader(BaseDataLoader):
             'L_frames': 'left',
             'R_frames': 'right'
         }
+        
         # Store the score threshold for filtering objects
         self.score_threshold = config['score_threshold']
+        
         # Set up object colors for visualization
         self.object_colors = OBJECT_COLORS
 
         logging.info(f"Initialized combined loader for session {session_name} with score threshold {self.score_threshold}")
+    def re_initialize(self, 
+                 session_name: str):
+        """
+        Re-initialize the loader with new parameters.
+        
+        Args:
+            session_name: New session name to process
+        """
+        data_root_dir = self._init_params['data_root_dir']
+        config = self._init_params['config']
+        # Re-initialize with updated parameters
+        self._initialize_with_params(session_name, data_root_dir, config)
+        
+        logging.info(f"Re-initialized combined loader for session {session_name}")
     
     def load_features(self, camera_view: str, frame_idx: int) -> Dict[str, Any]:
         """
@@ -225,7 +271,7 @@ class CombinedLoader(BaseDataLoader):
         return None
     
     
-def visualize_object_masks(id_map, rgb_frame, object_id_map, object_colors, alpha=0.5):
+def visualize_object_masks_combined(id_map, rgb_frame, object_id_map, object_colors, alpha=0.5):
     """
     Create a visualization of object masks overlaid on an RGB frame.
     
@@ -320,7 +366,7 @@ if __name__ == "__main__":
     object_id_map = features['merged']['object_id_map']
     frame = combined_loader._load_original_frame(camera_view='cam_side_r', frame_idx=index)
 
-    visualization = visualize_object_masks(final_mask, frame, object_id_map, combined_loader.object_colors)
+    visualization = visualize_object_masks_combined(final_mask, frame, object_id_map, combined_loader.object_colors)
     
     print(features)
     cv2.imwrite('Visualization.png', visualization)

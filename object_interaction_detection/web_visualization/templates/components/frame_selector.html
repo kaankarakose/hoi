@@ -1,0 +1,13 @@
+<div class="form-group">
+    <label for="frame-select">Frame Index:</label>
+    <div class="d-flex align-items-center">
+        <input type="range" 
+               id="frame-select" 
+               class="form-range flex-grow-1 auto-update" 
+               min="{{ valid_frames|default([0])|min }}" 
+               max="{{ valid_frames|default([0])|max }}" 
+               value="{{ default_frame|default(0) }}" 
+               step="1">
+        <span id="frame-value" class="ms-2">{{ default_frame }}</span>
+    </div>
+</div>

@@ -24,7 +24,7 @@ if __name__ == "__main__":
 else:
     # When imported as a module, use relative imports
     from .helper_loader.base_loader import BaseDataLoader
-    from .combined_loader import CombinedLoader, visualize_object_masks
+    from .combined_loader import CombinedLoader, visualize_object_masks_combined
     from .helper_loader.flow_loader import FlowLoader
 
 logging.basicConfig(level=logging.INFO)
@@ -42,9 +42,8 @@ class MotionFilteredLoader(BaseDataLoader):
     def __init__(self, 
                  session_name: str, 
                  data_root_dir: str,
-                 score_threshold: float = 0.45,
+                 score_threshold: float = 0.52,
                  motion_threshold: float = 0.05,
-                 temporal_window: int = 1,
                  config: Optional[Dict[str, Any]] = None):
         """
         Initialize the motion-filtered loader.
@@ -54,19 +53,41 @@ class MotionFilteredLoader(BaseDataLoader):
             data_root_dir: Root directory for all data
             config: Configuration parameters (optional)
         """
+        # Store initial parameters
+        self._init_params = {
+            'score_threshold': score_threshold,
+            'motion_threshold': motion_threshold,
+            'data_root_dir': data_root_dir,
+            'config' : config or {}
+
+        }
+        # Initialize with provided parameters
+        self._initialize_with_params(session_name, data_root_dir, config)
+
+    def _initialize_with_params(self, 
+                            session_name: str, 
+                            data_root_dir: str,
+                            config: Optional[Dict[str, Any]] = None):
+        """
+        Internal method to initialize/re-initialize with parameters.
+        """
+        # Set defaults for paths
         # Set defaults for paths
         config = config or {}
-        
         
         #flow specific paths
         flow_root_dir = "/nas/project_data/B1_Behavior/rush/kaan/old_method/processed_data"
 
+        score_threshold = config.get('score_threshold', self._init_params['config']['score_threshold'])
+        motion_threshold = config.get('motion_threshold', self._init_params['config']['motion_threshold'])
         # Add default motion threshold configuration
-        config.setdefault('score_threshold', score_threshold)
-        config.setdefault('motion_threshold', motion_threshold)  # Default threshold for motion
-        config.setdefault('temporal_window', temporal_window)      # Default window for flow aggregation
-        config.setdefault('frames_dir', os.path.join(data_root_dir, 'orginal_frames'))  # For visualization
-        print(config, "motionFiltered")
+        # config.setdefault('score_threshold', score_threshold)
+        # config.setdefault('motion_threshold', motion_threshold)  # Default threshold for motion
+        # config.setdefault('frames_dir', os.path.join(data_root_dir, 'orginal_frames'))  # For visualization
+
+        self.score_threshold = score_threshold
+        self.motion_threshold = motion_threshold
+        self._init_params['config'] = config
         # Call parent constructor
         super().__init__(session_name, data_root_dir, config)
         
@@ -76,13 +97,37 @@ class MotionFilteredLoader(BaseDataLoader):
         
         # Copy camera views from combined loader
         self.camera_views = self.combined_loader.camera_views
-        
+        self.current_camera_view = None
         # Store configuration parameters
         self.motion_threshold = config['motion_threshold']
         self.temporal_window = config['temporal_window']
         
         logging.info(f"Initialized motion-filtered loader for session {session_name} "
                      f"with motion threshold {self.motion_threshold}")
+
+
+    def re_initialize(self, 
+                     session_name: str):
+        """
+        Re-initialize the loader with new parameters.
+        
+        Args:
+            session_name: New session name to process
+            data_root_dir: New root directory for all data
+            score_threshold: New score threshold (optional, keeps current if None)
+            motion_threshold: New motion threshold (optional, keeps current if None)
+            temporal_window: New temporal window (optional, keeps current if None)
+            flow_root_dir: New flow root directory (optional, keeps current if None)
+            config: Configuration parameters (optional)
+        """
+        data_root_dir = self._init_params['data_root_dir']
+        config = self._init_params['config']
+        self.score_threshold = self._init_params['config']['score_threshold']
+        self.motion_threshold = self._init_params['config']['motion_threshold']
+        # Re-initialize with updated parameters
+        self._initialize_with_params(session_name, data_root_dir, config)
+        
+        logging.info(f"Re-initialized motion-filtered loader for session {session_name}")
     
     def load_features(self, camera_view: str, frame_idx: int) -> Dict[str, Any]:
         """
@@ -95,7 +140,8 @@ class MotionFilteredLoader(BaseDataLoader):
         Returns:
             Dictionary containing motion-filtered features
         """
-
+        ## Visulization only
+        self.current_camera_view = camera_view
         # Load combined features (object masks)
         combined_features = self.combined_loader.load_features(camera_view, frame_idx)
         
@@ -651,9 +697,9 @@ def visualize_object_masks(id_map, rgb_frame, object_id_map, object_colors, acti
                         text,
                         (center_x, center_y),
                         cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        (255, 255, 255),
-                        1,
+                        2,
+                        (45, 122, 133),
+                        3,
                         cv2.LINE_AA
                     )
     
@@ -672,7 +718,7 @@ if __name__ == "__main__":
     # Create a configuration with specific thresholds
     config = {
         'score_threshold': 0.40,    # CNOS confidence threshold
-        'motion_threshold': 0.05,   # Threshold for determining motion - old version
+        'motion_threshold': 0.05,   # Threshold for determining motion - old version - NO LONGER USED
         'temporal_window': 2,       # Window for optical flow aggregation
         'frames_dir': f"{data_root_dir}/orginal_frames"
     }

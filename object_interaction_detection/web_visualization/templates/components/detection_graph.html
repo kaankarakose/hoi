@@ -1,0 +1,579 @@
+<!-- components/detection_graph.html -->
+<div class="col-lg-6">
+    <div class="visualization-container">
+        <h3>Detection Visualization</h3>
+        
+        <div class="controls-section mb-3">
+            <button class="btn btn-sm btn-outline-secondary" onclick="resetDetectionZoom()" title="Reset View">
+                <i class="fas fa-home"></i> Reset View
+            </button>
+            <span class="ms-3 text-muted small">Use mouse wheel to zoom, drag to pan, keyboard: +/- to zoom, 0 to reset</span>
+        </div>
+
+        <div class="image-viewer-container" id="detection-viewer">
+            <div id="eval-loading" class="loading d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            
+            <div id="eval-error" class="error-message d-none"></div>
+            
+            <img id="eval-image" class="visualization-image" src="" alt="Detection Visualization" style="display: none;">
+            
+            <div id="eval-placeholder" class="image-placeholder">
+                <div class="placeholder-content">
+                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Click 'Update Visualizations' to load detection data.</p>
+                </div>
+            </div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomDetectionIn()" title="Zoom In (+ key)">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="zoom-btn" onclick="zoomDetectionOut()" title="Zoom Out (- key)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="zoom-btn" onclick="resetDetectionZoom()" title="Reset Zoom (0 key)">
+                    <i class="fas fa-home"></i>
+                </button>
+            </div>
+            
+            <div class="zoom-info" id="detection-zoom-info">
+                Zoom: 100%
+            </div>
+            
+            <div class="image-info" id="detection-image-info">
+                <span id="image-dimensions"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Detection Graph Specific Styles */
+.visualization-container {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.image-viewer-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    cursor: grab;
+    transition: border-color 0.3s ease;
+}
+
+.image-viewer-container:hover {
+    border-color: #007bff;
+}
+
+.image-viewer-container.dragging {
+    cursor: grabbing;
+    border-color: #0056b3;
+}
+
+.visualization-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.placeholder-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.zoom-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 10;
+}
+
+.zoom-btn {
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 123, 255, 0.9);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.zoom-btn:hover {
+    background: rgba(0, 123, 255, 1);
+    transform: scale(1.1);
+}
+
+.zoom-btn:active {
+    transform: scale(0.95);
+}
+
+.zoom-btn:disabled {
+    background: rgba(108, 117, 125, 0.5);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.zoom-info {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    z-index: 10;
+    font-family: monospace;
+}
+
+.image-info {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    z-index: 10;
+    font-family: monospace;
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 15;
+}
+
+.error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    z-index: 15;
+    max-width: 80%;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.data-info {
+    margin-top: 15px;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 4px;
+}
+
+.controls-section {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .zoom-controls {
+        flex-direction: row;
+        top: auto;
+        bottom: 50px;
+        right: 10px;
+        left: 10px;
+        justify-content: center;
+    }
+    
+    .zoom-info {
+        bottom: 35px;
+    }
+    
+    .image-info {
+        bottom: 35px;
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .controls-section span {
+        font-size: 12px;
+    }
+}
+</style>
+
+<script>
+// Detection Graph Interactive Functionality
+(function() {
+    let detectionZoom = 1;
+    let isDragging = false;
+    let startX, startY;
+    let currentX = 0, currentY = 0;
+    let imageNaturalWidth = 0, imageNaturalHeight = 0;
+    
+    const detectionViewer = document.getElementById('detection-viewer');
+    const detectionImage = document.getElementById('eval-image');
+    const detectionZoomInfo = document.getElementById('detection-zoom-info');
+    const imageDimensionsEl = document.getElementById('image-dimensions');
+    
+    // Enhanced zoom functions with better constraints
+    window.zoomDetectionIn = function() {
+        if (detectionZoom < 5) {
+            detectionZoom = Math.min(5, detectionZoom + 0.25);
+            applyDetectionTransform();
+            updateZoomControls();
+        }
+    };
+    
+    window.zoomDetectionOut = function() {
+        if (detectionZoom > 0.25) {
+            detectionZoom = Math.max(0.25, detectionZoom - 0.25);
+            applyDetectionTransform();
+            updateZoomControls();
+        }
+    };
+    
+    window.resetDetectionZoom = function() {
+        detectionZoom = 1;
+        currentX = 0;
+        currentY = 0;
+        applyDetectionTransform();
+        updateZoomControls();
+    };
+    
+    // Enhanced transform function with smart panning constraints
+    function applyDetectionTransform() {
+        if (!detectionImage || !detectionViewer) return;
+        
+        const containerRect = detectionViewer.getBoundingClientRect();
+        const imageRect = detectionImage.getBoundingClientRect();
+        
+        // Calculate maximum pan based on actual scaled dimensions
+        const scaledWidth = imageRect.width * detectionZoom;
+        const scaledHeight = imageRect.height * detectionZoom;
+        
+        const maxPanX = Math.max(0, (scaledWidth - containerRect.width) / (2 * detectionZoom));
+        const maxPanY = Math.max(0, (scaledHeight - containerRect.height) / (2 * detectionZoom));
+        
+        // Constrain panning
+        currentX = Math.max(-maxPanX, Math.min(maxPanX, currentX));
+        currentY = Math.max(-maxPanY, Math.min(maxPanY, currentY));
+        
+        // Apply transform
+        detectionImage.style.transform = `scale(${detectionZoom}) translate(${currentX}px, ${currentY}px)`;
+        
+        // Update zoom info
+        if (detectionZoomInfo) {
+            detectionZoomInfo.textContent = `Zoom: ${Math.round(detectionZoom * 100)}%`;
+        }
+    }
+    
+    // Update zoom control button states
+    function updateZoomControls() {
+        const zoomInBtn = document.querySelector('.zoom-controls .zoom-btn:first-child');
+        const zoomOutBtn = document.querySelector('.zoom-controls .zoom-btn:nth-child(2)');
+        
+        if (zoomInBtn) {
+            zoomInBtn.disabled = detectionZoom >= 5;
+        }
+        if (zoomOutBtn) {
+            zoomOutBtn.disabled = detectionZoom <= 0.25;
+        }
+    }
+    
+    // Enhanced mouse wheel zoom with zoom center
+    if (detectionViewer) {
+        detectionViewer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            const rect = detectionViewer.getBoundingClientRect();
+            const centerX = (e.clientX - rect.left) / rect.width;
+            const centerY = (e.clientY - rect.top) / rect.height;
+            
+            const oldZoom = detectionZoom;
+            
+            if (e.deltaY < 0) {
+                zoomDetectionIn();
+            } else {
+                zoomDetectionOut();
+            }
+            
+            // Adjust pan to zoom towards cursor position
+            if (detectionZoom !== oldZoom) {
+                const zoomRatio = detectionZoom / oldZoom;
+                currentX = currentX * zoomRatio + (centerX - 0.5) * rect.width * (zoomRatio - 1) / detectionZoom;
+                currentY = currentY * zoomRatio + (centerY - 0.5) * rect.height * (zoomRatio - 1) / detectionZoom;
+                applyDetectionTransform();
+            }
+        });
+        
+        // Enhanced mouse drag for panning
+        detectionViewer.addEventListener('mousedown', (e) => {
+            if (detectionZoom > 1) {
+                isDragging = true;
+                startX = e.clientX - currentX;
+                startY = e.clientY - currentY;
+                detectionViewer.classList.add('dragging');
+                e.preventDefault();
+            }
+        });
+    }
+    
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging && detectionZoom > 1) {
+            currentX = e.clientX - startX;
+            currentY = e.clientY - startY;
+            applyDetectionTransform();
+        }
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        if (detectionViewer) {
+            detectionViewer.classList.remove('dragging');
+        }
+    });
+    
+    // Enhanced touch support for mobile
+    let touchStartDistance = 0;
+    let touchStartZoom = 1;
+    let lastTouchCenter = { x: 0, y: 0 };
+    
+    if (detectionViewer) {
+        detectionViewer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                
+                touchStartDistance = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+                touchStartZoom = detectionZoom;
+                
+                lastTouchCenter = {
+                    x: (touch1.clientX + touch2.clientX) / 2,
+                    y: (touch1.clientY + touch2.clientY) / 2
+                };
+            } else if (e.touches.length === 1 && detectionZoom > 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - currentX;
+                startY = e.touches[0].clientY - currentY;
+                detectionViewer.classList.add('dragging');
+            }
+        });
+        
+        detectionViewer.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            if (e.touches.length === 2) {
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                
+                const currentDistance = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+                
+                const zoomFactor = currentDistance / touchStartDistance;
+                detectionZoom = Math.max(0.25, Math.min(5, touchStartZoom * zoomFactor));
+                
+                applyDetectionTransform();
+                updateZoomControls();
+            } else if (e.touches.length === 1 && isDragging && detectionZoom > 1) {
+                currentX = e.touches[0].clientX - startX;
+                currentY = e.touches[0].clientY - startY;
+                applyDetectionTransform();
+            }
+        });
+        
+        detectionViewer.addEventListener('touchend', () => {
+            isDragging = false;
+            if (detectionViewer) {
+                detectionViewer.classList.remove('dragging');
+            }
+        });
+    }
+    
+    // Enhanced keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            switch(e.key) {
+                case '+':
+                case '=':
+                    e.preventDefault();
+                    zoomDetectionIn();
+                    break;
+                case '-':
+                    e.preventDefault();
+                    zoomDetectionOut();
+                    break;
+                case '0':
+                    e.preventDefault();
+                    resetDetectionZoom();
+                    break;
+                case 'ArrowLeft':
+                    if (detectionZoom > 1) {
+                        e.preventDefault();
+                        currentX += 20;
+                        applyDetectionTransform();
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (detectionZoom > 1) {
+                        e.preventDefault();
+                        currentX -= 20;
+                        applyDetectionTransform();
+                    }
+                    break;
+                case 'ArrowUp':
+                    if (detectionZoom > 1) {
+                        e.preventDefault();
+                        currentY += 20;
+                        applyDetectionTransform();
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (detectionZoom > 1) {
+                        e.preventDefault();
+                        currentY -= 20;
+                        applyDetectionTransform();
+                    }
+                    break;
+            }
+        }
+    });
+    
+    // Enhanced integration with API service
+    window.updateDetectionVisualization = function(imageUrl, status = 'Loaded') {
+        const loading = document.getElementById('eval-loading');
+        const error = document.getElementById('eval-error');
+        const image = document.getElementById('eval-image');
+        const placeholder = document.getElementById('eval-placeholder');
+        const statusEl = document.getElementById('detection-status');
+        
+        // Hide loading and error states
+        loading.classList.add('d-none');
+        error.classList.add('d-none');
+        
+        if (imageUrl) {
+            // Show image, hide placeholder
+            image.src = imageUrl;
+            image.style.display = 'block';
+            placeholder.style.display = 'none';
+            
+            // Reset zoom when new image loads
+            resetDetectionZoom();
+            
+            // Update status
+            if (statusEl) statusEl.textContent = status;
+        } else {
+            // Show placeholder, hide image
+            image.style.display = 'none';
+            placeholder.style.display = 'flex';
+            
+            if (statusEl) statusEl.textContent = 'No data available';
+        }
+    };
+    
+    // Download functionality
+    window.downloadDetectionImage = function() {
+        const image = document.getElementById('eval-image');
+        if (image && image.src) {
+            const link = document.createElement('a');
+            link.href = image.src;
+            link.download = `detection_visualization_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+    
+    // Enhanced image load handling
+    if (detectionImage) {
+        detectionImage.addEventListener('load', () => {
+            // Store natural dimensions
+            imageNaturalWidth = detectionImage.naturalWidth;
+            imageNaturalHeight = detectionImage.naturalHeight;
+            
+            // Update image info
+            if (imageDimensionsEl) {
+                imageDimensionsEl.textContent = `${imageNaturalWidth} × ${imageNaturalHeight}`;
+            }
+            
+            // Reset zoom when new image successfully loads
+            resetDetectionZoom();
+            
+            // Hide error if it was showing
+            const error = document.getElementById('eval-error');
+            if (error) {
+                error.classList.add('d-none');
+            }
+        });
+        
+        detectionImage.addEventListener('error', () => {
+            // Fixed: Use correct error element ID
+            const error = document.getElementById('eval-error');
+            if (error) {
+                error.textContent = 'Failed to load detection visualization';
+                error.classList.remove('d-none');
+            }
+            
+            // Show placeholder when image fails to load
+            const placeholder = document.getElementById('eval-placeholder');
+            if (placeholder) {
+                placeholder.style.display = 'flex';
+            }
+            
+            detectionImage.style.display = 'none';
+            
+            // Clear image info
+            if (imageDimensionsEl) {
+                imageDimensionsEl.textContent = '';
+            }
+        });
+    }
+    
+    // Initialize
+    updateZoomControls();
+})();
+</script>

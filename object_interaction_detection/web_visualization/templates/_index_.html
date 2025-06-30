@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Loader Visualization</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Data Loader Visualization</h1>
+        <div class="control-panel">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="session-select">Session:</label>
+                        <select id="session-select" class="form-control auto-update">
+                            {% for session in available_sessions %}
+                            <option value="{{ session }}" {% if session == default_session %}selected{% endif %}>{{ session }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="camera-select">Camera View:</label>
+                        <select id="camera-select" class="form-control auto-update">
+                            <option value="cam_top" {% if default_camera == 'cam_top' %}selected{% endif %}>Top Camera</option>
+                            <option value="cam_side_l" {% if default_camera == 'cam_side_l' %}selected{% endif %}>Left Side Camera</option>
+                            <option value="cam_side_r" {% if default_camera == 'cam_side_r' %}selected{% endif %}>Right Side Camera</option>
+                        </select>
+                    </div>
+                    <small id="valid-frames-count" class="text-info mt-1">
+                        Frames: {{ valid_frames|length }} frames / 
+                    </small>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="frame-select">Frame Index:</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" id="frame-select" class="form-range flex-grow-1 auto-update" 
+                                min="{{ valid_frames|default([0])|min }}" 
+                                max="{{ valid_frames|default([0])|max }}" 
+                                value="{{ default_frame|default(0) }}" 
+                                step="1">
+                            <span id="frame-value" class="ms-2">{{ default_frame }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <button id="update-btn" class="btn btn-primary mt-4">Update Visualizations</button>
+                </div>
+            </div>
+            <!-- Auto-update toggle (optional enhancement) -->
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="auto-update-toggle">
+                <label class="form-check-label" for="auto-update-toggle">
+                    Auto-update when changing parameters
+                </label>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Flow Visualization -->
+            <div class="col-lg-6">
+                <div class="visualization-container">
+                    <h3>Optical Flow Data</h3>
+                    <div id="flow-loading" class="loading d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="flow-error" class="error-message d-none"></div>
+                    <img id="flow-image" class="visualization-image" src="" alt="Flow Visualization">
+                    <div id="flow-data" class="data-info">
+                        <p>Click 'Update Visualizations' to load data.</p>
+                    </div>
+                </div>
+            </div>
+            
+    <!-- CNOS Visualization-->
+       
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <div class="visualization-container">
+                    <h3>CNOS Visualization</h3>
+                    <div id="cnos-loading" class="loading d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="cnos-error" class="error-message d-none"></div>
+                    <img id="cnos-image" class="visualization-image" src="" alt="CNOS Visualization">
+                    <div id="cnos-data" class="data-info">
+                        <p>Click 'Update Visualizations' to load data.</p>
+                    </div>
+                </div>
+            </div>
+       
+         <!-- Evaluation Data -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Evaluation Data</h3>
+                        <button id="fetch-evaluation-btn" class="btn btn-sm btn-primary">Fetch Evaluation Data</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="evaluation-loading" class="loading d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="evaluation-error" class="error-message d-none"></div>
+                        
+                        <!-- Simplified layout for side-by-side -->
+                        <div id="general-metrics" class="mb-3">
+                            <h6>General Metrics</h6>
+                            <div>Select session and camera, then click "Fetch Evaluation Data"</div>
+                        </div>
+                        
+                        <div id="detection-timeline" class="mb-3">
+                            <h6>Object Detection Timeline</h6>
+                            <div>No data available</div>
+                        </div>
+                        
+                        <div id="object-hits" class="table-responsive">
+                            <h6>Object Hit Details</h6>
+                            <div>No data available</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Application JS -->
+    <script src="{{ url_for('static', filename='js/api-service.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/visualization-ui.js') }}"></script>
+</body>
+</html>

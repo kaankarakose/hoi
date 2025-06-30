@@ -141,6 +141,10 @@ def main():
                 print(f"    - {camera}")
         
     
+    output_root = os.path.join(args.output_root, str(args.time_window).replace('.', '_'))
+    os.makedirs(output_root, exist_ok=True)
+
+
     # Create configuration
     config = EvaluationConfig(
         activeness_threshold=args.activeness_threshold,
@@ -149,7 +153,7 @@ def main():
         fps=args.fps,
         annotation_root=args.annotation_root,
         detection_root=args.detection_root,
-        output_root=args.output_root
+        output_root=output_root
     )
     
     # Create evaluator
@@ -165,7 +169,7 @@ def main():
         
         if not sessions_to_evaluate:
             logger.error("No sessions found in both annotation and detection directories.")
-            return
+            raise ValueError("No common sessions found in annotation and detection directories.")
     elif args.session:
         # Use specified session
         sessions_to_evaluate = [args.session]
@@ -185,7 +189,7 @@ def main():
         
         if not camera_views:
             logger.error("No camera views found. Please specify with --camera.")
-            return
+            raise ValueError(f"No camera views found. Please specify with {args.camera}.")
     
     # Evaluate each camera view
     for camera_view in camera_views:

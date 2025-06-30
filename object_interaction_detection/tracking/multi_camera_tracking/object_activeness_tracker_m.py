@@ -609,11 +609,11 @@ def parse_args():
                        help="Root directory for data")
     parser.add_argument("--camera", type=str, default="cam_top",
                        help="Camera view to process (default: cam_top)")
-    parser.add_argument("--output-dir", type=str, default="/nas/project_data/B1_Behavior/rush/kaan/hoi/outputs/tracking_multi",
+    parser.add_argument("--output-dir", type=str,
                        help="Output directory for visualizations and data")
     parser.add_argument("--num-frames", type=int, default=100,
                        help="Number of frames to process (default: 100)")
-    parser.add_argument("--score-threshold", type=float, default=0.47)
+    parser.add_argument("--score-threshold", type=float, default=0.52)
                        
     parser.add_argument("--threshold", type=float, default=0.25,
                        help="Activeness threshold (default: 0.25)")

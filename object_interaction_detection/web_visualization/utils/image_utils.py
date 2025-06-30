@@ -8,6 +8,20 @@ from io import BytesIO
 from PIL import Image
 import cv2
 
+##
+OBJECT_COLORS = {
+    'AMF1': [161, 113, 146],      # Color for AMF1
+    'AMF2': [131, 136, 51],       # Color for AMF2
+    'AMF3': [130, 171, 146],      # Color for AMF3
+    'BOX': [112, 62, 54],         # Color for BOX
+    'CUP': [146, 79, 156],        # Color for CUP
+    'DINOSAUR': [99, 93, 79],     # Color for DINOSAUR
+    'FIRETRUCK': [94, 121, 171],  # Color for FIRETRUCK
+    'HAIRBRUSH': [59, 175, 143],  # Color for HAIRBRUSH
+    'PINCER': [210, 196, 209],    # Color for PINCER 
+    'WRENCH': [67, 126, 87],      # Color for WRENCH
+}
+
 def image_to_base64(image_array):
     """
     Convert a numpy array image to base64 encoded string for web display
